@@ -114,7 +114,7 @@ plt.show()
 ##### To load and compute the same statistics for a large number of models:
 
 loadfiles_directory = '/Users/hematthi/Documents/GradSchool/Research/ACI/Simulated_Data/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/GP_best_models/'
-runs = 10 #100
+runs = 100
 
 sss_per_sys_all = []
 sss_all = []
@@ -135,12 +135,3 @@ for i in range(1,runs+1):
     plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'], x_min=-8., x_max=4., y_min=1e-2, y_max=1e8, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Simulated observed systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_obs_mmen_%s_sigma0_vs_beta_per_system_%s.pdf' % (prescription_str, run_number), save_fig=savefigures)
 
 plt.show()
-
-
-
-
-
-# To plot the distribution of fitted power-law parameters (sigma0 vs. beta) for the simulated observed systems:
-#x, y = sigma0_beta_obs_RC2014_all[:,1], sigma0_beta_obs_RC2014_all[:,0] # beta's, sigma0's
-#plot_2d_points_and_contours_with_histograms(x, y, x_min=-8., x_max=4., y_min=1e-2, y_max=1e8, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Simulated observed systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_obs_mmen_RC2014_sigma0_vs_beta_per_system.pdf', save_fig=savefigures)
-
