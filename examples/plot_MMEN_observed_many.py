@@ -82,7 +82,6 @@ dists, dists_w = compute_distances_sim_Kepler(sss_per_sys, sss, ssk_per_sys, ssk
 
 
 # Plotting parameters:
-
 n_bins = 50
 lw = 1 # linewidth
 
@@ -91,10 +90,9 @@ tfs = 20 # text labels font size
 lfs = 16 # legend labels font size
 
 # Parameters for defining the MMEN:
-
 prescription_str = 'RC2014' # make sure this actually matches the prescription used!
 solid_surface_density_prescription = solid_surface_density_system_RC2014
-a0 = 1. # normalization separation for fitting power-laws
+a0 = 0.3 # normalization separation for fitting power-laws
 
 
 
@@ -133,5 +131,19 @@ for i in range(1,runs+1):
     
     # To plot the distribution of fitted power-law parameters (sigma0 vs. beta) for the simulated observed systems:
     plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'], x_min=-8., x_max=4., y_min=1e-2, y_max=1e8, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Simulated observed systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_obs_mmen_%s_sigma0_vs_beta_per_system_%s.pdf' % (prescription_str, run_number), save_fig=savefigures)
+    #plt.show()
+    plt.close()
 
+plt.show()
+
+# To plot the median sigma0 vs. beta for each simulated catalog:
+sigma0_med_all = [np.median(fit_per_sys_dict['sigma0']) for fit_per_sys_dict in fit_per_sys_dict_all]
+beta_med_all = [np.median(fit_per_sys_dict['beta']) for fit_per_sys_dict in fit_per_sys_dict_all]
+
+ax_main = plot_2d_points_and_contours_with_histograms(beta_med_all, sigma0_med_all, x_min=-2.25, x_max=-1.5, y_min=250., y_max=750., log_y=True, n_bins=20, points_only=True, xlabel_text=r'Median $\beta$', ylabel_text=r'Median $\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta_{\rm med}$', y_symbol=r'$\Sigma_{0,\rm med}$')
+ax_main.scatter(np.median(fit_per_sys_dict_Kep['beta']), np.log10(np.median(fit_per_sys_dict_Kep['sigma0'])), marker='x', color='r', label='Kepler')
+ax_main.legend(loc='upper left', bbox_to_anchor=(0.,1.), ncol=1, frameon=False, fontsize=lfs)
+if savefigures:
+    plt.savefig(savefigures_directory + model_name + '_obs_mmen_%s_median_sigma0_vs_beta_per_system.pdf' % prescription_str)
+    plt.close()
 plt.show()
