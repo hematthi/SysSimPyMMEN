@@ -99,7 +99,9 @@ a0 = 0.3 # normalization separation for fitting power-laws
 
 
 
-# Compute the MMSN:
+##### To plot the solid surface density vs. semi-major axis for each planet in the physical catalog:
+
+# Compute the MMSN for comparison:
 a_array = np.linspace(1e-3,2,1001)
 sigma_MMSN = MMSN(a_array)
 MeVeEa_masses = np.array([0.0553, 0.815, 1.]) # masses of Mercury, Venus, and Earth, in Earth masses
@@ -141,7 +143,7 @@ a_bins = np.logspace(np.log10(np.min(a_all)), np.log10(np.max(a_all)), n_bins+1)
 a_bins_mid = (a_bins[1:]+a_bins[:-1])/2.
 sigma_med_per_bin = [np.median(sigma_all[(a_all >= a_bins[i]) & (a_all < a_bins[i+1])]) for i in range(len(a_bins)-1)]
 
-a_ticks = [0.05, 0.1, 0.2, 0.4, 1.]
+a_ticks = [0.05, 0.1, 0.2, 0.4, 0.8]
 
 fig = plt.figure(figsize=(16,8))
 plot = GridSpec(1,1,left=0.1,bottom=0.1,right=0.95,top=0.95,wspace=0,hspace=0)
@@ -157,8 +159,8 @@ ax.tick_params(axis='both', labelsize=afs)
 plt.gca().set_xscale("log")
 plt.xticks(a_ticks)
 ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
-plt.xlim([0.04,1.1])
-plt.ylim([-0.5,5.5])
+plt.xlim([0.04,0.9])
+plt.ylim([0.,5.5])
 plt.xlabel(r'Semimajor axis $a$ (AU)', fontsize=20)
 plt.ylabel(r'Surface density $\log_{10}(\sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
 plt.legend(loc='upper right', bbox_to_anchor=(1.,1.), ncol=1, frameon=False, fontsize=lfs)
@@ -166,4 +168,60 @@ if savefigures:
     plt.savefig(savefigures_directory + model_name + '_mmen_%s.pdf' % prescription_str)
     plt.close()
 
+plt.show()
+
+
+
+
+
+##### To test different prescriptions for the feeding zone width (delta_a):
+
+sigma_all_CL2013, a_all = solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys)
+sigma_all_S2014, _ = solid_surface_density_S2014_given_physical_catalog(sssp_per_sys, sssp)
+sigma_all_nHill10, _ = solid_surface_density_nHill_given_physical_catalog(sssp_per_sys, sssp, n=10.)
+sigma_all_RC2014, a_all_2p, mult_all_2p = solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys)
+
+sigma0_CL2013, beta_CL2013 = fit_power_law_MMEN(a_all, sigma_all_CL2013, a0=a0)
+sigma0_S2014, beta_S2014 = fit_power_law_MMEN(a_all, sigma_all_S2014, a0=a0)
+sigma0_nHill10, beta_nHill10 = fit_power_law_MMEN(a_all, sigma_all_nHill10, a0=a0)
+sigma0_RC2014, beta_RC2014 = fit_power_law_MMEN(a_all_2p, sigma_all_RC2014, a0=a0)
+
+a_bins = np.logspace(np.log10(np.min(a_all)), np.log10(np.max(a_all)), n_bins+1)
+a_bins_mid = (a_bins[1:]+a_bins[:-1])/2.
+sigma_med_per_bin_CL2013 = [np.median(sigma_all_CL2013[(a_all >= a_bins[i]) & (a_all < a_bins[i+1])]) for i in range(len(a_bins)-1)]
+sigma_med_per_bin_S2014 = [np.median(sigma_all_S2014[(a_all >= a_bins[i]) & (a_all < a_bins[i+1])]) for i in range(len(a_bins)-1)]
+sigma_med_per_bin_nHill10 = [np.median(sigma_all_nHill10[(a_all >= a_bins[i]) & (a_all < a_bins[i+1])]) for i in range(len(a_bins)-1)]
+sigma_med_per_bin_RC2014 = [np.median(sigma_all_RC2014[(a_all_2p >= a_bins[i]) & (a_all_2p < a_bins[i+1])]) for i in range(len(a_bins)-1)] # contains planets in multis (2+) only
+
+fig = plt.figure(figsize=(16,8))
+plot = GridSpec(1,1,left=0.1,bottom=0.1,right=0.95,top=0.95,wspace=0,hspace=0)
+ax = plt.subplot(plot[0,0])
+i_sample_plot = np.random.choice(np.arange(len(a_all)), 1000, replace=False)
+plt.scatter(a_all[i_sample_plot], np.log10(sigma_all_CL2013[i_sample_plot]), marker='o', s=10, alpha=0.2, color='k')
+plt.scatter(a_all[i_sample_plot], np.log10(sigma_all_S2014[i_sample_plot]), marker='o', s=10, alpha=0.2, color='r')
+plt.scatter(a_all[i_sample_plot], np.log10(sigma_all_nHill10[i_sample_plot]), marker='o', s=10, alpha=0.2, color='b')
+i_sample_plot = np.random.choice(np.arange(len(a_all_2p)), 1000, replace=False)
+plt.scatter(a_all_2p[i_sample_plot], np.log10(sigma_all_RC2014[i_sample_plot]), marker='o', s=10, alpha=0.2, color='m')
+#plt.plot(a_bins_mid, np.log10(sigma_med_per_bin_CL2013), drawstyle='steps-mid', lw=3, color='k') #label=r'$\Delta{a} = a$'
+#plt.plot(a_bins_mid, np.log10(sigma_med_per_bin_S2014), drawstyle='steps-mid', lw=3, color='r') #label=r'$\Delta{a} = 2^{3/2}a(\frac{a M_p}{R_p M_\star})^{1/2}$'
+#plt.plot(a_bins_mid, np.log10(sigma_med_per_bin_nHill10), drawstyle='steps-mid', lw=3, color='b') #label=r'$\Delta{a} = 10 R_{\rm Hill}$'
+#plt.plot(a_bins_mid, np.log10(sigma_med_per_bin_RC2014), drawstyle='steps-mid', lw=3, color='m') #label=r'$\Delta{a} = \sqrt{a_{i+1} a_i} - \sqrt{a_i a_{i-1}}$ (multis only)'
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_CL2013, beta_CL2013, a0=a0)), lw=3, ls='--', color='k', label=r'$\Delta{a} = a$' + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_CL2013, beta_CL2013))
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_S2014, beta_S2014, a0=a0)), lw=3, ls='--', color='r', label=r'$\Delta{a} = 2^{3/2}a(\frac{a M_p}{R_p M_\star})^{1/2}$' + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_S2014, beta_S2014))
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_nHill10, beta_nHill10, a0=a0)), lw=3, ls='--', color='b', label=r'$\Delta{a} = 10 R_{\rm Hill}$' + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_nHill10, beta_nHill10))
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_RC2014, beta_RC2014, a0=a0)), lw=3, ls='--', color='m', label=r'$\Delta{a} = \sqrt{a_{i+1} a_i} - \sqrt{a_i a_{i-1}}$, multis only' + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_RC2014, beta_RC2014))
+plt.plot(a_array, np.log10(sigma_MMSN), lw=2, color='g', label=r'MMSN ($\sigma_{\rm solid} = 10.89(a/{\rm AU})^{-3/2}$ g/cm$^2$)')
+plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g', label='Solar system planets (Mercury, Venus, Earth)')
+ax.tick_params(axis='both', labelsize=afs)
+plt.gca().set_xscale("log")
+plt.xticks(a_ticks)
+ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
+plt.xlim([0.04,0.9])
+plt.ylim([0.,5.5])
+plt.xlabel(r'Semimajor axis $a$ (AU)', fontsize=20)
+plt.ylabel(r'Surface density $\log_{10}(\sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
+plt.legend(loc='upper right', bbox_to_anchor=(1.,1.), ncol=1, frameon=False, fontsize=lfs)
+if savefigures:
+    plt.savefig(savefigures_directory + model_name + '_mmen_deltaa_compare.pdf')
+    plt.close()
 plt.show()

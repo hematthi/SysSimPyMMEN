@@ -112,6 +112,47 @@ def solid_surface_density_system_RC2014(M_sys, a_sys):
     delta_a_sys = np.diff(a_bounds_sys)
     return solid_surface_density(M_sys, a_sys, delta_a_sys)
 
+def solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys):
+    # Compute the solid surface density (g/cm^2) using the Chiang & Laughlin (2013) prescription, for each planet in a given physical catalog
+    # Returns an array of solid surface densities and semi-major axes
+    a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
+    sigma_all = solid_surface_density_CL2013(sssp_per_sys['mass_all'], sssp_per_sys['a_all'])[sssp_per_sys['a_all'] > 0]
+    return sigma_all, a_all
+
+def solid_surface_density_S2014_given_physical_catalog(sssp_per_sys, sssp):
+    # Compute the solid surface density (g/cm^2) using the Schlichting (2014) prescription, for each planet in a given physical catalog
+    # Returns an array of solid surface densities and semi-major axes
+    a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
+    sigma_all = solid_surface_density_S2014(sssp_per_sys['mass_all'], sssp_per_sys['radii_all'], sssp_per_sys['a_all'], Mstar=sssp['Mstar_all'][:,None])[sssp_per_sys['a_all'] > 0]
+    return sigma_all, a_all
+
+def solid_surface_density_nHill_given_physical_catalog(sssp_per_sys, sssp, n=10.):
+    # Compute the solid surface density (g/cm^2) using a number of Hill radii for the feeding zone width, for each planet in a given physical catalog
+    # 'n' is the number of Hill radii for  the feeding zone width of each planet
+    # Returns an array of solid surface densities and semi-major axes
+    a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
+    sigma_all = solid_surface_density_nHill(sssp_per_sys['mass_all'], sssp_per_sys['a_all'], Mstar=sssp['Mstar_all'][:,None], n=n)[sssp_per_sys['a_all'] > 0]
+    return sigma_all, a_all
+
+def solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys):
+    # Compute the solid surface density (g/cm^2) using the Raymond & Cossou (2014) prescription, for each planet in each multi-planet system in a given physical catalog
+    # Returns an array of solid surface densities and semi-major axes
+    mult_all = sssp_per_sys['Mtot_all']
+    a_all_2p = []
+    mult_all_2p = []
+    sigma_all_2p = []
+    for i in np.arange(len(mult_all))[mult_all > 1]: # only consider multi-planet systems
+        a_sys = sssp_per_sys['a_all'][i]
+        M_sys = sssp_per_sys['mass_all'][i][a_sys > 0]
+        a_sys = a_sys[a_sys > 0]
+        a_all_2p += list(a_sys)
+        mult_all_2p += [len(a_sys)]*len(a_sys)
+        sigma_all_2p += list(solid_surface_density_system_RC2014(M_sys, a_sys))
+    a_all_2p = np.array(a_all_2p)
+    mult_all_2p = np.array(mult_all_2p)
+    sigma_all_2p = np.array(sigma_all_2p)
+    return sigma_all_2p, a_all_2p, mult_all_2p
+
 def MMSN(a, F=1., Zrel=0.33):
     # Compute the minimum mass solar nebular (MMSN) surface density (g/cm^2) at a semi-major axis 'a' (AU), from equation 2 in Chiang & Youdin (2010) (https://arxiv.org/pdf/0909.2652.pdf)
     # Default values of F=1 and Zrel=0.33 give 1M_earth of solids in an annulus centered on Earth's orbit
