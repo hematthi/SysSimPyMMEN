@@ -182,6 +182,7 @@ def fit_power_law_MMEN(a_array, sigma_array, a0=1., p0=1., p1=-1.5):
 
 def fit_power_law_MMEN_per_system_observed(sss_per_sys, solid_surface_density_prescription=solid_surface_density_system_RC2014, a0=1., p0=1., p1=-1.5):
     # Compute solid surface densities and fit power-law parameters to each multi-planet system in an observed catalog
+    # WARNING: This function currently only works for 'solid_surface_density_prescription=solid_surface_density_system_RC2014'
     fit_per_sys_dict = {'m_obs':[], 'Mstar_obs':[], 'sigma0':[], 'beta':[]} # 'm_obs' is number of observed planets
     a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
     for i,a_sys in enumerate(a_obs_per_sys):
@@ -198,6 +199,25 @@ def fit_power_law_MMEN_per_system_observed(sss_per_sys, solid_surface_density_pr
     
     fit_per_sys_dict['m_obs'] = np.array(fit_per_sys_dict['m_obs'])
     fit_per_sys_dict['Mstar_obs'] = np.array(fit_per_sys_dict['Mstar_obs'])
+    fit_per_sys_dict['sigma0'] = np.array(fit_per_sys_dict['sigma0'])
+    fit_per_sys_dict['beta'] = np.array(fit_per_sys_dict['beta'])
+    return fit_per_sys_dict
+
+def fit_power_law_MMEN_per_system_physical(sssp_per_sys, solid_surface_density_prescription=solid_surface_density_system_RC2014, a0=1., p0=1., p1=-1.5):
+    # Compute solid surface densities and fit power-law parameters to each multi-planet system in a physical catalog
+    # WARNING: This function currently only works for 'solid_surface_density_prescription=solid_surface_density_system_RC2014'
+    fit_per_sys_dict = {'n_pl':[], 'sigma0':[], 'beta':[]} # 'n_pl' is number of planets in each system
+    for i,a_sys in enumerate(sssp_per_sys['a_all']):
+        if np.sum(a_sys > 0) > 1:
+            M_sys = sssp_per_sys['mass_all'][i][a_sys > 0]
+            a_sys = a_sys[a_sys > 0]
+            sigma_sys = solid_surface_density_prescription(M_sys, a_sys)
+            sigma0, beta = fit_power_law_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
+            fit_per_sys_dict['n_pl'].append(len(a_sys))
+            fit_per_sys_dict['sigma0'].append(sigma0)
+            fit_per_sys_dict['beta'].append(beta)
+    
+    fit_per_sys_dict['n_pl'] = np.array(fit_per_sys_dict['n_pl'])
     fit_per_sys_dict['sigma0'] = np.array(fit_per_sys_dict['sigma0'])
     fit_per_sys_dict['beta'] = np.array(fit_per_sys_dict['beta'])
     return fit_per_sys_dict
