@@ -1,12 +1,13 @@
 # To import required modules:
 import numpy as np
+import os
 from scipy.interpolate import RectBivariateSpline
 from scipy.interpolate import interp1d
 from scipy.stats import truncnorm
 from scipy.optimize import curve_fit # for fitting functions
 
 import sys
-sys.path.append('/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/SysSimExClusters_plotting') # TODO: update when those files get made into a package
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))),'SysSim_Plotting/src')) # TODO: update when those files get made into a package
 
 import functions_general as gen
 
@@ -26,7 +27,9 @@ def density_given_mass_radius(M, R):
 
 
 
-logMR_Ning2018_table = np.genfromtxt('/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/SysSimExClusters/src/mr_model/MRpredict_table_weights3025_R1001_Q1001.txt', delimiter=',', skip_header=2, names=True) # first column is array of log_R values
+#data_path = '/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/SysSimExClusters/src/mr_model/MRpredict_table_weights3025_R1001_Q1001.txt'
+data_path = 'C:/Users/HeYMa/Documents/GradSchool/Research/SysSimExClusters/src/mr_model/MRpredict_table_weights3025_R1001_Q1001.txt'
+logMR_Ning2018_table = np.genfromtxt(data_path, delimiter=',', skip_header=2, names=True) # first column is array of log_R values
 
 table_array = logMR_Ning2018_table.view(np.float64).reshape(logMR_Ning2018_table.shape + (-1,))[:,1:]
 log_R_table = logMR_Ning2018_table['log_R']
@@ -41,8 +44,10 @@ def generate_planet_mass_from_radius_Ning2018_table(R):
     q = np.random.random() # drawn quantile
     logM = logMR_table_interp(logR, q)[0][0]
     return 10.**logM # planet mass in Earth masses
-    
-MR_earthlike_rocky = np.genfromtxt('/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/SysSimExClusters/src/mr_model/MR_earthlike_rocky.txt', delimiter='\t', skip_header=2, names=('mass','radius'))
+
+#data_path = '/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/SysSimExClusters/src/mr_model/MR_earthlike_rocky.txt'
+data_path = 'C:/Users/HeYMa/Documents/GradSchool/Research/SysSimExClusters/src/mr_model/MR_earthlike_rocky.txt'
+MR_earthlike_rocky = np.genfromtxt(data_path, delimiter='\t', skip_header=2, names=('mass','radius'))
 
 M_earthlike_rocky_interp = interp1d(MR_earthlike_rocky['radius'], MR_earthlike_rocky['mass'])
 
