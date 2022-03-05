@@ -53,3 +53,49 @@ def test_generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_ea
     M_array2 = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(R_logunif)
     assert np.all(0. <= M_array2)
     assert gen.Pearson_correlation_coefficient(R_logunif, M_array2) > 0.
+
+def test_solid_surface_density(seed=42):
+    np.random.seed(seed)
+    M, a, delta_a = np.array([100., 2., 2.])*np.random.rand(3)
+    assert np.isclose(solid_surface_density(1., 1., 1.), 4.246946, atol=1e-5)
+    assert np.isclose(solid_surface_density(10., 0.3, 0.3), 471.882894, atol=1e-5)
+    assert solid_surface_density(2., a, delta_a) < solid_surface_density(5., a, delta_a)
+    assert solid_surface_density(M, 0.8, delta_a) < solid_surface_density(M, 0.5, delta_a)
+    assert solid_surface_density(M, a, 0.2) < solid_surface_density(M, a, 0.1)
+
+def test_solid_surface_density_CL2013():
+    assert np.isclose(solid_surface_density_CL2013(1., 1.,), 4.246946, atol=1e-5)
+    assert np.isclose(solid_surface_density_CL2013(10., 0.3), 471.882894, atol=1e-5)
+
+def test_solid_surface_density_S2014():
+    assert np.isclose(solid_surface_density_S2014(1., 1., 1.), 5.654930, atol=1e-5)
+
+def test_solid_surface_density_nHill():
+    assert np.isclose(solid_surface_density_nHill(1., 1.), 42.457605, atol=1e-5)
+    assert 0 < solid_surface_density_nHill(1., 1., n=10.) < solid_surface_density_nHill(1., 1., n=8.)
+
+def test_solid_surface_density_system_RC2014(seed=42):
+    np.random.seed(seed)
+    M_sys = 10.*np.random.rand(3)
+    a_sys = np.sort(10.**(-1. + 2.*np.random.rand(3))) # log-uniform between 0.1 and 10 AU
+    sigma_sys_in_out = solid_surface_density_system_RC2014(M_sys, a_sys)[::2] # solid surface densities based on inner and outer planets
+    sigma_sys_removed_mid = solid_surface_density_system_RC2014(M_sys[::2], a_sys[::2]) # same as above, but remove the middle planet
+    assert 0 < sigma_sys_removed_mid[0] < sigma_sys_in_out[0]
+    assert 0 < sigma_sys_removed_mid[1] < sigma_sys_in_out[1]
+
+##### Load catalogs before testing these functions:
+#def test_solid_surface_density_CL2013_given_physical_catalog():
+
+def test_MMSN():
+    assert np.isclose(MMSN(1.), 10.89)
+    assert np.isclose(MMSN(0.5, F=2.), 2.*MMSN(0.5, F=1.))
+    assert np.isclose(MMSN(0.3, Zrel=0.4), 4.*MMSN(0.3, Zrel=0.1))
+
+def test_MMEN_power_law(seed=42):
+    np.random.seed(seed)
+    a0 = 2.*np.random.rand()
+    sigma0 = 100.*np.random.rand()
+    beta = -5. + 4.*np.random.rand()
+    assert np.isclose(MMEN_power_law(a0, sigma0, beta, a0=a0), sigma0)
+    assert MMEN_power_law(1., sigma0, beta) < MMEN_power_law(0.5, sigma0, beta)
+    assert np.isclose(MMEN_power_law(1., 2.*sigma0, beta), 2.*MMEN_power_law(1., sigma0, beta))
