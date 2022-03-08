@@ -3,11 +3,15 @@ import numpy as np
 import os
 import sys
 
-#sys.path.append('/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/SysSimExClusters_plotting') # TODO: update when those files get made into a package
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))),'SysSim_Plotting')) # TODO: update when those files get made into a package
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+from src.functions_general import *
+from src.functions_compare_kepler import *
+from src.functions_load_sims import *
 
-from src.MMEN_functions import *
+sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),'src'))
+
+from MMEN_functions import *
 
 
 
@@ -83,8 +87,16 @@ def test_solid_surface_density_system_RC2014(seed=42):
     assert 0 < sigma_sys_removed_mid[0] < sigma_sys_in_out[0]
     assert 0 < sigma_sys_removed_mid[1] < sigma_sys_in_out[1]
 
-##### Load catalogs before testing these functions:
-#def test_solid_surface_density_CL2013_given_physical_catalog():
+#loadfiles_directory = '/Users/hematthi/Documents/GradSchool/Research/ACI/Simulated_Data/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/GP_med/'
+loadfiles_directory = 'C:/Users/HeYMa/Documents/GradSchool/Research/ACI/Simulated_Data/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/GP_med/'
+run_number = ''
+sssp_per_sys, sssp = compute_summary_stats_from_cat_phys(file_name_path=loadfiles_directory, run_number=run_number, load_full_tables=True, match_observed=True)
+
+def test_solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys=sssp_per_sys):
+    sigma_all, a_all = solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys)
+    assert len(sigma_all) == len(a_all)
+    assert 0 < np.min(sigma_all)
+    assert 0 < np.min(a_all)
 
 def test_MMSN():
     assert np.isclose(MMSN(1.), 10.89)
