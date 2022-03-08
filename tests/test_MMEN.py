@@ -98,7 +98,6 @@ def test_solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys=sssp_p
     assert 0 < np.min(sigma_all)
     assert 0 < np.min(a_all)
 
-
 def test_MMSN():
     assert np.isclose(MMSN(1.), 10.89)
     assert np.isclose(MMSN(0.5, F=2.), 2.*MMSN(0.5, F=1.))
