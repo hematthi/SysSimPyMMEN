@@ -90,6 +90,7 @@ def test_solid_surface_density_system_RC2014(seed=42):
 #loadfiles_directory = '/Users/hematthi/Documents/GradSchool/Research/ACI/Simulated_Data/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/GP_med/'
 loadfiles_directory = 'C:/Users/HeYMa/Documents/GradSchool/Research/ACI/Simulated_Data/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/GP_med/'
 run_number = ''
+sss_per_sys, sss = compute_summary_stats_from_cat_obs(file_name_path=loadfiles_directory, run_number=run_number, compute_ratios=compute_ratios_adjacent)
 sssp_per_sys, sssp = compute_summary_stats_from_cat_phys(file_name_path=loadfiles_directory, run_number=run_number, load_full_tables=True, match_observed=True)
 
 def test_solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys=sssp_per_sys):
@@ -97,6 +98,24 @@ def test_solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys=sssp_p
     assert len(sigma_all) == len(a_all)
     assert 0 < np.min(sigma_all)
     assert 0 < np.min(a_all)
+
+def test_solid_surface_density_S2014_given_physical_catalog(sssp_per_sys=sssp_per_sys, sssp=sssp):
+    sigma_all, a_all = solid_surface_density_S2014_given_physical_catalog(sssp_per_sys, sssp)
+    assert len(sigma_all) == len(a_all)
+    assert 0 < np.min(sigma_all)
+    assert 0 < np.min(a_all)
+
+def test_solid_surface_density_nHill_given_physical_catalog(sssp_per_sys=sssp_per_sys, sssp=sssp):
+    sigma_all, a_all = solid_surface_density_nHill_given_physical_catalog(sssp_per_sys, sssp)
+    assert 0 < np.min(sigma_all)
+    assert 0 < np.min(a_all)
+
+def test_solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys=sssp_per_sys):
+    sigma_all_2p, a_all_2p, mult_all_2p = solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys)
+    assert len(sigma_all_2p) == len(a_all_2p) == len(mult_all_2p)
+    assert 0 < np.min(sigma_all_2p)
+    assert 0 < np.min(a_all_2p)
+    assert 0 < np.min(mult_all_2p)
 
 def test_MMSN():
     assert np.isclose(MMSN(1.), 10.89)
@@ -111,3 +130,44 @@ def test_MMEN_power_law(seed=42):
     assert np.isclose(MMEN_power_law(a0, sigma0, beta, a0=a0), sigma0)
     assert MMEN_power_law(1., sigma0, beta) < MMEN_power_law(0.5, sigma0, beta)
     assert np.isclose(MMEN_power_law(1., 2.*sigma0, beta), 2.*MMEN_power_law(1., sigma0, beta))
+
+def test_fit_power_law_MMEN(seed=42):
+    np.random.seed(seed)
+    sigma0 = 10.**(3.*np.random.rand()) # log-uniform draw between 1 and 1e3
+    beta = -3. + 5.*np.random.rand() # uniform draw between -3 and 2
+    a0 = 10.**(-1. + 2.*np.random.rand()) # log-uniform draw between 0.1 and 10
+    a_array = np.logspace(-1., 1, 1000)
+    sigma_array = sigma0*(a_array/a0)**beta
+    #sigma_array = sigma_array * np.random.lognormal(1., 0.1, len(a_array)) # add normally distributed noise to the log(sigma) values (will lead to inaccurate fits for 'sigma0' if 'a0' is extreme)
+    sigma0_fit, beta_fit = fit_power_law_MMEN(a_array, sigma_array, a0=a0)
+    assert np.isclose(np.log10(sigma0), np.log10(sigma0_fit), atol=1e-5)
+    assert np.isclose(beta, beta_fit, atol=1e-5)
+
+def test_fit_power_law_MMEN_per_system_observed(sss_per_sys=sss_per_sys):
+    # TODO: Expand tests when this function is expanded to allow for other prescriptions
+    fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys) # for RC2014 prescription
+    assert len(fit_per_sys_dict['m_obs']) == len(fit_per_sys_dict['Mstar_obs']) == len(fit_per_sys_dict['sigma0']) == len(fit_per_sys_dict['beta'])
+    assert 1 < np.min(fit_per_sys_dict['m_obs'])
+    assert 0 < np.min(fit_per_sys_dict['Mstar_obs'])
+    assert 0 < np.min(fit_per_sys_dict['sigma0'])
+
+def test_fit_power_law_MMEN_per_system_physical(sssp_per_sys=sssp_per_sys):
+    # TODO: Expand tests when this function is expanded to allow for other prescriptions
+    fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys)
+    assert len(fit_per_sys_dict['n_pl']) == len(fit_per_sys_dict['sigma0']) == len(fit_per_sys_dict['beta'])
+    assert 1 < np.min(fit_per_sys_dict['n_pl'])
+    assert 0 < np.min(fit_per_sys_dict['sigma0'])
+
+def test_solid_mass_integrated_r0_to_r_given_power_law_profile(seed=42):
+    np.random.seed(seed)
+    sigma0 = 10.**(3.*np.random.rand()) # log-uniform draw between 1 and 1e3
+    beta = -3. + 5.*np.random.rand() # uniform draw between -3 and 2
+    a0 = 10.**(-1. + 2.*np.random.rand()) # log-uniform draw between 0.1 and 10
+    r0 = 10.**(-1. + np.random.rand()) # log-uniform draw between 0.1 and 1
+    dr1, dr2 = 10.**(-1. + np.random.rand(2)) # log-uniform draws between 0.1 and 1
+    dr_less, dr_more = np.sort((dr1, dr2))
+    int_to_r0_plus_dr_less = solid_mass_integrated_r0_to_r_given_power_law_profile(r0+dr_less, r0, sigma0, beta, a0=a0)
+    int_to_r0_plus_dr_more = solid_mass_integrated_r0_to_r_given_power_law_profile(r0+dr_more, r0, sigma0, beta, a0=a0)
+    assert 0 < int_to_r0_plus_dr_less < int_to_r0_plus_dr_more
+    assert np.isclose(solid_mass_integrated_r0_to_r_given_power_law_profile(r0+dr_less+dr_more, r0, sigma0, beta, a0=a0), solid_mass_integrated_r0_to_r_given_power_law_profile(r0+dr_less+dr_more, r0+dr_less, sigma0, beta, a0=a0) + int_to_r0_plus_dr_less)
+    assert np.isclose(solid_mass_integrated_r0_to_r_given_power_law_profile(r0+dr_less+dr_more, r0, sigma0, beta, a0=a0), solid_mass_integrated_r0_to_r_given_power_law_profile(r0+dr_less+dr_more, r0+dr_more, sigma0, beta, a0=a0) + int_to_r0_plus_dr_more)
