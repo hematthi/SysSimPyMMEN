@@ -27,8 +27,8 @@ def density_given_mass_radius(M, R):
 
 
 
-#data_path = '/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/SysSimExClusters/src/mr_model/MRpredict_table_weights3025_R1001_Q1001.txt'
-data_path = 'C:/Users/HeYMa/Documents/GradSchool/Research/SysSimExClusters/src/mr_model/MRpredict_table_weights3025_R1001_Q1001.txt'
+data_path = '/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/SysSimExClusters/src/mr_model/MRpredict_table_weights3025_R1001_Q1001.txt'
+#data_path = 'C:/Users/HeYMa/Documents/GradSchool/Research/SysSimExClusters/src/mr_model/MRpredict_table_weights3025_R1001_Q1001.txt'
 logMR_Ning2018_table = np.genfromtxt(data_path, delimiter=',', skip_header=2, names=True) # first column is array of log_R values
 
 table_array = logMR_Ning2018_table.view(np.float64).reshape(logMR_Ning2018_table.shape + (-1,))[:,1:]
@@ -45,8 +45,8 @@ def generate_planet_mass_from_radius_Ning2018_table(R):
     logM = logMR_table_interp(logR, q)[0][0]
     return 10.**logM # planet mass in Earth masses
 
-#data_path = '/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/SysSimExClusters/src/mr_model/MR_earthlike_rocky.txt'
-data_path = 'C:/Users/HeYMa/Documents/GradSchool/Research/SysSimExClusters/src/mr_model/MR_earthlike_rocky.txt'
+data_path = '/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/SysSimExClusters/src/mr_model/MR_earthlike_rocky.txt'
+#data_path = 'C:/Users/HeYMa/Documents/GradSchool/Research/SysSimExClusters/src/mr_model/MR_earthlike_rocky.txt'
 MR_earthlike_rocky = np.genfromtxt(data_path, delimiter='\t', skip_header=2, names=('mass','radius'))
 
 M_earthlike_rocky_interp = interp1d(MR_earthlike_rocky['radius'], MR_earthlike_rocky['mass'])
@@ -201,7 +201,7 @@ def fit_power_law_MMEN_per_system_observed(sss_per_sys, solid_surface_density_pr
             fit_per_sys_dict['Mstar_obs'].append(sss_per_sys['Mstar_obs'][i])
             fit_per_sys_dict['sigma0'].append(sigma0)
             fit_per_sys_dict['beta'].append(beta)
-    
+
     fit_per_sys_dict['m_obs'] = np.array(fit_per_sys_dict['m_obs'])
     fit_per_sys_dict['Mstar_obs'] = np.array(fit_per_sys_dict['Mstar_obs'])
     fit_per_sys_dict['sigma0'] = np.array(fit_per_sys_dict['sigma0'])
@@ -221,7 +221,7 @@ def fit_power_law_MMEN_per_system_physical(sssp_per_sys, solid_surface_density_p
             fit_per_sys_dict['n_pl'].append(len(a_sys))
             fit_per_sys_dict['sigma0'].append(sigma0)
             fit_per_sys_dict['beta'].append(beta)
-    
+
     fit_per_sys_dict['n_pl'] = np.array(fit_per_sys_dict['n_pl'])
     fit_per_sys_dict['sigma0'] = np.array(fit_per_sys_dict['sigma0'])
     fit_per_sys_dict['beta'] = np.array(fit_per_sys_dict['beta'])
