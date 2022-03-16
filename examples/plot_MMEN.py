@@ -608,6 +608,8 @@ if savefigures:
 
 
 
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=# Transferred below to "plot_MMEN_observed_vs_multiplicity.py"
+
 ##### To test the RC2014 prescription for delta_a (geometric means) as a function of observed multiplicity:
 
 fig = plt.figure(figsize=(16,8))
@@ -648,9 +650,13 @@ if savefigures:
 
 plt.show()
 
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
 
 
 
+
+
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=# Transferred below to "plot_MMEN_observed_per_system.py"
 
 ##### To fit a line to each observed system (RC2014 prescription), for simulated and Kepler catalogs:
 a0 = 0.3
@@ -751,6 +757,8 @@ for m in range(2,5):
     plot_2d_points_and_contours_with_histograms(x, y, x_min=-8., x_max=4., y_min=1e-2, y_max=1e8, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text=r'$m = %s$' % m, plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_obs_mmen_RC2014_sigma0_vs_beta_per_system_m%s.pdf' % m, save_fig=savefigures)
 
 plt.show()
+
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
 
 
 
