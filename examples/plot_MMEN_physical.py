@@ -92,8 +92,8 @@ lfs = 16 # legend labels font size
 
 # Parameters for defining the MMEN:
 prescription_str = 'CL2013' #'RC2014' # make sure this actually matches the prescription used!
-solid_surface_density_prescription = solid_surface_density_CL2013 #solid_surface_density_system_RC2014
-a0 = 0.3 # normalization separation for fitting power-laws
+solid_surface_density_prescription = solid_surface_density_CL2013 #solid_surface_density_system_RC2014 # NOTE: need to standardize the inputs for each function of the different prescriptions
+a0 = 1. #0.3 # normalization separation for fitting power-laws
 
 
 
@@ -109,7 +109,7 @@ MeVeEa_a = np.array([0.387, 0.723, 1.]) # semi-major axes of Mercury, Venus, and
 MeVeEa_sigmas = solid_surface_density_prescription(MeVeEa_masses, MeVeEa_a)
 
 a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
-sigma_all = solid_surface_density_prescription(sssp_per_sys['mass_all'], sssp_per_sys['a_all'])[sssp_per_sys['a_all'] > 0]
+sigma_all = solid_surface_density_prescription(sssp_per_sys['mass_all'][sssp_per_sys['a_all'] > 0], a_all)
 
 sigma0, beta = fit_power_law_MMEN(a_all, sigma_all, a0=a0)
 
@@ -163,6 +163,33 @@ plt.xlim([0.04,0.9])
 plt.ylim([0.,5.5])
 plt.xlabel(r'Semimajor axis $a$ (AU)', fontsize=20)
 plt.ylabel(r'Surface density $\log_{10}(\sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
+plt.legend(loc='upper right', bbox_to_anchor=(1.,1.), ncol=1, frameon=False, fontsize=lfs)
+if savefigures:
+    plt.savefig(savefigures_directory + model_name + '_mmen_%s.pdf' % prescription_str)
+    plt.close()
+
+plt.show()
+
+##### Remake for defense talk:
+
+fig = plt.figure(figsize=(8,8))
+plot = GridSpec(1,1,left=0.15,bottom=0.15,right=0.95,top=0.95,wspace=0,hspace=0)
+ax = plt.subplot(plot[0,0])
+#corner.hist2d(a_all, np.log10(sigma_all), bins=50, plot_density=False, contour_kwargs={'colors': ['0.6','0.4','0.2','0']}, data_kwargs={'color': 'k'})
+i_sample_plot = np.random.choice(np.arange(len(a_all)), 10000, replace=False)
+plt.scatter(a_all[i_sample_plot], np.log10(sigma_all[i_sample_plot]), marker='.', s=1, alpha=1, color='k', label='Simulated planets')
+#plt.plot(a_bins_mid, np.log10(sigma_med_per_bin), drawstyle='steps-mid', lw=3, color='r', label='MMEN (median per bin)')
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0, beta, a0=a0)), lw=3, ls='--', color='r', label=r'MMEN (linear fit: $\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0, beta))
+plt.plot(a_array, np.log10(sigma_MMSN), lw=3, color='g', label=r'MMSN ($\sigma_{\rm solid} = 10.89(a/{\rm AU})^{-3/2}$ g/cm$^2$)')
+#plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g', label='Solar system planets (Mercury, Venus, Earth)')
+ax.tick_params(axis='both', labelsize=afs)
+plt.gca().set_xscale("log")
+plt.xticks(a_ticks)
+ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
+plt.xlim([0.04,0.9])
+plt.ylim([0.,5.5])
+plt.xlabel(r'Semimajor axis, $a$ (AU)', fontsize=20)
+plt.ylabel(r'Surface density, $\log_{10}(\sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
 plt.legend(loc='upper right', bbox_to_anchor=(1.,1.), ncol=1, frameon=False, fontsize=lfs)
 if savefigures:
     plt.savefig(savefigures_directory + model_name + '_mmen_%s.pdf' % prescription_str)

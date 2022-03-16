@@ -105,6 +105,8 @@ lfs = 16 #legend labels font size
 
 
 
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=# Transferred below to "plot_MMEN_physical.py"
+
 # Compute the MMSN:
 a_array = np.linspace(1e-3,2,1001)
 sigma_MMSN = MMSN(a_array)
@@ -246,9 +248,13 @@ if savefigures:
     plt.savefig(savefigures_directory + model_name + '_mmen_deltaa_compare.pdf')
     plt.close()
 
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
 
 
 
+
+
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=# Transferred below to "plot_MMEN_physical_vs_multiplicity.py"
 
 ##### To test the RC2014 prescription for delta_a (geometric means) as a function of intrinsic multiplicity:
 
@@ -261,11 +267,11 @@ for n in range(2,11):
     a_all_2p_n = a_all_2p[mult_all_2p == n]
     sigma_all_RC2014_n = sigma_all_RC2014[mult_all_2p == n]
     sigma_med_per_bin_RC2014_n = [np.median(sigma_all_RC2014_n[(a_all_2p_n >= a_bins[i]) & (a_all_2p_n < a_bins[i+1])]) for i in range(len(a_bins)-1)]
-    
+
     mmen_fit_RC2014_n = scipy.optimize.curve_fit(f_linear, np.log10(a_all_2p_n/a0), np.log10(sigma_all_RC2014_n), [p0, p1])[0]
     sigma0_RC2014_n, beta_RC2014_n = 10.**(mmen_fit_RC2014_n[0]), mmen_fit_RC2014_n[1]
     print('n = %s:' % n + 'sigma0 = {:0.4f}, beta = {:0.4f})'.format(sigma0_RC2014_n, beta_RC2014_n))
-    
+
     plt.plot(a_bins_mid, np.log10(sigma_med_per_bin_RC2014_n), drawstyle='steps-mid', lw=2, label=r'$n = %s$' % n) #label=r'$n = %s$' % n
     #plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_RC2014_n, beta_RC2014_n, a0=a0)), lw=1, ls='--', color='k', label=r'$n = %s$' % n + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_RC2014_n, beta_RC2014_n))
 plt.plot(a_array, np.log10(sigma_MMSN), lw=2, color='g')
@@ -281,9 +287,13 @@ if savefigures:
     plt.savefig(savefigures_directory + model_name + '_mmen_RC2014_per_mult.pdf')
     plt.close()
 
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
 
 
 
+
+
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=# Transferred below to "plot_MMEN_physical_per_system.py"
 
 ##### To fit a line to each system (RC2014 prescription):
 a0 = 0.3
@@ -300,11 +310,11 @@ for i,a_sys in enumerate(sssp_per_sys['a_all'][:100000]): #100000
         #print(i)
         n_sys_all.append(len(a_sys))
         sigma_sys_RC2014 = solid_surface_density_system_RC2014(M_sys, a_sys)
-        
+
         mmen_fit_RC2014 = scipy.optimize.curve_fit(f_linear, np.log10(a_sys/a0), np.log10(sigma_sys_RC2014), [p0, p1])[0]
         sigma0_RC2014, beta_RC2014 = 10.**(mmen_fit_RC2014[0]), mmen_fit_RC2014[1]
         sigma0_beta_RC2014_all.append([sigma0_RC2014, beta_RC2014])
-        
+
         plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_RC2014, beta_RC2014, a0=a0)), lw=0.1, ls='-', alpha=1, color='k')
 n_sys_all = np.array(n_sys_all)
 sigma0_beta_RC2014_all = np.array(sigma0_beta_RC2014_all)
@@ -349,18 +359,26 @@ for a0 in a0_array:
             #print(i)
             n_sys_all.append(len(a_sys))
             sigma_sys_RC2014 = solid_surface_density_system_RC2014(M_sys, a_sys)
-            
+
             mmen_fit_RC2014 = scipy.optimize.curve_fit(f_linear, np.log10(a_sys/a0), np.log10(sigma_sys_RC2014), [p0, p1])[0]
             sigma0_RC2014, beta_RC2014 = 10.**(mmen_fit_RC2014[0]), mmen_fit_RC2014[1]
             sigma0_beta_RC2014_all.append([sigma0_RC2014, beta_RC2014])
     n_sys_all = np.array(n_sys_all)
     sigma0_beta_RC2014_all = np.array(sigma0_beta_RC2014_all)
-    
+
     x, y = sigma0_beta_RC2014_all[:,1], sigma0_beta_RC2014_all[:,0] # beta's, sigma0's
     plot_2d_points_and_contours_with_histograms(x, y, x_min=-10., x_max=5., y_min=1e-4, y_max=1e6, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text=r'$\Sigma_0 = \Sigma({:0.3f} AU)$'.format(a0), plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_RC2014_sigma0_vs_beta_per_system_a0_{:0.3f}.pdf'.format(a0), save_fig=savefigures)
 plt.show()
 a0 = 1.
 '''
+
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
+
+
+
+
+
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=# Transferred below to "plot_MMEN_physical_total_mass_per_system.py"
 
 ##### To integrate the total mass in solids for the fitted power-laws as a function of separation:
 
@@ -462,9 +480,13 @@ plot_fig_cdf_simple((8,5), r_Mr_pl_arrays, [], x_min=1e-2, x_max=200., log_x=Tru
 '''
 plt.show()
 
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
 
 
 
+
+
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=# Transferred below to "plot_MMEN_observed.py"
 
 #####
 ##### To plot the MMEN from planets in the observed catalogs only, compared to that of Kepler using the same M-R relation (re-drawn from our NWG18/Earth-like rocky composite model):
@@ -580,6 +602,8 @@ if savefigures:
     plt.savefig(savefigures_directory + model_name + '_obs_vs_Kepler_mmen_RC2014.pdf')
     plt.close()
 
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
+
 
 
 
@@ -599,14 +623,14 @@ for m in range(2,5):
     a_obs_2p_Kep_m = a_obs_2p_Kep[mult_obs_2p_Kep == m]
     sigma_obs_RC2014_Kep_m = sigma_obs_RC2014_Kep[mult_obs_2p_Kep == m]
     sigma_med_per_bin_RC2014_Kep_m = [np.median(sigma_obs_RC2014_Kep_m[(a_obs_2p_Kep_m >= a_bins[i]) & (a_obs_2p_Kep_m < a_bins[i+1])]) for i in range(len(a_bins)-1)]
-    
+
     mmen_obs_fit_RC2014_m = scipy.optimize.curve_fit(f_linear, np.log10(a_obs_2p_m/a0), np.log10(sigma_obs_RC2014_m), [p0, p1])[0]
     mmen_obs_fit_RC2014_Kep_m = scipy.optimize.curve_fit(f_linear, np.log10(a_obs_2p_Kep_m/a0), np.log10(sigma_obs_RC2014_Kep_m), [p0, p1])[0]
     sigma0_obs_RC2014_m, beta_obs_RC2014_m = 10.**(mmen_obs_fit_RC2014_m[0]), mmen_obs_fit_RC2014_m[1]
     sigma0_obs_RC2014_Kep_m, beta_obs_RC2014_Kep_m = 10.**(mmen_obs_fit_RC2014_Kep_m[0]), mmen_obs_fit_RC2014_Kep_m[1]
     print('Sim. obs. (m = %s): ' % m + 'sigma0 = {:0.4f}, beta = {:0.4f})'.format(sigma0_obs_RC2014_m, beta_obs_RC2014_m))
     print('Kep. obs. (m = %s): ' % m + 'sigma0 = {:0.4f}, beta = {:0.4f})'.format(sigma0_obs_RC2014_Kep_m, beta_obs_RC2014_Kep_m))
-    
+
     plt.plot(a_bins_mid, np.log10(sigma_med_per_bin_RC2014_m), drawstyle='steps-mid', lw=2, label=r'$m = %s$' % m)
     plt.plot(a_bins_mid, np.log10(sigma_med_per_bin_RC2014_Kep_m), drawstyle='steps-mid', ls='--', lw=2, label=r'$m = %s (Kepler)$' % m)
 plt.plot(a_array, np.log10(sigma_MMSN), lw=2, color='g')
@@ -647,11 +671,11 @@ for i,a_sys in enumerate(a_obs_per_sys):
         m_sys_all.append(len(a_sys))
         Mstar_obs_all.append(Mstar_sys)
         sigma_obs_sys_RC2014 = solid_surface_density_system_RC2014(M_sys, a_sys)
-        
+
         mmen_obs_fit_RC2014 = scipy.optimize.curve_fit(f_linear, np.log10(a_sys/a0), np.log10(sigma_obs_sys_RC2014), [p0, p1])[0]
         sigma0_obs_RC2014, beta_obs_RC2014 = 10.**(mmen_obs_fit_RC2014[0]), mmen_obs_fit_RC2014[1]
         sigma0_beta_obs_RC2014_all.append([sigma0_obs_RC2014, beta_obs_RC2014])
-        
+
         plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_obs_RC2014, beta_obs_RC2014, a0=a0)), lw=0.1, ls='-', alpha=1, color='k')
 m_sys_all = np.array(m_sys_all)
 Mstar_obs_all = np.array(Mstar_obs_all)
@@ -687,11 +711,11 @@ for i,a_sys in enumerate(a_obs_per_sys_Kep):
         m_sys_Kep_all.append(len(a_sys))
         Mstar_obs_Kep_all.append(Mstar_sys)
         sigma_obs_sys_RC2014_Kep = solid_surface_density_system_RC2014(M_sys, a_sys)
-        
+
         mmen_obs_fit_RC2014_Kep = scipy.optimize.curve_fit(f_linear, np.log10(a_sys/a0), np.log10(sigma_obs_sys_RC2014_Kep), [p0, p1])[0]
         sigma0_obs_RC2014_Kep, beta_obs_RC2014_Kep = 10.**(mmen_obs_fit_RC2014_Kep[0]), mmen_obs_fit_RC2014_Kep[1]
         sigma0_beta_obs_RC2014_Kep_all.append([sigma0_obs_RC2014_Kep, beta_obs_RC2014_Kep])
-        
+
         plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_obs_RC2014_Kep, beta_obs_RC2014_Kep, a0=a0)), lw=0.1, ls='-', alpha=1, color='k')
 m_sys_Kep_all = np.array(m_sys_Kep_all)
 Mstar_obs_Kep_all = np.array(Mstar_obs_Kep_all)
@@ -765,7 +789,7 @@ for i,det_sys in enumerate(sssp_per_sys['det_all']):
         #print(i)
         a_sys = sssp_per_sys['a_all'][i] # all semimajor axes including padded zeros
         M_sys = sssp_per_sys['mass_all'][i] # all planet masses including padded zeros
-        
+
         a_sys_obs = a_sys[det_sys == 1] # semimajor axes of observed planets
         M_sys_obs = M_sys[det_sys == 1] # masses of observed planets
         M_sys = M_sys[a_sys > 0] # masses of all planets
@@ -774,7 +798,7 @@ for i,det_sys in enumerate(sssp_per_sys['det_all']):
         n_m_sys_all.append([len(a_sys), len(a_sys_obs)])
         sigma_sys_RC2014 = solid_surface_density_system_RC2014(M_sys, a_sys)
         sigma_sys_obs_RC2014 = solid_surface_density_system_RC2014(M_sys_obs, a_sys_obs)
-        
+
         mmen_fit_RC2014 = scipy.optimize.curve_fit(f_linear, np.log10(a_sys/a0), np.log10(sigma_sys_RC2014), [p0, p1])[0]
         mmen_obs_fit_RC2014 = scipy.optimize.curve_fit(f_linear, np.log10(a_sys_obs/a0), np.log10(sigma_sys_obs_RC2014), [p0, p1])[0]
         sigma0_RC2014, beta_RC2014 = 10.**(mmen_fit_RC2014[0]), mmen_fit_RC2014[1]

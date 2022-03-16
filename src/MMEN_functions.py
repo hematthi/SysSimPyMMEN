@@ -121,7 +121,7 @@ def solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys):
     # Compute the solid surface density (g/cm^2) using the Chiang & Laughlin (2013) prescription, for each planet in a given physical catalog
     # Returns an array of solid surface densities and semi-major axes
     a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
-    sigma_all = solid_surface_density_CL2013(sssp_per_sys['mass_all'], sssp_per_sys['a_all'])[sssp_per_sys['a_all'] > 0]
+    sigma_all = solid_surface_density_CL2013(sssp_per_sys['mass_all'][sssp_per_sys['a_all'] > 0], a_all)
     return sigma_all, a_all
 
 def solid_surface_density_S2014_given_physical_catalog(sssp_per_sys, sssp):
@@ -158,6 +158,68 @@ def solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys):
     sigma_all_2p = np.array(sigma_all_2p)
     return sigma_all_2p, a_all_2p, mult_all_2p
 
+# TODO: write unit test
+def solid_surface_density_CL2013_given_observed_catalog(sss_per_sys):
+    # Compute the solid surface density (g/cm^2) using the Chiang & Laughlin (2013) prescription, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
+    # Returns an array of solid surface densities and semi-major axes
+    a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
+    a_obs = a_obs_per_sys[sss_per_sys['P_obs'] > 0]
+    radii_obs = sss_per_sys['radii_obs'][sss_per_sys['P_obs'] > 0]
+    mass_obs = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(radii_obs)
+    sigma_obs = solid_surface_density_CL2013(mass_obs, a_obs)
+    return sigma_obs, mass_obs, a_obs
+
+# TODO: write unit test
+def solid_surface_density_S2014_given_observed_catalog(sss_per_sys):
+    # Compute the solid surface density (g/cm^2) using the Schlichting (2014) prescription, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
+    # Returns an array of solid surface densities and semi-major axes
+    a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
+    a_obs = a_obs_per_sys[sss_per_sys['P_obs'] > 0]
+    radii_obs = sss_per_sys['radii_obs'][sss_per_sys['P_obs'] > 0]
+    mass_obs = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(radii_obs)
+    sigma_obs = solid_surface_density_S2014(mass_obs, radii_obs, a_obs, Mstar=sss_per_sys['Mstar_obs'])
+    return sigma_obs, mass_obs, a_obs
+
+# TODO: write unit test
+def solid_surface_density_nHill_given_observed_catalog(sss_per_sys, n=10.):
+    # Compute the solid surface density (g/cm^2) using a number of Hill radii for the feeding zone width, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
+    # 'n' is the number of Hill radii for  the feeding zone width of each planet
+    # Returns an array of solid surface densities and semi-major axes
+    a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
+    a_obs = a_obs_per_sys[sss_per_sys['P_obs'] > 0]
+    radii_obs = sss_per_sys['radii_obs'][sss_per_sys['P_obs'] > 0]
+    mass_obs = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(radii_obs)
+    sigma_obs = solid_surface_density_nHill(mass_obs, a_obs, Mstar=sss_per_sys['Mstar_obs'], n=n)
+    return sigma_obs, mass_obs, a_obs
+
+# TODO: write unit test
+def solid_surface_density_RC2014_given_observed_catalog(sss_per_sys):
+    # Compute the solid surface density (g/cm^2) using the Raymond & Cossou (2014) prescription, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
+    # Returns an array of solid surface densities and semi-major axes
+    mult_obs = sss_per_sys['Mtot_obs']
+    mult_obs_2p = []
+    a_obs_2p = []
+    mass_obs_2p = []
+    sigma_obs_2p = []
+    for i in np.arange(len(mult_obs))[mult_obs > 1]: # only consider multi-planet systems
+        a_sys = gen.a_from_P(sss_per_sys['P_obs'][i], sss_per_sys['Mstar_obs'][i])
+        M_sys = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(sss_per_sys['radii_obs'][i][a_sys > 0])
+        a_sys = a_sys[a_sys > 0]
+
+        mult_obs_2p += [len(a_sys)]*len(a_sys)
+        a_obs_2p += list(a_sys)
+        mass_obs_2p += list(M_sys)
+        sigma_obs_2p += list(solid_surface_density_system_RC2014(M_sys, a_sys))
+    mult_obs_2p = np.array(mult_obs_2p)
+    a_obs_2p = np.array(a_obs_2p)
+    mass_obs_2p = np.array(mass_obs_2p)
+    sigma_obs_2p = np.array(sigma_obs_2p)
+    return sigma_obs_2p, mass_obs_2p, a_obs_2p, mult_obs_2p
+
+
+
+##### Functions to fit a power-law to the MMEN (sigma = sigma0 * (a/a0)^beta <==> log(sigma) = log(sigma0) + beta*log(a/a0)):
+
 def MMSN(a, F=1., Zrel=0.33):
     # Compute the minimum mass solar nebular (MMSN) surface density (g/cm^2) at a semi-major axis 'a' (AU), from equation 2 in Chiang & Youdin (2010) (https://arxiv.org/pdf/0909.2652.pdf)
     # Default values of F=1 and Zrel=0.33 give 1M_earth of solids in an annulus centered on Earth's orbit
@@ -171,10 +233,6 @@ def MMEN_power_law(a, sigma0, beta, a0=1.):
     assert a0 > 0
     sigma_a = sigma0 * (a/a0)**beta
     return sigma_a
-
-
-
-##### Functions to fit a power-law to the MMEN (sigma = sigma0 * (a/a0)^beta <==> log(sigma) = log(sigma0) + beta*log(a/a0)):
 
 f_linear = lambda x, p0, p1: p0 + p1*x
 
