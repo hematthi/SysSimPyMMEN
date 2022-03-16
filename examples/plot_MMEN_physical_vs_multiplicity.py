@@ -140,10 +140,10 @@ for n in range(2,11):
     a_all_n = a_all[mult_all == n]
     sigma_all_n = sigma_all_CL2013[mult_all == n]
     sigma_med_per_bin_n = [np.median(sigma_all_n[(a_all_n >= a_bins[i]) & (a_all_n < a_bins[i+1])]) for i in range(len(a_bins)-1)]
-    
+
     sigma0_n, beta_n = fit_power_law_MMEN(a_all_n, sigma_all_n, a0=a0)
     print('n = %s:' % n + 'sigma0 = {:0.4f}, beta = {:0.4f})'.format(sigma0_n, beta_n))
-    
+
     plt.plot(a_bins_mid, np.log10(sigma_med_per_bin_n), drawstyle='steps-mid', lw=2, label=r'$n = %s$' % n) #label=r'$n = %s$' % n
     #plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_n, beta_n, a0=a0)), lw=1, ls='--', color='k', label=r'$n = %s$' % n + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_n, beta_n))
 plt.plot(a_array, np.log10(sigma_MMSN), lw=2, color='g')

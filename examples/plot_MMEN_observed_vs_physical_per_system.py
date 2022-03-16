@@ -98,52 +98,15 @@ a0 = 0.3 # normalization separation for fitting power-laws
 
 
 
-##### To fit a power-law to each observed system for the Kepler catalog and plot the distribution of fitted parameters (sigma0 vs. beta):
+##### To fit a power-law to each observed system in a simulated observed catalog, and then for each underlying physical system (i.e. including all planets), to compare how the power-law fits change:
+##### NOTE: we will use the 'true' planet masses for the simulated observed planets so their masses are consistent in both MMEN calculations of the physical systems and the observed systems
 
-fit_per_sys_dict_Kep = fit_power_law_MMEN_per_system_observed(ssk_per_sys, solid_surface_density_prescription=solid_surface_density_prescription, a0=a0)
+fit_per_sys_dict = fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, solid_surface_density_prescription=solid_surface_density_system_RC2014, a0=a0)
 
-plot_2d_points_and_contours_with_histograms(fit_per_sys_dict_Kep['beta'], fit_per_sys_dict_Kep['sigma0'], x_min=-8., x_max=4., y_min=1e-2, y_max=1e8, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Kepler observed systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + 'Kepler_mmen_%s_sigma0_vs_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
-plt.show()
+# To plot sigma0_obs vs sigma0_true for the simulated observed systems:
+plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['sigma0_true'], fit_per_sys_dict['sigma0_obs'], x_min=1e-2, x_max=1e7, y_min=1e-2, y_max=1e7, log_x=True, log_y=True, xlabel_text=r'$\log_{10}(\Sigma_{0,\rm true}/{\rm g cm^{-2}})$', ylabel_text=r'$\log_{10}(\Sigma_{0,\rm obs}/{\rm g cm^{-2}})$', extra_text='Simulated observed systems', plot_qtls=True, x_str_format='{:0.1f}', y_str_format='{:0.1f}', x_symbol=r'$\Sigma_{0,\rm true}$', y_symbol=r'$\Sigma_{0,\rm obs}$', save_name=savefigures_directory + model_name + '_true_vs_obs_mmen_%s_sigma0_per_system.pdf' % prescription_str, save_fig=savefigures)
 
+# To plot beta_obs vs beta_true for the simulated observed systems:
+plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta_true'], fit_per_sys_dict['beta_obs'], x_min=-8., x_max=4., y_min=-8., y_max=4., xlabel_text=r'$\beta_{\rm true}$', ylabel_text=r'$\beta_{\rm obs}$', extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$\beta_{\rm true}$', y_symbol=r'$\beta_{\rm obs}$', save_name=savefigures_directory + model_name + '_true_vs_obs_mmen_%s_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
 
-
-
-
-##### To load and compute the same statistics for a large number of models:
-
-loadfiles_directory = '/Users/hematthi/Documents/GradSchool/Research/ACI/Simulated_Data/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/GP_best_models/'
-runs = 100
-
-sss_per_sys_all = []
-sss_all = []
-fit_per_sys_dict_all = []
-
-for i in range(1,runs+1):
-    run_number = i
-    sss_per_sys_i, sss_i = compute_summary_stats_from_cat_obs(file_name_path=loadfiles_directory, run_number=run_number, compute_ratios=compute_ratios)
-    dists_i, dists_w_i = compute_distances_sim_Kepler(sss_per_sys_i, sss_i, ssk_per_sys, ssk, weights_all['all'], dists_include, N_Kep, cos_factor=cos_factor, AD_mod=AD_mod, compute_ratios=compute_ratios)
-
-    sss_per_sys_all.append(sss_per_sys_i)
-    sss_all.append(sss_i)
-
-    fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys_i, solid_surface_density_prescription=solid_surface_density_prescription, a0=a0)
-    fit_per_sys_dict_all.append(fit_per_sys_dict)
-
-    # To plot the distribution of fitted power-law parameters (sigma0 vs. beta) for the simulated observed systems:
-    plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'], x_min=-8., x_max=4., y_min=1e-2, y_max=1e8, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Simulated observed systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_obs_mmen_%s_sigma0_vs_beta_per_system_%s.pdf' % (prescription_str, run_number), save_fig=savefigures)
-    #plt.show()
-    plt.close()
-
-plt.show()
-
-# To plot the median sigma0 vs. beta for each simulated catalog:
-sigma0_med_all = [np.median(fit_per_sys_dict['sigma0']) for fit_per_sys_dict in fit_per_sys_dict_all]
-beta_med_all = [np.median(fit_per_sys_dict['beta']) for fit_per_sys_dict in fit_per_sys_dict_all]
-
-ax_main = plot_2d_points_and_contours_with_histograms(beta_med_all, sigma0_med_all, x_min=-2.25, x_max=-1.5, y_min=250., y_max=750., log_y=True, n_bins=20, points_only=True, xlabel_text=r'Median $\beta$', ylabel_text=r'Median $\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta_{\rm med}$', y_symbol=r'$\Sigma_{0,\rm med}$')
-ax_main.scatter(np.median(fit_per_sys_dict_Kep['beta']), np.log10(np.median(fit_per_sys_dict_Kep['sigma0'])), marker='x', color='r', label='Kepler')
-ax_main.legend(loc='upper left', bbox_to_anchor=(0.,1.), ncol=1, frameon=False, fontsize=lfs)
-if savefigures:
-    plt.savefig(savefigures_directory + model_name + '_obs_mmen_%s_median_sigma0_vs_beta_per_system.pdf' % prescription_str)
-    plt.close()
 plt.show()

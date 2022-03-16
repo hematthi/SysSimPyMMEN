@@ -283,6 +283,40 @@ def fit_power_law_MMEN_per_system_physical(sssp_per_sys, solid_surface_density_p
     fit_per_sys_dict['beta'] = np.array(fit_per_sys_dict['beta'])
     return fit_per_sys_dict
 
+def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, solid_surface_density_prescription=solid_surface_density_system_RC2014, a0=1., p0=1., p1=-1.5):
+    # Compute solid surface densities and fit power-law parameters to each multi-planet system in an observed catalog, for the observed planets only and then for all the planets in those systems (using the physical planet properties for both)
+    # WARNING: This function currently only works for 'solid_surface_density_prescription=solid_surface_density_system_RC2014'
+    fit_per_sys_dict = {'n_pl_true':[], 'n_pl_obs':[], 'sigma0_true':[], 'sigma0_obs':[], 'beta_true':[], 'beta_obs':[]}
+    for i,det_sys in enumerate(sssp_per_sys['det_all']):
+        if np.sum(det_sys) > 1:
+            a_sys = sssp_per_sys['a_all'][i] # all semimajor axes including padded zeros
+            M_sys = sssp_per_sys['mass_all'][i] # all planet masses including padded zeros
+
+            a_sys_obs = a_sys[det_sys == 1] # semimajor axes of observed planets
+            M_sys_obs = M_sys[det_sys == 1] # masses of observed planets
+            M_sys = M_sys[a_sys > 0] # masses of all planets
+            a_sys = a_sys[a_sys > 0] # semimajor axes of all planets
+
+            sigma_sys = solid_surface_density_prescription(M_sys, a_sys) # using all planets
+            sigma_sys_obs = solid_surface_density_prescription(M_sys_obs, a_sys_obs) # using observed planets only
+            sigma0, beta = fit_power_law_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
+            sigma0_obs, beta_obs = fit_power_law_MMEN(a_sys_obs, sigma_sys_obs, a0=a0, p0=p0, p1=p1)
+
+            fit_per_sys_dict['n_pl_true'].append(len(a_sys))
+            fit_per_sys_dict['n_pl_obs'].append(len(a_sys_obs))
+            fit_per_sys_dict['sigma0_true'].append(sigma0)
+            fit_per_sys_dict['sigma0_obs'].append(sigma0_obs)
+            fit_per_sys_dict['beta_true'].append(beta)
+            fit_per_sys_dict['beta_obs'].append(beta_obs)
+
+    fit_per_sys_dict['n_pl_true'] = np.array(fit_per_sys_dict['n_pl_true'])
+    fit_per_sys_dict['n_pl_obs'] = np.array(fit_per_sys_dict['n_pl_obs'])
+    fit_per_sys_dict['sigma0_true'] = np.array(fit_per_sys_dict['sigma0_true'])
+    fit_per_sys_dict['sigma0_obs'] = np.array(fit_per_sys_dict['sigma0_obs'])
+    fit_per_sys_dict['beta_true'] = np.array(fit_per_sys_dict['beta_true'])
+    fit_per_sys_dict['beta_obs'] = np.array(fit_per_sys_dict['beta_obs'])
+    return fit_per_sys_dict
+
 
 
 ##### Functions to compute the total integrated mass of solids within a given separation for a fitted power-law MMEN:

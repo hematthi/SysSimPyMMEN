@@ -181,7 +181,7 @@ def test_fit_power_law_MMEN_per_system_observed(sss_per_sys=sss_per_sys):
     # TODO: Expand tests when this function is expanded to allow for other prescriptions
     fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys) # for RC2014 prescription
     assert len(fit_per_sys_dict['m_obs']) == len(fit_per_sys_dict['Mstar_obs']) == len(fit_per_sys_dict['sigma0']) == len(fit_per_sys_dict['beta'])
-    assert 1 < np.min(fit_per_sys_dict['m_obs'])
+    assert 2 <= np.min(fit_per_sys_dict['m_obs'])
     assert 0 < np.min(fit_per_sys_dict['Mstar_obs'])
     assert 0 < np.min(fit_per_sys_dict['sigma0'])
 
@@ -189,8 +189,18 @@ def test_fit_power_law_MMEN_per_system_physical(sssp_per_sys=sssp_per_sys):
     # TODO: Expand tests when this function is expanded to allow for other prescriptions
     fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys)
     assert len(fit_per_sys_dict['n_pl']) == len(fit_per_sys_dict['sigma0']) == len(fit_per_sys_dict['beta'])
-    assert 1 < np.min(fit_per_sys_dict['n_pl'])
+    assert 2 <= np.min(fit_per_sys_dict['n_pl'])
     assert 0 < np.min(fit_per_sys_dict['sigma0'])
+
+def test_fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys=sssp_per_sys):
+    # TODO: Expand tests when this function is expanded to allow for other prescriptions
+    fit_per_sys_dict = fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys)
+    assert len(fit_per_sys_dict['n_pl_true']) == len(fit_per_sys_dict['n_pl_obs']) == len(fit_per_sys_dict['sigma0_true']) == len(fit_per_sys_dict['sigma0_obs']) == len(fit_per_sys_dict['beta_true']) == len(fit_per_sys_dict['beta_obs'])
+    assert 2 <= np.min(fit_per_sys_dict['n_pl_true'])
+    assert 2 <= np.min(fit_per_sys_dict['n_pl_obs'])
+    assert np.all(fit_per_sys_dict['n_pl_obs'] <= fit_per_sys_dict['n_pl_true'])
+    assert 0 < np.min(fit_per_sys_dict['sigma0_true'])
+    assert 0 < np.min(fit_per_sys_dict['sigma0_obs'])
 
 def test_solid_mass_integrated_r0_to_r_given_power_law_profile(seed=42):
     np.random.seed(seed)

@@ -762,6 +762,8 @@ plt.show()
 
 
 
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=# Transferred below to "plot_MMEN_observed_vs_stars.py"
+
 ##### To test how the fitted observed MMEN may correlate with stellar mass:
 
 # To plot sigma0 vs. stellar mass for the simulated observed systems:
@@ -782,9 +784,13 @@ plot_2d_points_and_contours_with_histograms(x, y, x_min=0.5, x_max=1.5, y_min=-8
 
 plt.show()
 
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
 
 
 
+
+
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=# Transferred below to "plot_MMEN_observed_vs_physical_per_system.py"
 
 ##### To compare the power-law fits of the observed systems to the corresponding true, physical systems:
 ##### NOTE: in the analyses above for the simulated observed catalogs, the planet masses are 're-drawn' using our M-R relationship (so they are treated in the same way as for the Kepler catalog). However, for the following comparisons, we will use the 'true' planet masses for the simulated observed planets so their masses are consistent in both MMEN calculations of the physical systems and the observed systems.
@@ -828,3 +834,5 @@ x, y = sigma0_beta_true_obs_RC2014_all[:,2], sigma0_beta_true_obs_RC2014_all[:,3
 plot_2d_points_and_contours_with_histograms(x, y, x_min=-8., x_max=4., y_min=-8., y_max=4., xlabel_text=r'$\beta_{\rm true}$', ylabel_text=r'$\beta_{\rm obs}$', extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$\beta_{\rm true}$', y_symbol=r'$\beta_{\rm obs}$', save_name=savefigures_directory + model_name + '_true_vs_obs_mmen_RC2014_beta_per_system.pdf', save_fig=savefigures)
 
 plt.show()
+
+#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#

@@ -134,10 +134,10 @@ for i,a_sys in enumerate(sssp_per_sys['a_all'][:10000]): #100000
         #print(i)
         n_sys_all.append(len(a_sys))
         sigma_sys_RC2014 = solid_surface_density_system_RC2014(M_sys, a_sys)
-        
+
         sigma0_RC2014, beta_RC2014 = fit_power_law_MMEN(a_sys, sigma_sys_RC2014, a0=a0)
         sigma0_beta_RC2014_all.append([sigma0_RC2014, beta_RC2014])
-        
+
         plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_RC2014, beta_RC2014, a0=a0)), lw=0.1, ls='-', alpha=1, color='k')
 n_sys_all = np.array(n_sys_all)
 sigma0_beta_RC2014_all = np.array(sigma0_beta_RC2014_all)
@@ -174,7 +174,7 @@ plt.show()
 a0_array = np.logspace(np.log10(a_from_P(3.,1.)), np.log10(a_from_P(300.,1.)), 11)
 for a0 in a0_array:
     fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys, solid_surface_density_prescription=solid_surface_density_system_RC2014, a0=a0)
-    
+
     x, y = fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'] # beta's, sigma0's
     plot_2d_points_and_contours_with_histograms(x, y, x_min=-10., x_max=5., y_min=1e-4, y_max=1e6, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text=r'$\Sigma_0 = \Sigma({:0.3f} AU)$'.format(a0), plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_RC2014_sigma0_vs_beta_per_system_a0_{:0.3f}.pdf'.format(a0), save_fig=savefigures)
 plt.show()
