@@ -158,7 +158,6 @@ def solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys):
     sigma_all_2p = np.array(sigma_all_2p)
     return sigma_all_2p, a_all_2p, mult_all_2p
 
-# TODO: write unit test
 def solid_surface_density_CL2013_given_observed_catalog(sss_per_sys):
     # Compute the solid surface density (g/cm^2) using the Chiang & Laughlin (2013) prescription, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
     # Returns an array of solid surface densities and semi-major axes
@@ -169,30 +168,29 @@ def solid_surface_density_CL2013_given_observed_catalog(sss_per_sys):
     sigma_obs = solid_surface_density_CL2013(mass_obs, a_obs)
     return sigma_obs, mass_obs, a_obs
 
-# TODO: write unit test
 def solid_surface_density_S2014_given_observed_catalog(sss_per_sys):
     # Compute the solid surface density (g/cm^2) using the Schlichting (2014) prescription, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
     # Returns an array of solid surface densities and semi-major axes
+    Mstar_obs = np.repeat(sss_per_sys['Mstar_obs'][:,None], np.shape(sss_per_sys['P_obs'])[1], axis=1)[sss_per_sys['P_obs'] > 0] # flattened array of stellar masses repeated for each planet
     a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
     a_obs = a_obs_per_sys[sss_per_sys['P_obs'] > 0]
     radii_obs = sss_per_sys['radii_obs'][sss_per_sys['P_obs'] > 0]
     mass_obs = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(radii_obs)
-    sigma_obs = solid_surface_density_S2014(mass_obs, radii_obs, a_obs, Mstar=sss_per_sys['Mstar_obs'])
+    sigma_obs = solid_surface_density_S2014(mass_obs, radii_obs, a_obs, Mstar=Mstar_obs)
     return sigma_obs, mass_obs, a_obs
 
-# TODO: write unit test
 def solid_surface_density_nHill_given_observed_catalog(sss_per_sys, n=10.):
     # Compute the solid surface density (g/cm^2) using a number of Hill radii for the feeding zone width, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
     # 'n' is the number of Hill radii for  the feeding zone width of each planet
     # Returns an array of solid surface densities and semi-major axes
+    Mstar_obs = np.repeat(sss_per_sys['Mstar_obs'][:,None], np.shape(sss_per_sys['P_obs'])[1], axis=1)[sss_per_sys['P_obs'] > 0] # flattened array of stellar masses repeated for each planet
     a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
     a_obs = a_obs_per_sys[sss_per_sys['P_obs'] > 0]
     radii_obs = sss_per_sys['radii_obs'][sss_per_sys['P_obs'] > 0]
     mass_obs = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(radii_obs)
-    sigma_obs = solid_surface_density_nHill(mass_obs, a_obs, Mstar=sss_per_sys['Mstar_obs'], n=n)
+    sigma_obs = solid_surface_density_nHill(mass_obs, a_obs, Mstar=Mstar_obs, n=n)
     return sigma_obs, mass_obs, a_obs
 
-# TODO: write unit test
 def solid_surface_density_RC2014_given_observed_catalog(sss_per_sys):
     # Compute the solid surface density (g/cm^2) using the Raymond & Cossou (2014) prescription, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
     # Returns an array of solid surface densities and semi-major axes

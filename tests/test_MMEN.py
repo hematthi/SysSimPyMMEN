@@ -107,6 +107,7 @@ def test_solid_surface_density_S2014_given_physical_catalog(sssp_per_sys=sssp_pe
 
 def test_solid_surface_density_nHill_given_physical_catalog(sssp_per_sys=sssp_per_sys, sssp=sssp):
     sigma_all, a_all = solid_surface_density_nHill_given_physical_catalog(sssp_per_sys, sssp)
+    assert len(sigma_all) == len(a_all)
     assert 0 < np.min(sigma_all)
     assert 0 < np.min(a_all)
 
@@ -115,7 +116,40 @@ def test_solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys=sssp_p
     assert len(sigma_all_2p) == len(a_all_2p) == len(mult_all_2p)
     assert 0 < np.min(sigma_all_2p)
     assert 0 < np.min(a_all_2p)
-    assert 0 < np.min(mult_all_2p)
+    assert 2 <= np.min(mult_all_2p)
+
+def test_solid_surface_density_CL2013_given_observed_catalog(sss_per_sys=sss_per_sys, seed=42):
+    np.random.seed(seed) # to draw the same planet masses from the M-R relation
+    sigma_obs, mass_obs, a_obs = solid_surface_density_CL2013_given_observed_catalog(sss_per_sys)
+    assert len(sigma_obs) == len(mass_obs) == len(a_obs)
+    assert 0 < np.min(sigma_obs)
+    assert 0 < np.min(mass_obs)
+    assert 0 < np.min(a_obs)
+
+def test_solid_surface_density_S2014_given_observed_catalog(sss_per_sys=sss_per_sys, seed=42):
+    np.random.seed(seed) # to draw the same planet masses from the M-R relation
+    sigma_obs, mass_obs, a_obs = solid_surface_density_S2014_given_observed_catalog(sss_per_sys)
+    assert len(sigma_obs) == len(mass_obs) == len(a_obs)
+    assert 0 < np.min(sigma_obs)
+    assert 0 < np.min(mass_obs)
+    assert 0 < np.min(a_obs)
+
+def test_solid_surface_density_nHill_given_observed_catalog(sss_per_sys=sss_per_sys, seed=42):
+    np.random.seed(seed) # to draw the same planet masses from the M-R relation
+    sigma_obs, mass_obs, a_obs = solid_surface_density_nHill_given_observed_catalog(sss_per_sys)
+    assert len(sigma_obs) == len(mass_obs) == len(a_obs)
+    assert 0 < np.min(sigma_obs)
+    assert 0 < np.min(mass_obs)
+    assert 0 < np.min(a_obs)
+
+def test_solid_surface_density_RC2014_given_observed_catalog(sss_per_sys=sss_per_sys, seed=42):
+    np.random.seed(seed) # to draw the same planet masses from the M-R relation
+    sigma_obs_2p, mass_obs_2p, a_obs_2p, mult_obs_2p = solid_surface_density_RC2014_given_observed_catalog(sss_per_sys)
+    assert len(sigma_obs_2p) == len(mass_obs_2p) == len(a_obs_2p) == len(mult_obs_2p)
+    assert 0 < np.min(sigma_obs_2p)
+    assert 0 < np.min(mass_obs_2p)
+    assert 0 < np.min(a_obs_2p)
+    assert 2 <= np.min(mult_obs_2p)
 
 def test_MMSN():
     assert np.isclose(MMSN(1.), 10.89)
