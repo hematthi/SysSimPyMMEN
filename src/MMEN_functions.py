@@ -117,6 +117,22 @@ def solid_surface_density_system_RC2014(M_sys, a_sys):
     delta_a_sys = np.diff(a_bounds_sys)
     return solid_surface_density(M_sys, a_sys, delta_a_sys)
 
+def solid_surface_density_prescription(M, R, a, Mstar=1., n=10., prescription='CL2013'):
+    # Wrapper function to compute the solid surface density (g/cm^2) of planets given a prescription
+    if prescription == 'CL2013':
+        return solid_surface_density_CL2013(M, a)
+    elif prescription == 'S2014':
+        return solid_surface_density_S2014(M, R, a, Mstar=Mstar)
+    elif prescription == 'nHill':
+        return solid_surface_density_nHill(M, a, Mstar=Mstar, n=n)
+    elif prescription == 'RC2014':
+        # Warning: 'M' and 'a' must all be in the same system
+        return solid_surface_density_system_RC2014(M, a)
+    else:
+        print('No matching prescription!')
+
+
+
 def solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys):
     # Compute the solid surface density (g/cm^2) using the Chiang & Laughlin (2013) prescription, for each planet in a given physical catalog
     # Returns an array of solid surface densities and semi-major axes
@@ -157,6 +173,8 @@ def solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys):
     mult_all_2p = np.array(mult_all_2p)
     sigma_all_2p = np.array(sigma_all_2p)
     return sigma_all_2p, a_all_2p, mult_all_2p
+
+
 
 def solid_surface_density_CL2013_given_observed_catalog(sss_per_sys):
     # Compute the solid surface density (g/cm^2) using the Chiang & Laughlin (2013) prescription, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
@@ -241,17 +259,18 @@ def fit_power_law_MMEN(a_array, sigma_array, a0=1., p0=1., p1=-1.5):
     sigma0, beta = 10.**(mmen_fit[0]), mmen_fit[1]
     return sigma0, beta
 
-def fit_power_law_MMEN_per_system_observed(sss_per_sys, solid_surface_density_prescription=solid_surface_density_system_RC2014, a0=1., p0=1., p1=-1.5):
+def fit_power_law_MMEN_per_system_observed(sss_per_sys, prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5):
     # Compute solid surface densities and fit power-law parameters to each multi-planet system in an observed catalog
-    # WARNING: This function currently only works for 'solid_surface_density_prescription=solid_surface_density_system_RC2014'
     fit_per_sys_dict = {'m_obs':[], 'Mstar_obs':[], 'sigma0':[], 'beta':[]} # 'm_obs' is number of observed planets
     a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
     for i,a_sys in enumerate(a_obs_per_sys):
         if np.sum(a_sys > 0) > 1:
             #print(i)
-            M_sys = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(sss_per_sys['radii_obs'][i][a_sys > 0])
+            Mstar = sss_per_sys['Mstar_obs'][i]
+            R_sys = sss_per_sys['radii_obs'][i][a_sys > 0]
+            M_sys = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(R_sys)
             a_sys = a_sys[a_sys > 0]
-            sigma_obs_sys = solid_surface_density_prescription(M_sys, a_sys)
+            sigma_obs_sys = solid_surface_density_prescription(M_sys, R_sys, a_sys, Mstar=Mstar, n=n, prescription=prescription)
             sigma0, beta = fit_power_law_MMEN(a_sys, sigma_obs_sys, a0=a0, p0=p0, p1=p1)
             fit_per_sys_dict['m_obs'].append(len(a_sys))
             fit_per_sys_dict['Mstar_obs'].append(sss_per_sys['Mstar_obs'][i])
@@ -264,15 +283,16 @@ def fit_power_law_MMEN_per_system_observed(sss_per_sys, solid_surface_density_pr
     fit_per_sys_dict['beta'] = np.array(fit_per_sys_dict['beta'])
     return fit_per_sys_dict
 
-def fit_power_law_MMEN_per_system_physical(sssp_per_sys, solid_surface_density_prescription=solid_surface_density_system_RC2014, a0=1., p0=1., p1=-1.5):
+def fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5):
     # Compute solid surface densities and fit power-law parameters to each multi-planet system in a physical catalog
-    # WARNING: This function currently only works for 'solid_surface_density_prescription=solid_surface_density_system_RC2014'
     fit_per_sys_dict = {'n_pl':[], 'sigma0':[], 'beta':[]} # 'n_pl' is number of planets in each system
     for i,a_sys in enumerate(sssp_per_sys['a_all']):
         if np.sum(a_sys > 0) > 1:
+            Mstar = sssp['Mstar_all'][i]
             M_sys = sssp_per_sys['mass_all'][i][a_sys > 0]
+            R_sys = sssp_per_sys['radii_all'][i][a_sys > 0]
             a_sys = a_sys[a_sys > 0]
-            sigma_sys = solid_surface_density_prescription(M_sys, a_sys)
+            sigma_sys = solid_surface_density_prescription(M_sys, R_sys, a_sys, Mstar=Mstar, n=n, prescription=prescription)
             sigma0, beta = fit_power_law_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
             fit_per_sys_dict['n_pl'].append(len(a_sys))
             fit_per_sys_dict['sigma0'].append(sigma0)
@@ -283,22 +303,25 @@ def fit_power_law_MMEN_per_system_physical(sssp_per_sys, solid_surface_density_p
     fit_per_sys_dict['beta'] = np.array(fit_per_sys_dict['beta'])
     return fit_per_sys_dict
 
-def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, solid_surface_density_prescription=solid_surface_density_system_RC2014, a0=1., p0=1., p1=-1.5):
+def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5):
     # Compute solid surface densities and fit power-law parameters to each multi-planet system in an observed catalog, for the observed planets only and then for all the planets in those systems (using the physical planet properties for both)
-    # WARNING: This function currently only works for 'solid_surface_density_prescription=solid_surface_density_system_RC2014'
     fit_per_sys_dict = {'n_pl_true':[], 'n_pl_obs':[], 'sigma0_true':[], 'sigma0_obs':[], 'beta_true':[], 'beta_obs':[]}
     for i,det_sys in enumerate(sssp_per_sys['det_all']):
         if np.sum(det_sys) > 1:
-            a_sys = sssp_per_sys['a_all'][i] # all semimajor axes including padded zeros
+            Mstar = sssp['Mstar_all'][i]
             M_sys = sssp_per_sys['mass_all'][i] # all planet masses including padded zeros
+            R_sys = sssp_per_sys['radii_all'][i] # all planet radii including padded zeros
+            a_sys = sssp_per_sys['a_all'][i] # all semimajor axes including padded zeros
 
-            a_sys_obs = a_sys[det_sys == 1] # semimajor axes of observed planets
             M_sys_obs = M_sys[det_sys == 1] # masses of observed planets
+            R_sys_obs = R_sys[det_sys == 1] # radii of observed planets
+            a_sys_obs = a_sys[det_sys == 1] # semimajor axes of observed planets
             M_sys = M_sys[a_sys > 0] # masses of all planets
+            R_sys = R_sys[a_sys > 0] # radii of all planets
             a_sys = a_sys[a_sys > 0] # semimajor axes of all planets
 
-            sigma_sys = solid_surface_density_prescription(M_sys, a_sys) # using all planets
-            sigma_sys_obs = solid_surface_density_prescription(M_sys_obs, a_sys_obs) # using observed planets only
+            sigma_sys = solid_surface_density_prescription(M_sys, R_sys, a_sys, Mstar=Mstar, n=n, prescription=prescription) # using all planets
+            sigma_sys_obs = solid_surface_density_prescription(M_sys_obs, R_sys_obs, a_sys_obs, Mstar=Mstar, n=n, prescription=prescription) # using observed planets only
             sigma0, beta = fit_power_law_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
             sigma0_obs, beta_obs = fit_power_law_MMEN(a_sys_obs, sigma_sys_obs, a0=a0, p0=p0, p1=p1)
 

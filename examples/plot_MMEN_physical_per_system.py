@@ -91,8 +91,7 @@ tfs = 20 # text labels font size
 lfs = 16 # legend labels font size
 
 # Parameters for defining the MMEN:
-prescription_str = 'CL2013' #'RC2014' # make sure this actually matches the prescription used!
-solid_surface_density_prescription = solid_surface_density_CL2013 #solid_surface_density_system_RC2014
+prescription_str = 'CL2013' #'RC2014'
 a0 = 0.3 # normalization separation for fitting power-laws
 
 # Compute the MMSN for comparison:
@@ -100,7 +99,7 @@ a_array = np.linspace(1e-3,2,1001)
 sigma_MMSN = MMSN(a_array)
 MeVeEa_masses = np.array([0.0553, 0.815, 1.]) # masses of Mercury, Venus, and Earth, in Earth masses
 MeVeEa_a = np.array([0.387, 0.723, 1.]) # semi-major axes of Mercury, Venus, and Earth, in AU
-MeVeEa_sigmas = solid_surface_density_prescription(MeVeEa_masses, MeVeEa_a)
+MeVeEa_sigmas = solid_surface_density_CL2013(MeVeEa_masses, MeVeEa_a) # WARNING: need to replace with any prescription
 
 
 
@@ -173,7 +172,7 @@ plt.show()
 '''
 a0_array = np.logspace(np.log10(a_from_P(3.,1.)), np.log10(a_from_P(300.,1.)), 11)
 for a0 in a0_array:
-    fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys, solid_surface_density_prescription=solid_surface_density_system_RC2014, a0=a0)
+    fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription=prescription_str, a0=a0)
 
     x, y = fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'] # beta's, sigma0's
     plot_2d_points_and_contours_with_histograms(x, y, x_min=-10., x_max=5., y_min=1e-4, y_max=1e6, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text=r'$\Sigma_0 = \Sigma({:0.3f} AU)$'.format(a0), plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_RC2014_sigma0_vs_beta_per_system_a0_{:0.3f}.pdf'.format(a0), save_fig=savefigures)

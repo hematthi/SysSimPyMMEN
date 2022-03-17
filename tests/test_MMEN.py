@@ -87,6 +87,17 @@ def test_solid_surface_density_system_RC2014(seed=42):
     assert 0 < sigma_sys_removed_mid[0] < sigma_sys_in_out[0]
     assert 0 < sigma_sys_removed_mid[1] < sigma_sys_in_out[1]
 
+def test_solid_surface_density_prescription(seed=42):
+    np.random.seed(seed)
+    R_sys = 0.5 + 9.5*np.random.rand(5) # uniform between 0.5 and 10 R_earth
+    M_sys = R_sys**3.
+    a_sys = np.sort(10.**(-1. + 2.*np.random.rand(5))) # log-uniform between 0.1 and 10 AU
+    Mstar = 0.5 + np.random.rand() # uniform between 0.5 and 1.5 M_sun
+    assert np.allclose(solid_surface_density_prescription(M_sys, R_sys, a_sys, prescription='CL2013'), solid_surface_density_CL2013(M_sys, a_sys))
+    assert np.allclose(solid_surface_density_prescription(M_sys, R_sys, a_sys, Mstar=Mstar, prescription='S2014'), solid_surface_density_S2014(M_sys, R_sys, a_sys, Mstar=Mstar))
+    assert np.allclose(solid_surface_density_prescription(M_sys, R_sys, a_sys, Mstar=Mstar, n=10., prescription='nHill'), solid_surface_density_nHill(M_sys, a_sys, Mstar=Mstar, n=10.))
+    assert np.allclose(solid_surface_density_prescription(M_sys, R_sys, a_sys, prescription='RC2014'), solid_surface_density_system_RC2014(M_sys, a_sys))
+
 loadfiles_directory = '/Users/hematthi/Documents/GradSchool/Research/ACI/Simulated_Data/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/GP_med/'
 #loadfiles_directory = 'C:/Users/HeYMa/Documents/GradSchool/Research/ACI/Simulated_Data/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/GP_med/'
 run_number = ''
@@ -178,29 +189,29 @@ def test_fit_power_law_MMEN(seed=42):
     assert np.isclose(beta, beta_fit, atol=1e-5)
 
 def test_fit_power_law_MMEN_per_system_observed(sss_per_sys=sss_per_sys):
-    # TODO: Expand tests when this function is expanded to allow for other prescriptions
-    fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys) # for RC2014 prescription
-    assert len(fit_per_sys_dict['m_obs']) == len(fit_per_sys_dict['Mstar_obs']) == len(fit_per_sys_dict['sigma0']) == len(fit_per_sys_dict['beta'])
-    assert 2 <= np.min(fit_per_sys_dict['m_obs'])
-    assert 0 < np.min(fit_per_sys_dict['Mstar_obs'])
-    assert 0 < np.min(fit_per_sys_dict['sigma0'])
+    for prescription in ['CL2013', 'S2014', 'nHill', 'RC2014']:
+        fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys, prescription=prescription)
+        assert len(fit_per_sys_dict['m_obs']) == len(fit_per_sys_dict['Mstar_obs']) == len(fit_per_sys_dict['sigma0']) == len(fit_per_sys_dict['beta'])
+        assert 2 <= np.min(fit_per_sys_dict['m_obs'])
+        assert 0 < np.min(fit_per_sys_dict['Mstar_obs'])
+        assert 0 < np.min(fit_per_sys_dict['sigma0'])
 
-def test_fit_power_law_MMEN_per_system_physical(sssp_per_sys=sssp_per_sys):
-    # TODO: Expand tests when this function is expanded to allow for other prescriptions
-    fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys)
-    assert len(fit_per_sys_dict['n_pl']) == len(fit_per_sys_dict['sigma0']) == len(fit_per_sys_dict['beta'])
-    assert 2 <= np.min(fit_per_sys_dict['n_pl'])
-    assert 0 < np.min(fit_per_sys_dict['sigma0'])
+def test_fit_power_law_MMEN_per_system_physical(sssp_per_sys=sssp_per_sys, sssp=sssp):
+    for prescription in ['CL2013', 'S2014', 'nHill', 'RC2014']:
+        fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription=prescription)
+        assert len(fit_per_sys_dict['n_pl']) == len(fit_per_sys_dict['sigma0']) == len(fit_per_sys_dict['beta'])
+        assert 2 <= np.min(fit_per_sys_dict['n_pl'])
+        assert 0 < np.min(fit_per_sys_dict['sigma0'])
 
-def test_fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys=sssp_per_sys):
-    # TODO: Expand tests when this function is expanded to allow for other prescriptions
-    fit_per_sys_dict = fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys)
-    assert len(fit_per_sys_dict['n_pl_true']) == len(fit_per_sys_dict['n_pl_obs']) == len(fit_per_sys_dict['sigma0_true']) == len(fit_per_sys_dict['sigma0_obs']) == len(fit_per_sys_dict['beta_true']) == len(fit_per_sys_dict['beta_obs'])
-    assert 2 <= np.min(fit_per_sys_dict['n_pl_true'])
-    assert 2 <= np.min(fit_per_sys_dict['n_pl_obs'])
-    assert np.all(fit_per_sys_dict['n_pl_obs'] <= fit_per_sys_dict['n_pl_true'])
-    assert 0 < np.min(fit_per_sys_dict['sigma0_true'])
-    assert 0 < np.min(fit_per_sys_dict['sigma0_obs'])
+def test_fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys=sssp_per_sys, sssp=sssp):
+    for prescription in ['CL2013', 'S2014', 'nHill', 'RC2014']:
+        fit_per_sys_dict = fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, prescription=prescription)
+        assert len(fit_per_sys_dict['n_pl_true']) == len(fit_per_sys_dict['n_pl_obs']) == len(fit_per_sys_dict['sigma0_true']) == len(fit_per_sys_dict['sigma0_obs']) == len(fit_per_sys_dict['beta_true']) == len(fit_per_sys_dict['beta_obs'])
+        assert 2 <= np.min(fit_per_sys_dict['n_pl_true'])
+        assert 2 <= np.min(fit_per_sys_dict['n_pl_obs'])
+        assert np.all(fit_per_sys_dict['n_pl_obs'] <= fit_per_sys_dict['n_pl_true'])
+        assert 0 < np.min(fit_per_sys_dict['sigma0_true'])
+        assert 0 < np.min(fit_per_sys_dict['sigma0_obs'])
 
 def test_solid_mass_integrated_r0_to_r_given_power_law_profile(seed=42):
     np.random.seed(seed)

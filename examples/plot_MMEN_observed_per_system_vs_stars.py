@@ -90,8 +90,7 @@ tfs = 20 # text labels font size
 lfs = 16 # legend labels font size
 
 # Parameters for defining the MMEN:
-prescription_str = 'RC2014' # make sure this actually matches the prescription used!
-solid_surface_density_prescription = solid_surface_density_system_RC2014
+prescription_str = 'RC2014'
 a0 = 0.3 # normalization separation for fitting power-laws
 
 
@@ -100,9 +99,8 @@ a0 = 0.3 # normalization separation for fitting power-laws
 
 ##### To fit a power-law to each observed system for the simulated observed and Kepler catalog:
 
-fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys, solid_surface_density_prescription=solid_surface_density_prescription, a0=a0)
-
-fit_per_sys_dict_Kep = fit_power_law_MMEN_per_system_observed(ssk_per_sys, solid_surface_density_prescription=solid_surface_density_prescription, a0=a0)
+fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys, prescription=prescription_str, a0=a0)
+fit_per_sys_dict_Kep = fit_power_law_MMEN_per_system_observed(ssk_per_sys, prescription=prescription_str, a0=a0)
 
 ##### To test how the fitted observed MMEN may correlate with stellar mass:
 

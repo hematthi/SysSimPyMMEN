@@ -90,8 +90,7 @@ tfs = 20 # text labels font size
 lfs = 16 # legend labels font size
 
 # Parameters for defining the MMEN:
-prescription_str = 'RC2014' # make sure this actually matches the prescription used!
-solid_surface_density_prescription = solid_surface_density_system_RC2014
+prescription_str = 'RC2014'
 a0 = 0.3 # normalization separation for fitting power-laws
 
 
@@ -101,7 +100,7 @@ a0 = 0.3 # normalization separation for fitting power-laws
 ##### To fit a power-law to each observed system in a simulated observed catalog, and then for each underlying physical system (i.e. including all planets), to compare how the power-law fits change:
 ##### NOTE: we will use the 'true' planet masses for the simulated observed planets so their masses are consistent in both MMEN calculations of the physical systems and the observed systems
 
-fit_per_sys_dict = fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, solid_surface_density_prescription=solid_surface_density_system_RC2014, a0=a0)
+fit_per_sys_dict = fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, prescription=prescription_str, a0=a0)
 
 # To plot sigma0_obs vs sigma0_true for the simulated observed systems:
 plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['sigma0_true'], fit_per_sys_dict['sigma0_obs'], x_min=1e-2, x_max=1e7, y_min=1e-2, y_max=1e7, log_x=True, log_y=True, xlabel_text=r'$\log_{10}(\Sigma_{0,\rm true}/{\rm g cm^{-2}})$', ylabel_text=r'$\log_{10}(\Sigma_{0,\rm obs}/{\rm g cm^{-2}})$', extra_text='Simulated observed systems', plot_qtls=True, x_str_format='{:0.1f}', y_str_format='{:0.1f}', x_symbol=r'$\Sigma_{0,\rm true}$', y_symbol=r'$\Sigma_{0,\rm obs}$', save_name=savefigures_directory + model_name + '_true_vs_obs_mmen_%s_sigma0_per_system.pdf' % prescription_str, save_fig=savefigures)

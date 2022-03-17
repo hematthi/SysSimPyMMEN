@@ -91,8 +91,7 @@ tfs = 20 # text labels font size
 lfs = 16 # legend labels font size
 
 # Parameters for defining the MMEN:
-prescription_str = 'CL2013' #'RC2014' # make sure this actually matches the prescription used!
-solid_surface_density_prescription = solid_surface_density_CL2013 #solid_surface_density_system_RC2014
+prescription_str = 'CL2013' #'RC2014'
 a0 = 0.3 # normalization separation for fitting power-laws
 
 # Compute the MMSN for comparison:
@@ -100,7 +99,7 @@ a_array = np.linspace(1e-3,2,1001)
 sigma_MMSN = MMSN(a_array)
 MeVeEa_masses = np.array([0.0553, 0.815, 1.]) # masses of Mercury, Venus, and Earth, in Earth masses
 MeVeEa_a = np.array([0.387, 0.723, 1.]) # semi-major axes of Mercury, Venus, and Earth, in AU
-MeVeEa_sigmas = solid_surface_density_prescription(MeVeEa_masses, MeVeEa_a)
+MeVeEa_sigmas = solid_surface_density_CL2013(MeVeEa_masses, MeVeEa_a) # WARNING: need to replace with any prescription
 
 
 
@@ -108,7 +107,7 @@ MeVeEa_sigmas = solid_surface_density_prescription(MeVeEa_masses, MeVeEa_a)
 
 ##### To integrate the total mass in solids for the fitted power-laws as a function of separation:
 
-fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys, solid_surface_density_prescription=solid_surface_density_system_RC2014, a0=a0)
+fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription=prescription_str, a0=a0)
 
 r0 = a_from_P(3., 1.) # inner truncation radius/limit of integration, in AU
 r_array = np.logspace(np.log10(r0+1e-6), np.log10(1.1), 100)

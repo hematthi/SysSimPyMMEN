@@ -90,8 +90,7 @@ tfs = 20 # text labels font size
 lfs = 16 # legend labels font size
 
 # Parameters for defining the MMEN:
-prescription_str = 'RC2014' # make sure this actually matches the prescription used!
-solid_surface_density_prescription = solid_surface_density_system_RC2014
+prescription_str = 'RC2014'
 a0 = 0.3 # normalization separation for fitting power-laws
 
 
@@ -100,7 +99,7 @@ a0 = 0.3 # normalization separation for fitting power-laws
 
 ##### To fit a power-law to each observed system for the Kepler catalog and plot the distribution of fitted parameters (sigma0 vs. beta):
 
-fit_per_sys_dict_Kep = fit_power_law_MMEN_per_system_observed(ssk_per_sys, solid_surface_density_prescription=solid_surface_density_prescription, a0=a0)
+fit_per_sys_dict_Kep = fit_power_law_MMEN_per_system_observed(ssk_per_sys, prescription=prescription_str, a0=a0)
 
 plot_2d_points_and_contours_with_histograms(fit_per_sys_dict_Kep['beta'], fit_per_sys_dict_Kep['sigma0'], x_min=-8., x_max=4., y_min=1e-2, y_max=1e8, log_y=True, bins_cont=30, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Kepler observed systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + 'Kepler_mmen_%s_sigma0_vs_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
 plt.show()
@@ -126,7 +125,7 @@ for i in range(1,runs+1):
     sss_per_sys_all.append(sss_per_sys_i)
     sss_all.append(sss_i)
 
-    fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys_i, solid_surface_density_prescription=solid_surface_density_prescription, a0=a0)
+    fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys_i, prescription=prescription_str, a0=a0)
     fit_per_sys_dict_all.append(fit_per_sys_dict)
 
     # To plot the distribution of fitted power-law parameters (sigma0 vs. beta) for the simulated observed systems:
