@@ -91,9 +91,8 @@ tfs = 20 # text labels font size
 lfs = 16 # legend labels font size
 
 # Parameters for defining the MMEN:
-prescription_str = 'CL2013' #'RC2014' # make sure this actually matches the prescription used!
-solid_surface_density_prescription = solid_surface_density_CL2013 #solid_surface_density_system_RC2014 # NOTE: need to standardize the inputs for each function of the different prescriptions
-a0 = 1. #0.3 # normalization separation for fitting power-laws
+prescription_str = 'CL2013' #'RC2014'
+a0 = 0.3 # normalization separation for fitting power-laws
 
 
 
@@ -105,11 +104,12 @@ a0 = 1. #0.3 # normalization separation for fitting power-laws
 a_array = np.linspace(1e-3,2,1001)
 sigma_MMSN = MMSN(a_array)
 MeVeEa_masses = np.array([0.0553, 0.815, 1.]) # masses of Mercury, Venus, and Earth, in Earth masses
+MeVeEa_radii = np.array([0.383, 0.949, 1.]) # radii of Mercury, Venus, and Earth, in Earth radii
 MeVeEa_a = np.array([0.387, 0.723, 1.]) # semi-major axes of Mercury, Venus, and Earth, in AU
-MeVeEa_sigmas = solid_surface_density_prescription(MeVeEa_masses, MeVeEa_a)
+MeVeEa_sigmas = solid_surface_density_prescription(MeVeEa_masses, MeVeEa_radii, MeVeEa_a, prescription=prescription_str)
 
+sigma_all = solid_surface_density_prescription(sssp_per_sys['mass_all'], sssp_per_sys['radii_all'], sssp_per_sys['a_all'], Mstar=sssp['Mstar_all'][:,None], prescription=prescription_str)[sssp_per_sys['a_all'] > 0]
 a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
-sigma_all = solid_surface_density_prescription(sssp_per_sys['mass_all'][sssp_per_sys['a_all'] > 0], a_all)
 
 sigma0, beta = fit_power_law_MMEN(a_all, sigma_all, a0=a0)
 
@@ -132,7 +132,7 @@ ax.tick_params(axis='both', labelsize=afs)
 plt.xlim([0.,1.1]) #[0.,0.45]
 plt.ylim([0.,6.]) #[1.5,6.]
 plt.xlabel(r'Semimajor axis $a$ (AU)', fontsize=20)
-plt.ylabel(r'Surface density $\log_{10}(\sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
+plt.ylabel(r'Surface density, $\log_{10}(\Sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
 plt.legend(loc='upper right', bbox_to_anchor=(1.,1.), ncol=1, frameon=False, fontsize=lfs)
 if savefigures:
     plt.savefig(savefigures_directory + model_name + '_mmen_%s_unlogged.pdf' % prescription_str)
@@ -162,7 +162,7 @@ ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
 plt.xlim([0.04,0.9])
 plt.ylim([0.,5.5])
 plt.xlabel(r'Semimajor axis $a$ (AU)', fontsize=20)
-plt.ylabel(r'Surface density $\log_{10}(\sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
+plt.ylabel(r'Surface density, $\log_{10}(\Sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
 plt.legend(loc='upper right', bbox_to_anchor=(1.,1.), ncol=1, frameon=False, fontsize=lfs)
 if savefigures:
     plt.savefig(savefigures_directory + model_name + '_mmen_%s.pdf' % prescription_str)
@@ -189,7 +189,7 @@ ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
 plt.xlim([0.04,0.9])
 plt.ylim([0.,5.5])
 plt.xlabel(r'Semimajor axis, $a$ (AU)', fontsize=20)
-plt.ylabel(r'Surface density, $\log_{10}(\sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
+plt.ylabel(r'Surface density, $\log_{10}(\Sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
 plt.legend(loc='upper right', bbox_to_anchor=(1.,1.), ncol=1, frameon=False, fontsize=lfs)
 if savefigures:
     plt.savefig(savefigures_directory + model_name + '_mmen_%s.pdf' % prescription_str)
@@ -237,16 +237,16 @@ plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_CL2013, beta_CL2013, a
 plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_S2014, beta_S2014, a0=a0)), lw=3, ls='--', color='r', label=r'$\Delta{a} = 2^{3/2}a(\frac{a M_p}{R_p M_\star})^{1/2}$' + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_S2014, beta_S2014))
 plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_nHill10, beta_nHill10, a0=a0)), lw=3, ls='--', color='b', label=r'$\Delta{a} = 10 R_{\rm Hill}$' + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_nHill10, beta_nHill10))
 plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_RC2014, beta_RC2014, a0=a0)), lw=3, ls='--', color='m', label=r'$\Delta{a} = \sqrt{a_{i+1} a_i} - \sqrt{a_i a_{i-1}}$, multis only' + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_RC2014, beta_RC2014))
-plt.plot(a_array, np.log10(sigma_MMSN), lw=2, color='g', label=r'MMSN ($\sigma_{\rm solid} = 10.89(a/{\rm AU})^{-3/2}$ g/cm$^2$)')
-plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g', label='Solar system planets (Mercury, Venus, Earth)')
+plt.plot(a_array, np.log10(sigma_MMSN), lw=3, color='g', label=r'MMSN ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(MMSN(a0), -1.5)) #label=r'MMSN ($\sigma_{\rm solid} = 10.89(a/{\rm AU})^{-3/2}$ g/cm$^2$)'
+plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g', label='') #label='Solar system planets (Mercury, Venus, Earth)'
 ax.tick_params(axis='both', labelsize=afs)
 plt.gca().set_xscale("log")
 plt.xticks(a_ticks)
 ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
 plt.xlim([0.04,0.9])
 plt.ylim([0.,5.5])
-plt.xlabel(r'Semimajor axis $a$ (AU)', fontsize=20)
-plt.ylabel(r'Surface density $\log_{10}(\sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
+plt.xlabel(r'Semimajor axis, $a$ (AU)', fontsize=20)
+plt.ylabel(r'Surface density, $\log_{10}(\Sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
 plt.legend(loc='upper right', bbox_to_anchor=(1.,1.), ncol=1, frameon=False, fontsize=lfs)
 if savefigures:
     plt.savefig(savefigures_directory + model_name + '_mmen_deltaa_compare.pdf')

@@ -97,8 +97,9 @@ a0 = 0.3 # normalization separation for fitting power-laws
 a_array = np.linspace(1e-3,2,1001)
 sigma_MMSN = MMSN(a_array)
 MeVeEa_masses = np.array([0.0553, 0.815, 1.]) # masses of Mercury, Venus, and Earth, in Earth masses
+MeVeEa_radii = np.array([0.383, 0.949, 1.]) # radii of Mercury, Venus, and Earth, in Earth radii
 MeVeEa_a = np.array([0.387, 0.723, 1.]) # semi-major axes of Mercury, Venus, and Earth, in AU
-MeVeEa_sigmas = solid_surface_density_CL2013(MeVeEa_masses, MeVeEa_a)
+MeVeEa_sigmas = solid_surface_density_prescription(MeVeEa_masses, MeVeEa_radii, MeVeEa_a, prescription=prescription_str)
 
 
 

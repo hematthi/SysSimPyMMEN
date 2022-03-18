@@ -91,80 +91,60 @@ tfs = 20 # text labels font size
 lfs = 16 # legend labels font size
 
 # Parameters for defining the MMEN:
-prescription_str = 'CL2013' #'RC2014'
+prescription_str = 'RC2014' #'RC2014'
 a0 = 0.3 # normalization separation for fitting power-laws
 
 # Compute the MMSN for comparison:
-a_array = np.linspace(1e-3,2,1001)
+a_array = np.linspace(1e-3,2,101)
 sigma_MMSN = MMSN(a_array)
 MeVeEa_masses = np.array([0.0553, 0.815, 1.]) # masses of Mercury, Venus, and Earth, in Earth masses
+MeVeEa_radii = np.array([0.383, 0.949, 1.]) # radii of Mercury, Venus, and Earth, in Earth radii
 MeVeEa_a = np.array([0.387, 0.723, 1.]) # semi-major axes of Mercury, Venus, and Earth, in AU
-MeVeEa_sigmas = solid_surface_density_CL2013(MeVeEa_masses, MeVeEa_a) # WARNING: need to replace with any prescription
+MeVeEa_sigmas = solid_surface_density_prescription(MeVeEa_masses, MeVeEa_radii, MeVeEa_a, prescription=prescription_str)
 
 
 
 
-
-##### To test different prescriptions for the feeding zone width (delta_a):
-
-mult_all = np.repeat(sssp_per_sys['Mtot_all'], sssp_per_sys['Mtot_all'])
-sigma_all_CL2013, a_all = solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys)
-sigma_all_S2014, _ = solid_surface_density_S2014_given_physical_catalog(sssp_per_sys, sssp)
-sigma_all_nHill10, _ = solid_surface_density_nHill_given_physical_catalog(sssp_per_sys, sssp, n=10.)
-sigma_all_RC2014, a_all_2p, mult_all_2p = solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys)
-
-sigma0_CL2013, beta_CL2013 = fit_power_law_MMEN(a_all, sigma_all_CL2013, a0=a0)
-sigma0_S2014, beta_S2014 = fit_power_law_MMEN(a_all, sigma_all_S2014, a0=a0)
-sigma0_nHill10, beta_nHill10 = fit_power_law_MMEN(a_all, sigma_all_nHill10, a0=a0)
-sigma0_RC2014, beta_RC2014 = fit_power_law_MMEN(a_all_2p, sigma_all_RC2014, a0=a0)
 
 ##### To fit a line to each system:
-a0 = 0.3
 
-fig = plt.figure(figsize=(16,8))
-plot = GridSpec(1,1,left=0.1,bottom=0.1,right=0.95,top=0.95,wspace=0,hspace=0)
+fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription=prescription_str, a0=a0, N_sys=N_sim)
+
+sigma0_med, beta_med = np.median(fit_per_sys_dict['sigma0']), np.median(fit_per_sys_dict['beta'])
+
+# To plot a sample of individual lines:
+fig = plt.figure(figsize=(8,8))
+plot = GridSpec(1,1,left=0.15,bottom=0.15,right=0.95,top=0.95,wspace=0,hspace=0)
 ax = plt.subplot(plot[0,0])
-n_sys_all = []
-sigma0_beta_RC2014_all = []
-for i,a_sys in enumerate(sssp_per_sys['a_all'][:10000]): #100000
-    M_sys = sssp_per_sys['mass_all'][i][a_sys > 0]
-    a_sys = a_sys[a_sys > 0]
-    if len(a_sys) > 1:
-        #print(i)
-        n_sys_all.append(len(a_sys))
-        sigma_sys_RC2014 = solid_surface_density_system_RC2014(M_sys, a_sys)
-
-        sigma0_RC2014, beta_RC2014 = fit_power_law_MMEN(a_sys, sigma_sys_RC2014, a0=a0)
-        sigma0_beta_RC2014_all.append([sigma0_RC2014, beta_RC2014])
-
-        plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_RC2014, beta_RC2014, a0=a0)), lw=0.1, ls='-', alpha=1, color='k')
-n_sys_all = np.array(n_sys_all)
-sigma0_beta_RC2014_all = np.array(sigma0_beta_RC2014_all)
-sigma0_RC2014_qtls = np.quantile(sigma0_beta_RC2014_all[:,0], q=[0.16,0.5,0.84])
-beta_RC2014_qtls = np.quantile(sigma0_beta_RC2014_all[:,1], q=[0.16,0.5,0.84])
-plt.plot(a_array, np.log10(sigma_MMSN), lw=2, color='g')
-plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g')
+for i in range(min(len(fit_per_sys_dict['n_pl']), 10000)):
+    sigma0_i, beta_i = fit_per_sys_dict['sigma0'][i], fit_per_sys_dict['beta'][i]
+    plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_i, beta_i, a0=a0)), lw=0.2, ls='-', alpha=0.2, color='k')
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_med, beta_med, a0=a0)), lw=2, ls='--', alpha=1, color='b', label=r'Median MMEN ($\Sigma_0 = {:0.1f}$, $\beta = {:0.2f}$)'.format(sigma0_med, beta_med))
+plt.plot(a_array, np.log10(sigma_MMSN), lw=2, color='g', label='MMSN')
+#plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g')
 ax.tick_params(axis='both', labelsize=afs)
 plt.gca().set_xscale("log")
+a_ticks = [0.05, 0.1, 0.2, 0.4, 0.8]
+plt.xticks(a_ticks)
+ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
 plt.xlim([0.04,1.1])
 plt.ylim([-0.5,5.5])
-plt.xlabel(r'Semimajor axis $a$ (AU)', fontsize=20)
-plt.ylabel(r'Surface density $\log_{10}(\sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
-plt.legend(loc='upper right', bbox_to_anchor=(1.,1.), ncol=2, frameon=False, fontsize=lfs)
+plt.xlabel(r'Semimajor axis, $a$ (AU)', fontsize=20)
+plt.ylabel(r'Surface density, $\log_{10}(\Sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
+plt.legend(loc='upper right', bbox_to_anchor=(1.,1.), ncol=1, frameon=False, fontsize=lfs)
 if savefigures:
-    plt.savefig(savefigures_directory + model_name + '_mmen_RC2014_per_system.pdf')
+    plt.savefig(savefigures_directory + model_name + '_mmen_%s_per_system.png' % prescription_str)
     plt.close()
 
 # To plot the distribution of fitted power-law parameters (sigma0 vs. beta):
-x, y = sigma0_beta_RC2014_all[:,1], sigma0_beta_RC2014_all[:,0] # beta's, sigma0's
-plot_2d_points_and_contours_with_histograms(x, y, x_min=-8., x_max=4., y_min=1., y_max=1e5, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Simulated physical systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_RC2014_sigma0_vs_beta_per_system.pdf', save_fig=savefigures)
+plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'], x_min=-8., x_max=4., y_min=1e-1, y_max=1e5, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Simulated physical systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_%s_sigma0_vs_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
 
 # To repeat the above (plot sigma0 vs. beta) per intrinsic multiplicity:
 for n in range(2,9):
-    print(np.sum(n_sys_all == n))
-    x = sigma0_beta_RC2014_all[:,1][n_sys_all == n] # beta's
-    y = sigma0_beta_RC2014_all[:,0][n_sys_all == n] # sigma0's
-    plot_2d_points_and_contours_with_histograms(x, y, x_min=-8., x_max=4., y_min=1., y_max=1e5, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text=r'$n = %s$' % n, plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_RC2014_sigma0_vs_beta_per_system_n%s.pdf' % n, save_fig=savefigures)
+    print(np.sum(fit_per_sys_dict['n_pl'] == n))
+    x = fit_per_sys_dict['beta'][fit_per_sys_dict['n_pl'] == n] # beta's
+    y = fit_per_sys_dict['sigma0'][fit_per_sys_dict['n_pl'] == n] # sigma0's
+    plot_2d_points_and_contours_with_histograms(x, y, x_min=-8., x_max=4., y_min=1e-1, y_max=1e5, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text=r'$n = %s$' % n, plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_%s_sigma0_vs_beta_per_system_n%s.pdf' % (prescription_str, n), save_fig=savefigures)
 
 plt.show()
 
@@ -175,6 +155,6 @@ for a0 in a0_array:
     fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription=prescription_str, a0=a0)
 
     x, y = fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'] # beta's, sigma0's
-    plot_2d_points_and_contours_with_histograms(x, y, x_min=-10., x_max=5., y_min=1e-4, y_max=1e6, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text=r'$\Sigma_0 = \Sigma({:0.3f} AU)$'.format(a0), plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_RC2014_sigma0_vs_beta_per_system_a0_{:0.3f}.pdf'.format(a0), save_fig=savefigures)
+    plot_2d_points_and_contours_with_histograms(x, y, x_min=-10., x_max=5., y_min=1e-4, y_max=1e6, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text=r'$\Sigma_0 = \Sigma({:0.3f} AU)$'.format(a0), plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_%s_sigma0_vs_beta_per_system_a0_{:0.3f}.pdf'.format(a0) % prescription_str, save_fig=savefigures)
 plt.show()
 '''

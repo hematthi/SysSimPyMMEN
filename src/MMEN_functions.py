@@ -1,6 +1,7 @@
 # To import required modules:
 import numpy as np
 import os
+import time
 from scipy.interpolate import RectBivariateSpline
 from scipy.interpolate import interp1d
 from scipy.stats import truncnorm
@@ -283,10 +284,14 @@ def fit_power_law_MMEN_per_system_observed(sss_per_sys, prescription='CL2013', n
     fit_per_sys_dict['beta'] = np.array(fit_per_sys_dict['beta'])
     return fit_per_sys_dict
 
-def fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5):
+def fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, N_sys=10000):
     # Compute solid surface densities and fit power-law parameters to each multi-planet system in a physical catalog
+    # 'N_sys' is the maximum number of systems to loop through (to save time)
+    start = time.time()
+    N_sys_tot = len(sssp_per_sys['a_all'])
+    print('Fitting power-laws to the first %s systems (out of %s)...' % (min(N_sys,N_sys_tot), N_sys_tot))
     fit_per_sys_dict = {'n_pl':[], 'sigma0':[], 'beta':[]} # 'n_pl' is number of planets in each system
-    for i,a_sys in enumerate(sssp_per_sys['a_all']):
+    for i,a_sys in enumerate(sssp_per_sys['a_all'][:N_sys]):
         if np.sum(a_sys > 0) > 1:
             Mstar = sssp['Mstar_all'][i]
             M_sys = sssp_per_sys['mass_all'][i][a_sys > 0]
@@ -301,6 +306,8 @@ def fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription='CL2
     fit_per_sys_dict['n_pl'] = np.array(fit_per_sys_dict['n_pl'])
     fit_per_sys_dict['sigma0'] = np.array(fit_per_sys_dict['sigma0'])
     fit_per_sys_dict['beta'] = np.array(fit_per_sys_dict['beta'])
+    stop = time.time()
+    print('Time to compute: %s s' % (stop - start))
     return fit_per_sys_dict
 
 def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5):
