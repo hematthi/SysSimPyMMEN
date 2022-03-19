@@ -91,7 +91,7 @@ tfs = 20 # text labels font size
 lfs = 16 # legend labels font size
 
 # Parameters for defining the MMEN:
-prescription_str = 'RC2014' #'RC2014'
+prescription_str = 'RC2014'
 a0 = 0.3 # normalization separation for fitting power-laws
 
 # Compute the MMSN for comparison:
@@ -118,7 +118,7 @@ plot = GridSpec(1,1,left=0.15,bottom=0.15,right=0.95,top=0.95,wspace=0,hspace=0)
 ax = plt.subplot(plot[0,0])
 for i in range(min(len(fit_per_sys_dict['n_pl']), 10000)):
     sigma0_i, beta_i = fit_per_sys_dict['sigma0'][i], fit_per_sys_dict['beta'][i]
-    plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_i, beta_i, a0=a0)), lw=0.2, ls='-', alpha=0.2, color='k')
+    plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_i, beta_i, a0=a0)), lw=0.1, ls='-', alpha=0.1, color='k')
 plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_med, beta_med, a0=a0)), lw=2, ls='--', alpha=1, color='b', label=r'Median MMEN ($\Sigma_0 = {:0.1f}$, $\beta = {:0.2f}$)'.format(sigma0_med, beta_med))
 plt.plot(a_array, np.log10(sigma_MMSN), lw=2, color='g', label='MMSN')
 #plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g')
@@ -148,13 +148,13 @@ for n in range(2,9):
 
 plt.show()
 
+
+
 # To change the normalization point a0 for sigma0:
 '''
-a0_array = np.logspace(np.log10(a_from_P(3.,1.)), np.log10(a_from_P(300.,1.)), 11)
-for a0 in a0_array:
-    fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription=prescription_str, a0=a0)
-
-    x, y = fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'] # beta's, sigma0's
-    plot_2d_points_and_contours_with_histograms(x, y, x_min=-10., x_max=5., y_min=1e-4, y_max=1e6, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text=r'$\Sigma_0 = \Sigma({:0.3f} AU)$'.format(a0), plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_%s_sigma0_vs_beta_per_system_a0_{:0.3f}.pdf'.format(a0) % prescription_str, save_fig=savefigures)
+a0_array = np.logspace(np.log10(0.04), np.log10(1.), 11)
+for a0_new in a0_array:
+    sigma0_a0 = fit_per_sys_dict['sigma0']*(a0_new/a0)**fit_per_sys_dict['beta']
+    plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta'], sigma0_a0, x_min=-10., x_max=6., y_min=1e-4, y_max=1e8, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text=r'$\Sigma_0 = \Sigma({:0.3f} AU)$'.format(a0_new), plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_%s_sigma0_vs_beta_per_system_a0_{:0.3f}.pdf'.format(a0_new) % prescription_str, save_fig=savefigures)
 plt.show()
 '''
