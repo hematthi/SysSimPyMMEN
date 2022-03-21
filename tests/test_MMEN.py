@@ -131,34 +131,38 @@ def test_solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys=sssp_p
 
 def test_solid_surface_density_CL2013_given_observed_catalog(sss_per_sys=sss_per_sys, seed=42):
     np.random.seed(seed) # to draw the same planet masses from the M-R relation
-    sigma_obs, mass_obs, a_obs = solid_surface_density_CL2013_given_observed_catalog(sss_per_sys)
-    assert len(sigma_obs) == len(mass_obs) == len(a_obs)
+    max_core_mass = 10. # Earth masses
+    sigma_obs, core_mass_obs, a_obs = solid_surface_density_CL2013_given_observed_catalog(sss_per_sys, max_core_mass=max_core_mass)
+    assert len(sigma_obs) == len(core_mass_obs) == len(a_obs)
     assert 0 < np.min(sigma_obs)
-    assert 0 < np.min(mass_obs)
+    assert 0 < np.min(core_mass_obs) <= np.max(core_mass_obs) <= max_core_mass
     assert 0 < np.min(a_obs)
 
 def test_solid_surface_density_S2014_given_observed_catalog(sss_per_sys=sss_per_sys, seed=42):
     np.random.seed(seed) # to draw the same planet masses from the M-R relation
-    sigma_obs, mass_obs, a_obs = solid_surface_density_S2014_given_observed_catalog(sss_per_sys)
-    assert len(sigma_obs) == len(mass_obs) == len(a_obs)
+    max_core_mass = 10. # Earth masses
+    sigma_obs, core_mass_obs, a_obs = solid_surface_density_S2014_given_observed_catalog(sss_per_sys, max_core_mass=max_core_mass)
+    assert len(sigma_obs) == len(core_mass_obs) == len(a_obs)
     assert 0 < np.min(sigma_obs)
-    assert 0 < np.min(mass_obs)
+    assert 0 < np.min(core_mass_obs) <= np.max(core_mass_obs) <= max_core_mass
     assert 0 < np.min(a_obs)
 
 def test_solid_surface_density_nHill_given_observed_catalog(sss_per_sys=sss_per_sys, seed=42):
     np.random.seed(seed) # to draw the same planet masses from the M-R relation
-    sigma_obs, mass_obs, a_obs = solid_surface_density_nHill_given_observed_catalog(sss_per_sys)
-    assert len(sigma_obs) == len(mass_obs) == len(a_obs)
+    max_core_mass = 10. # Earth masses
+    sigma_obs, core_mass_obs, a_obs = solid_surface_density_nHill_given_observed_catalog(sss_per_sys, max_core_mass=max_core_mass)
+    assert len(sigma_obs) == len(core_mass_obs) == len(a_obs)
     assert 0 < np.min(sigma_obs)
-    assert 0 < np.min(mass_obs)
+    assert 0 < np.min(core_mass_obs) <= np.max(core_mass_obs) <= max_core_mass
     assert 0 < np.min(a_obs)
 
 def test_solid_surface_density_RC2014_given_observed_catalog(sss_per_sys=sss_per_sys, seed=42):
     np.random.seed(seed) # to draw the same planet masses from the M-R relation
-    sigma_obs_2p, mass_obs_2p, a_obs_2p, mult_obs_2p = solid_surface_density_RC2014_given_observed_catalog(sss_per_sys)
-    assert len(sigma_obs_2p) == len(mass_obs_2p) == len(a_obs_2p) == len(mult_obs_2p)
+    max_core_mass = 10. # Earth masses
+    sigma_obs_2p, core_mass_obs_2p, a_obs_2p, mult_obs_2p = solid_surface_density_RC2014_given_observed_catalog(sss_per_sys, max_core_mass=max_core_mass)
+    assert len(sigma_obs_2p) == len(core_mass_obs_2p) == len(a_obs_2p) == len(mult_obs_2p)
     assert 0 < np.min(sigma_obs_2p)
-    assert 0 < np.min(mass_obs_2p)
+    assert 0 < np.min(core_mass_obs_2p) <= np.max(core_mass_obs_2p) <= max_core_mass
     assert 0 < np.min(a_obs_2p)
     assert 2 <= np.min(mult_obs_2p)
 

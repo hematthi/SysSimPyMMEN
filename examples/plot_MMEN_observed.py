@@ -90,8 +90,7 @@ tfs = 20 # text labels font size
 lfs = 16 # legend labels font size
 
 # Parameters for defining the MMEN:
-prescription_str = 'RC2014' # make sure this actually matches the prescription used!
-solid_surface_density_prescription = solid_surface_density_system_RC2014
+prescription_str = 'RC2014'
 a0 = 0.3 # normalization separation for fitting power-laws
 
 
@@ -104,8 +103,9 @@ a0 = 0.3 # normalization separation for fitting power-laws
 a_array = np.linspace(1e-3,2,1001)
 sigma_MMSN = MMSN(a_array)
 MeVeEa_masses = np.array([0.0553, 0.815, 1.]) # masses of Mercury, Venus, and Earth, in Earth masses
+MeVeEa_radii = np.array([0.383, 0.949, 1.]) # radii of Mercury, Venus, and Earth, in Earth radii
 MeVeEa_a = np.array([0.387, 0.723, 1.]) # semi-major axes of Mercury, Venus, and Earth, in AU
-MeVeEa_sigmas = solid_surface_density_prescription(MeVeEa_masses, MeVeEa_a)
+MeVeEa_sigmas = solid_surface_density_prescription(MeVeEa_masses, MeVeEa_radii, MeVeEa_a, prescription=prescription_str)
 
 # Simulated observed planets:
 sigma_obs_CL2013, mass_obs, a_obs = solid_surface_density_CL2013_given_observed_catalog(sss_per_sys)
@@ -140,7 +140,7 @@ fig = plt.figure(figsize=(16,8))
 plot = GridSpec(1,1,left=0.1,bottom=0.1,right=0.95,top=0.95,wspace=0,hspace=0)
 ax = plt.subplot(plot[0,0])
 #corner.hist2d(a_obs, np.log10(sigma_obs), bins=50, plot_density=False, contour_kwargs={'colors': ['0.6','0.4','0.2','0']}, data_kwargs={'color': 'k'})
-i_sample_plot = np.random.choice(np.arange(len(a_obs)), 10000, replace=False)
+i_sample_plot = np.random.choice(np.arange(len(a_obs)), 5000, replace=False)
 plt.scatter(a_obs[i_sample_plot], np.log10(sigma_obs_CL2013[i_sample_plot]), marker='.', s=1, color='k', label='Simulated planets')
 plt.scatter(a_obs_Kep, np.log10(sigma_obs_CL2013_Kep), marker='.', s=1, color='b', label='Kepler planets')
 plt.plot(a_bins_mid, np.log10(sigma_med_per_bin_CL2013), drawstyle='steps-mid', lw=2, color='r', label='MMEN (median per bin)')

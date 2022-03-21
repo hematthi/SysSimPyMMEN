@@ -134,30 +134,40 @@ def solid_surface_density_prescription(M, R, a, Mstar=1., n=10., prescription='C
 
 
 
-def solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys):
+def solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys, max_core_mass=10.):
     # Compute the solid surface density (g/cm^2) using the Chiang & Laughlin (2013) prescription, for each planet in a given physical catalog
+    # 'max_core_mass' is the maximum core mass (Earth masses)
     # Returns an array of solid surface densities and semi-major axes
     a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
-    sigma_all = solid_surface_density_CL2013(sssp_per_sys['mass_all'][sssp_per_sys['a_all'] > 0], a_all)
+    core_mass_all = sssp_per_sys['mass_all'][sssp_per_sys['a_all'] > 0]
+    core_mass_all[core_mass_all > max_core_mass] = max_core_mass
+    sigma_all = solid_surface_density_CL2013(core_mass_all, a_all)
     return sigma_all, a_all
 
-def solid_surface_density_S2014_given_physical_catalog(sssp_per_sys, sssp):
+def solid_surface_density_S2014_given_physical_catalog(sssp_per_sys, sssp, max_core_mass=10.):
     # Compute the solid surface density (g/cm^2) using the Schlichting (2014) prescription, for each planet in a given physical catalog
+    # 'max_core_mass' is the maximum core mass (Earth masses)
     # Returns an array of solid surface densities and semi-major axes
     a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
-    sigma_all = solid_surface_density_S2014(sssp_per_sys['mass_all'], sssp_per_sys['radii_all'], sssp_per_sys['a_all'], Mstar=sssp['Mstar_all'][:,None])[sssp_per_sys['a_all'] > 0]
+    core_mass_all = sssp_per_sys['mass_all']
+    core_mass_all[core_mass_all > max_core_mass] = max_core_mass
+    sigma_all = solid_surface_density_S2014(core_mass_all, sssp_per_sys['radii_all'], sssp_per_sys['a_all'], Mstar=sssp['Mstar_all'][:,None])[sssp_per_sys['a_all'] > 0]
     return sigma_all, a_all
 
-def solid_surface_density_nHill_given_physical_catalog(sssp_per_sys, sssp, n=10.):
+def solid_surface_density_nHill_given_physical_catalog(sssp_per_sys, sssp, max_core_mass=10., n=10.):
     # Compute the solid surface density (g/cm^2) using a number of Hill radii for the feeding zone width, for each planet in a given physical catalog
+    # 'max_core_mass' is the maximum core mass (Earth masses)
     # 'n' is the number of Hill radii for  the feeding zone width of each planet
     # Returns an array of solid surface densities and semi-major axes
     a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
-    sigma_all = solid_surface_density_nHill(sssp_per_sys['mass_all'], sssp_per_sys['a_all'], Mstar=sssp['Mstar_all'][:,None], n=n)[sssp_per_sys['a_all'] > 0]
+    core_mass_all = sssp_per_sys['mass_all']
+    core_mass_all[core_mass_all > max_core_mass] = max_core_mass
+    sigma_all = solid_surface_density_nHill(core_mass_all, sssp_per_sys['a_all'], Mstar=sssp['Mstar_all'][:,None], n=n)[sssp_per_sys['a_all'] > 0]
     return sigma_all, a_all
 
-def solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys):
+def solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys, max_core_mass=10.):
     # Compute the solid surface density (g/cm^2) using the Raymond & Cossou (2014) prescription, for each planet in each multi-planet system in a given physical catalog
+    # 'max_core_mass' is the maximum core mass (Earth masses)
     # Returns an array of solid surface densities and semi-major axes
     mult_all = sssp_per_sys['Mtot_all']
     a_all_2p = []
@@ -165,11 +175,12 @@ def solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys):
     sigma_all_2p = []
     for i in np.arange(len(mult_all))[mult_all > 1]: # only consider multi-planet systems
         a_sys = sssp_per_sys['a_all'][i]
-        M_sys = sssp_per_sys['mass_all'][i][a_sys > 0]
+        core_mass_sys = sssp_per_sys['mass_all'][i][a_sys > 0]
+        core_mass_sys[core_mass_sys > max_core_mass] = max_core_mass
         a_sys = a_sys[a_sys > 0]
         a_all_2p += list(a_sys)
         mult_all_2p += [len(a_sys)]*len(a_sys)
-        sigma_all_2p += list(solid_surface_density_system_RC2014(M_sys, a_sys))
+        sigma_all_2p += list(solid_surface_density_system_RC2014(core_mass_sys, a_sys))
     a_all_2p = np.array(a_all_2p)
     mult_all_2p = np.array(mult_all_2p)
     sigma_all_2p = np.array(sigma_all_2p)
@@ -177,61 +188,69 @@ def solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys):
 
 
 
-def solid_surface_density_CL2013_given_observed_catalog(sss_per_sys):
+def solid_surface_density_CL2013_given_observed_catalog(sss_per_sys, max_core_mass=10.):
     # Compute the solid surface density (g/cm^2) using the Chiang & Laughlin (2013) prescription, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
+    # 'max_core_mass' is the maximum core mass (Earth masses)
     # Returns an array of solid surface densities and semi-major axes
     a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
     a_obs = a_obs_per_sys[sss_per_sys['P_obs'] > 0]
     radii_obs = sss_per_sys['radii_obs'][sss_per_sys['P_obs'] > 0]
-    mass_obs = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(radii_obs)
-    sigma_obs = solid_surface_density_CL2013(mass_obs, a_obs)
-    return sigma_obs, mass_obs, a_obs
+    core_mass_obs = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(radii_obs)
+    core_mass_obs[core_mass_obs > max_core_mass] = max_core_mass
+    sigma_obs = solid_surface_density_CL2013(core_mass_obs, a_obs)
+    return sigma_obs, core_mass_obs, a_obs
 
-def solid_surface_density_S2014_given_observed_catalog(sss_per_sys):
+def solid_surface_density_S2014_given_observed_catalog(sss_per_sys, max_core_mass=10.):
     # Compute the solid surface density (g/cm^2) using the Schlichting (2014) prescription, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
+    # 'max_core_mass' is the maximum core mass (Earth masses)
     # Returns an array of solid surface densities and semi-major axes
     Mstar_obs = np.repeat(sss_per_sys['Mstar_obs'][:,None], np.shape(sss_per_sys['P_obs'])[1], axis=1)[sss_per_sys['P_obs'] > 0] # flattened array of stellar masses repeated for each planet
     a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
     a_obs = a_obs_per_sys[sss_per_sys['P_obs'] > 0]
     radii_obs = sss_per_sys['radii_obs'][sss_per_sys['P_obs'] > 0]
-    mass_obs = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(radii_obs)
-    sigma_obs = solid_surface_density_S2014(mass_obs, radii_obs, a_obs, Mstar=Mstar_obs)
-    return sigma_obs, mass_obs, a_obs
+    core_mass_obs = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(radii_obs)
+    core_mass_obs[core_mass_obs > max_core_mass] = max_core_mass
+    sigma_obs = solid_surface_density_S2014(core_mass_obs, radii_obs, a_obs, Mstar=Mstar_obs)
+    return sigma_obs, core_mass_obs, a_obs
 
-def solid_surface_density_nHill_given_observed_catalog(sss_per_sys, n=10.):
+def solid_surface_density_nHill_given_observed_catalog(sss_per_sys, max_core_mass=10., n=10.):
     # Compute the solid surface density (g/cm^2) using a number of Hill radii for the feeding zone width, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
+    # 'max_core_mass' is the maximum core mass (Earth masses)
     # 'n' is the number of Hill radii for  the feeding zone width of each planet
     # Returns an array of solid surface densities and semi-major axes
     Mstar_obs = np.repeat(sss_per_sys['Mstar_obs'][:,None], np.shape(sss_per_sys['P_obs'])[1], axis=1)[sss_per_sys['P_obs'] > 0] # flattened array of stellar masses repeated for each planet
     a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
     a_obs = a_obs_per_sys[sss_per_sys['P_obs'] > 0]
     radii_obs = sss_per_sys['radii_obs'][sss_per_sys['P_obs'] > 0]
-    mass_obs = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(radii_obs)
-    sigma_obs = solid_surface_density_nHill(mass_obs, a_obs, Mstar=Mstar_obs, n=n)
-    return sigma_obs, mass_obs, a_obs
+    core_mass_obs = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(radii_obs)
+    core_mass_obs[core_mass_obs > max_core_mass] = max_core_mass
+    sigma_obs = solid_surface_density_nHill(core_mass_obs, a_obs, Mstar=Mstar_obs, n=n)
+    return sigma_obs, core_mass_obs, a_obs
 
-def solid_surface_density_RC2014_given_observed_catalog(sss_per_sys):
+def solid_surface_density_RC2014_given_observed_catalog(sss_per_sys, max_core_mass=10.):
     # Compute the solid surface density (g/cm^2) using the Raymond & Cossou (2014) prescription, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
+    # 'max_core_mass' is the maximum core mass (Earth masses)
     # Returns an array of solid surface densities and semi-major axes
     mult_obs = sss_per_sys['Mtot_obs']
     mult_obs_2p = []
     a_obs_2p = []
-    mass_obs_2p = []
+    core_mass_obs_2p = []
     sigma_obs_2p = []
     for i in np.arange(len(mult_obs))[mult_obs > 1]: # only consider multi-planet systems
         a_sys = gen.a_from_P(sss_per_sys['P_obs'][i], sss_per_sys['Mstar_obs'][i])
-        M_sys = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(sss_per_sys['radii_obs'][i][a_sys > 0])
+        core_mass_sys = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(sss_per_sys['radii_obs'][i][a_sys > 0])
+        core_mass_sys[core_mass_sys > max_core_mass] = max_core_mass
         a_sys = a_sys[a_sys > 0]
 
         mult_obs_2p += [len(a_sys)]*len(a_sys)
         a_obs_2p += list(a_sys)
-        mass_obs_2p += list(M_sys)
-        sigma_obs_2p += list(solid_surface_density_system_RC2014(M_sys, a_sys))
+        core_mass_obs_2p += list(core_mass_sys)
+        sigma_obs_2p += list(solid_surface_density_system_RC2014(core_mass_sys, a_sys))
     mult_obs_2p = np.array(mult_obs_2p)
     a_obs_2p = np.array(a_obs_2p)
-    mass_obs_2p = np.array(mass_obs_2p)
+    core_mass_obs_2p = np.array(core_mass_obs_2p)
     sigma_obs_2p = np.array(sigma_obs_2p)
-    return sigma_obs_2p, mass_obs_2p, a_obs_2p, mult_obs_2p
+    return sigma_obs_2p, core_mass_obs_2p, a_obs_2p, mult_obs_2p
 
 
 
@@ -260,82 +279,116 @@ def fit_power_law_MMEN(a_array, sigma_array, a0=1., p0=1., p1=-1.5):
     sigma0, beta = 10.**(mmen_fit[0]), mmen_fit[1]
     return sigma0, beta
 
-def fit_power_law_MMEN_per_system_observed(sss_per_sys, prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5):
+def fit_power_law_MMEN_per_system_observed(sss_per_sys, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False):
     # Compute solid surface densities and fit power-law parameters to each multi-planet system in an observed catalog
-    fit_per_sys_dict = {'m_obs':[], 'Mstar_obs':[], 'sigma0':[], 'beta':[]} # 'm_obs' is number of observed planets
+    # If 'scale_up' is True, will scale up the power-law to be above the surface densities of all planets in the system (i.e. multiply 'sigma0' by a factor such that sigma0*(a_i/a0)^beta >= sigma_i for all planets)
+    fit_per_sys_dict = {'m_obs':[], 'Mstar_obs':[], 'sigma0':[], 'scale_factor':[], 'beta':[]} # 'm_obs' is number of observed planets
     a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
     for i,a_sys in enumerate(a_obs_per_sys):
         if np.sum(a_sys > 0) > 1:
             #print(i)
             Mstar = sss_per_sys['Mstar_obs'][i]
             R_sys = sss_per_sys['radii_obs'][i][a_sys > 0]
-            M_sys = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(R_sys)
+            core_mass_sys = generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec(R_sys)
+            core_mass_sys[core_mass_sys > max_core_mass] = max_core_mass
             a_sys = a_sys[a_sys > 0]
-            sigma_obs_sys = solid_surface_density_prescription(M_sys, R_sys, a_sys, Mstar=Mstar, n=n, prescription=prescription)
+            sigma_obs_sys = solid_surface_density_prescription(core_mass_sys, R_sys, a_sys, Mstar=Mstar, n=n, prescription=prescription)
             sigma0, beta = fit_power_law_MMEN(a_sys, sigma_obs_sys, a0=a0, p0=p0, p1=p1)
+
+            sigma_fit_sys = MMEN_power_law(a_sys, sigma0, beta, a0=a0) # the solid surface density at the semi-major axes of each planet in the system, as computed from the power-law fit
+            sigma_fit_ratio_sys = sigma_obs_sys/sigma_fit_sys
+            scale_factor_sigma0 = np.max(sigma_fit_ratio_sys)
+            sigma0 = sigma0*scale_factor_sigma0 if scale_up else sigma0 # scale up sigma0 such that the power-law fit is above the solid surface density of all the planets
+
             fit_per_sys_dict['m_obs'].append(len(a_sys))
             fit_per_sys_dict['Mstar_obs'].append(sss_per_sys['Mstar_obs'][i])
             fit_per_sys_dict['sigma0'].append(sigma0)
+            fit_per_sys_dict['scale_factor'].append(scale_factor_sigma0)
             fit_per_sys_dict['beta'].append(beta)
 
     fit_per_sys_dict['m_obs'] = np.array(fit_per_sys_dict['m_obs'])
     fit_per_sys_dict['Mstar_obs'] = np.array(fit_per_sys_dict['Mstar_obs'])
     fit_per_sys_dict['sigma0'] = np.array(fit_per_sys_dict['sigma0'])
+    fit_per_sys_dict['scale_factor'] = np.array(fit_per_sys_dict['scale_factor'])
     fit_per_sys_dict['beta'] = np.array(fit_per_sys_dict['beta'])
     return fit_per_sys_dict
 
-def fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, N_sys=10000):
+def fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False, N_sys=10000):
     # Compute solid surface densities and fit power-law parameters to each multi-planet system in a physical catalog
+    # If 'scale_up' is True, will scale up the power-law to be above the surface densities of all planets in the system (i.e. multiply 'sigma0' by a factor such that sigma0*(a_i/a0)^beta >= sigma_i for all planets)
     # 'N_sys' is the maximum number of systems to loop through (to save time)
     start = time.time()
     N_sys_tot = len(sssp_per_sys['a_all'])
     print('Fitting power-laws to the first %s systems (out of %s)...' % (min(N_sys,N_sys_tot), N_sys_tot))
-    fit_per_sys_dict = {'n_pl':[], 'sigma0':[], 'beta':[]} # 'n_pl' is number of planets in each system
+    fit_per_sys_dict = {'n_pl':[], 'sigma0':[], 'scale_factor':[], 'beta':[]} # 'n_pl' is number of planets in each system
     for i,a_sys in enumerate(sssp_per_sys['a_all'][:N_sys]):
         if np.sum(a_sys > 0) > 1:
             Mstar = sssp['Mstar_all'][i]
-            M_sys = sssp_per_sys['mass_all'][i][a_sys > 0]
+            core_mass_sys = sssp_per_sys['mass_all'][i][a_sys > 0]
+            core_mass_sys[core_mass_sys > max_core_mass] = max_core_mass
             R_sys = sssp_per_sys['radii_all'][i][a_sys > 0]
             a_sys = a_sys[a_sys > 0]
-            sigma_sys = solid_surface_density_prescription(M_sys, R_sys, a_sys, Mstar=Mstar, n=n, prescription=prescription)
+            sigma_sys = solid_surface_density_prescription(core_mass_sys, R_sys, a_sys, Mstar=Mstar, n=n, prescription=prescription)
             sigma0, beta = fit_power_law_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
+
+            sigma_fit_sys = MMEN_power_law(a_sys, sigma0, beta, a0=a0) # the solid surface density at the semi-major axes of each planet in the system, as computed from the power-law fit
+            sigma_fit_ratio_sys = sigma_sys/sigma_fit_sys
+            scale_factor_sigma0 = np.max(sigma_fit_ratio_sys)
+            sigma0 = sigma0*scale_factor_sigma0 if scale_up else sigma0 # scale up sigma0 such that the power-law fit is above the solid surface density of all the planets
+
             fit_per_sys_dict['n_pl'].append(len(a_sys))
             fit_per_sys_dict['sigma0'].append(sigma0)
+            fit_per_sys_dict['scale_factor'].append(scale_factor_sigma0)
             fit_per_sys_dict['beta'].append(beta)
 
     fit_per_sys_dict['n_pl'] = np.array(fit_per_sys_dict['n_pl'])
     fit_per_sys_dict['sigma0'] = np.array(fit_per_sys_dict['sigma0'])
+    fit_per_sys_dict['scale_factor'] = np.array(fit_per_sys_dict['scale_factor'])
     fit_per_sys_dict['beta'] = np.array(fit_per_sys_dict['beta'])
     stop = time.time()
     print('Time to compute: %s s' % (stop - start))
     return fit_per_sys_dict
 
-def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5):
+def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False):
     # Compute solid surface densities and fit power-law parameters to each multi-planet system in an observed catalog, for the observed planets only and then for all the planets in those systems (using the physical planet properties for both)
-    fit_per_sys_dict = {'n_pl_true':[], 'n_pl_obs':[], 'sigma0_true':[], 'sigma0_obs':[], 'beta_true':[], 'beta_obs':[]}
+    # If 'scale_up' is True, will scale up the power-law to be above the surface densities of all planets in the system (i.e. multiply 'sigma0' by a factor such that sigma0*(a_i/a0)^beta >= sigma_i for all planets)
+    fit_per_sys_dict = {'n_pl_true':[], 'n_pl_obs':[], 'sigma0_true':[], 'sigma0_obs':[], 'scale_factor_true':[], 'scale_factor_obs':[], 'beta_true':[], 'beta_obs':[]}
     for i,det_sys in enumerate(sssp_per_sys['det_all']):
         if np.sum(det_sys) > 1:
             Mstar = sssp['Mstar_all'][i]
-            M_sys = sssp_per_sys['mass_all'][i] # all planet masses including padded zeros
+            core_mass_sys = sssp_per_sys['mass_all'][i] # all planet masses including padded zeros
+            core_mass_sys[core_mass_sys > max_core_mass] = max_core_mass
             R_sys = sssp_per_sys['radii_all'][i] # all planet radii including padded zeros
             a_sys = sssp_per_sys['a_all'][i] # all semimajor axes including padded zeros
 
-            M_sys_obs = M_sys[det_sys == 1] # masses of observed planets
+            core_mass_sys_obs = core_mass_sys[det_sys == 1] # masses of observed planets
+            core_mass_sys_obs[core_mass_sys_obs > max_core_mass] = max_core_mass
             R_sys_obs = R_sys[det_sys == 1] # radii of observed planets
             a_sys_obs = a_sys[det_sys == 1] # semimajor axes of observed planets
-            M_sys = M_sys[a_sys > 0] # masses of all planets
+            core_mass_sys = core_mass_sys[a_sys > 0] # masses of all planets
             R_sys = R_sys[a_sys > 0] # radii of all planets
             a_sys = a_sys[a_sys > 0] # semimajor axes of all planets
 
-            sigma_sys = solid_surface_density_prescription(M_sys, R_sys, a_sys, Mstar=Mstar, n=n, prescription=prescription) # using all planets
-            sigma_sys_obs = solid_surface_density_prescription(M_sys_obs, R_sys_obs, a_sys_obs, Mstar=Mstar, n=n, prescription=prescription) # using observed planets only
+            sigma_sys = solid_surface_density_prescription(core_mass_sys, R_sys, a_sys, Mstar=Mstar, n=n, prescription=prescription) # using all planets
+            sigma_sys_obs = solid_surface_density_prescription(core_mass_sys_obs, R_sys_obs, a_sys_obs, Mstar=Mstar, n=n, prescription=prescription) # using observed planets only
             sigma0, beta = fit_power_law_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
             sigma0_obs, beta_obs = fit_power_law_MMEN(a_sys_obs, sigma_sys_obs, a0=a0, p0=p0, p1=p1)
+
+            sigma_fit_sys = MMEN_power_law(a_sys, sigma0, beta, a0=a0)
+            sigma_fit_sys_obs = MMEN_power_law(a_sys_obs, sigma0_obs, beta_obs, a0=a0)
+            sigma_fit_ratio_sys = sigma_sys/sigma_fit_sys
+            sigma_fit_ratio_sys_obs = sigma_sys_obs/sigma_fit_sys_obs
+            scale_factor_sigma0 = np.max(sigma_fit_ratio_sys)
+            scale_factor_sigma0_obs = np.max(sigma_fit_ratio_sys_obs)
+            sigma0 = sigma0*scale_factor_sigma0 if scale_up else sigma0
+            sigma0_obs = sigma0_obs*scale_factor_sigma0_obs if scale_up else sigma0_obs
 
             fit_per_sys_dict['n_pl_true'].append(len(a_sys))
             fit_per_sys_dict['n_pl_obs'].append(len(a_sys_obs))
             fit_per_sys_dict['sigma0_true'].append(sigma0)
             fit_per_sys_dict['sigma0_obs'].append(sigma0_obs)
+            fit_per_sys_dict['scale_factor_true'].append(scale_factor_sigma0)
+            fit_per_sys_dict['scale_factor_obs'].append(scale_factor_sigma0_obs)
             fit_per_sys_dict['beta_true'].append(beta)
             fit_per_sys_dict['beta_obs'].append(beta_obs)
 
@@ -343,6 +396,8 @@ def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, pres
     fit_per_sys_dict['n_pl_obs'] = np.array(fit_per_sys_dict['n_pl_obs'])
     fit_per_sys_dict['sigma0_true'] = np.array(fit_per_sys_dict['sigma0_true'])
     fit_per_sys_dict['sigma0_obs'] = np.array(fit_per_sys_dict['sigma0_obs'])
+    fit_per_sys_dict['scale_factor_true'] = np.array(fit_per_sys_dict['scale_factor_true'])
+    fit_per_sys_dict['scale_factor_obs'] = np.array(fit_per_sys_dict['scale_factor_obs'])
     fit_per_sys_dict['beta_true'] = np.array(fit_per_sys_dict['beta_true'])
     fit_per_sys_dict['beta_obs'] = np.array(fit_per_sys_dict['beta_obs'])
     return fit_per_sys_dict
