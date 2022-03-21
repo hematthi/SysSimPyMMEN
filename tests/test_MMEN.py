@@ -195,27 +195,35 @@ def test_fit_power_law_MMEN(seed=42):
 def test_fit_power_law_MMEN_per_system_observed(sss_per_sys=sss_per_sys):
     for prescription in ['CL2013', 'S2014', 'nHill', 'RC2014']:
         fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys, prescription=prescription)
-        assert len(fit_per_sys_dict['m_obs']) == len(fit_per_sys_dict['Mstar_obs']) == len(fit_per_sys_dict['sigma0']) == len(fit_per_sys_dict['beta'])
+        assert len(fit_per_sys_dict['m_obs']) == len(fit_per_sys_dict['Mstar_obs']) == len(fit_per_sys_dict['sigma0']) == len(fit_per_sys_dict['scale_factor']) == len(fit_per_sys_dict['beta'])
         assert 2 <= np.min(fit_per_sys_dict['m_obs'])
         assert 0 < np.min(fit_per_sys_dict['Mstar_obs'])
         assert 0 < np.min(fit_per_sys_dict['sigma0'])
+        assert np.allclose(fit_per_sys_dict['scale_factor'][fit_per_sys_dict['m_obs'] == 2], 1.)
+        assert np.isclose(np.min(fit_per_sys_dict['scale_factor']), 1.)
 
 def test_fit_power_law_MMEN_per_system_physical(sssp_per_sys=sssp_per_sys, sssp=sssp):
     for prescription in ['CL2013', 'S2014', 'nHill', 'RC2014']:
         fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription=prescription)
-        assert len(fit_per_sys_dict['n_pl']) == len(fit_per_sys_dict['sigma0']) == len(fit_per_sys_dict['beta'])
+        assert len(fit_per_sys_dict['n_pl']) == len(fit_per_sys_dict['sigma0']) == len(fit_per_sys_dict['scale_factor']) == len(fit_per_sys_dict['beta'])
         assert 2 <= np.min(fit_per_sys_dict['n_pl'])
         assert 0 < np.min(fit_per_sys_dict['sigma0'])
+        assert np.allclose(fit_per_sys_dict['scale_factor'][fit_per_sys_dict['n_pl'] == 2], 1.)
+        assert np.isclose(np.min(fit_per_sys_dict['scale_factor']), 1.)
 
 def test_fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys=sssp_per_sys, sssp=sssp):
     for prescription in ['CL2013', 'S2014', 'nHill', 'RC2014']:
         fit_per_sys_dict = fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, prescription=prescription)
-        assert len(fit_per_sys_dict['n_pl_true']) == len(fit_per_sys_dict['n_pl_obs']) == len(fit_per_sys_dict['sigma0_true']) == len(fit_per_sys_dict['sigma0_obs']) == len(fit_per_sys_dict['beta_true']) == len(fit_per_sys_dict['beta_obs'])
+        assert len(fit_per_sys_dict['n_pl_true']) == len(fit_per_sys_dict['n_pl_obs']) == len(fit_per_sys_dict['sigma0_true']) == len(fit_per_sys_dict['sigma0_obs']) == len(fit_per_sys_dict['scale_factor_true']) == len(fit_per_sys_dict['scale_factor_obs']) == len(fit_per_sys_dict['beta_true']) == len(fit_per_sys_dict['beta_obs'])
         assert 2 <= np.min(fit_per_sys_dict['n_pl_true'])
         assert 2 <= np.min(fit_per_sys_dict['n_pl_obs'])
         assert np.all(fit_per_sys_dict['n_pl_obs'] <= fit_per_sys_dict['n_pl_true'])
         assert 0 < np.min(fit_per_sys_dict['sigma0_true'])
         assert 0 < np.min(fit_per_sys_dict['sigma0_obs'])
+        assert np.allclose(fit_per_sys_dict['scale_factor_true'][fit_per_sys_dict['n_pl_true'] == 2], 1.)
+        assert np.allclose(fit_per_sys_dict['scale_factor_obs'][fit_per_sys_dict['n_pl_obs'] == 2], 1.)
+        assert np.isclose(np.min(fit_per_sys_dict['scale_factor_true']), 1.)
+        assert np.isclose(np.min(fit_per_sys_dict['scale_factor_obs']), 1.)
 
 def test_solid_mass_integrated_r0_to_r_given_power_law_profile(seed=42):
     np.random.seed(seed)
