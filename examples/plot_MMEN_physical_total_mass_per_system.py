@@ -34,7 +34,7 @@ from src.MMEN_functions import *
 
 savefigures = False
 loadfiles_directory = '/Users/hematthi/Documents/GradSchool/Research/ACI/Simulated_Data/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/GP_med/'
-savefigures_directory = '/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/Figures/Model_Optimization/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/Best_models/GP_med/MMEN/'
+savefigures_directory = '/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/Figures/Model_Optimization/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/Best_models/GP_med/MMEN/RC2014/cap_core_mass_10Mearth_and_scale_up_sigma0/' #cap_core_mass_10Mearth_and_scale_up_sigma0/
 run_number = ''
 model_name = 'Maximum_AMD_model' + run_number
 model_label, model_color = 'Maximum AMD model', 'g' #'Maximum AMD model', 'g' #'Two-Rayleigh model', 'b'
@@ -91,15 +91,16 @@ tfs = 20 # text labels font size
 lfs = 16 # legend labels font size
 
 # Parameters for defining the MMEN:
-prescription_str = 'CL2013' #'RC2014'
+prescription_str = 'RC2014' #'RC2014'
 a0 = 0.3 # normalization separation for fitting power-laws
 
 # Compute the MMSN for comparison:
-a_array = np.linspace(1e-3,2,1001)
+a_array = np.linspace(1e-3,2,101)
 sigma_MMSN = MMSN(a_array)
 MeVeEa_masses = np.array([0.0553, 0.815, 1.]) # masses of Mercury, Venus, and Earth, in Earth masses
+MeVeEa_radii = np.array([0.383, 0.949, 1.]) # radii of Mercury, Venus, and Earth, in Earth radii
 MeVeEa_a = np.array([0.387, 0.723, 1.]) # semi-major axes of Mercury, Venus, and Earth, in AU
-MeVeEa_sigmas = solid_surface_density_CL2013(MeVeEa_masses, MeVeEa_a) # WARNING: need to replace with any prescription
+MeVeEa_sigmas = solid_surface_density_prescription(MeVeEa_masses, MeVeEa_radii, MeVeEa_a, prescription=prescription_str)
 
 
 
@@ -107,15 +108,15 @@ MeVeEa_sigmas = solid_surface_density_CL2013(MeVeEa_masses, MeVeEa_a) # WARNING:
 
 ##### To integrate the total mass in solids for the fitted power-laws as a function of separation:
 
-fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription=prescription_str, a0=a0)
+fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription=prescription_str, a0=a0, scale_up=True, N_sys=N_sim)
 
 r0 = a_from_P(3., 1.) # inner truncation radius/limit of integration, in AU
 r_array = np.logspace(np.log10(r0+1e-6), np.log10(1.1), 100)
 
-sigma0_ex1, beta_ex1 = 50., -2. # example with sigma0 = 50 g/cm^2 and beta = -2 (should be linear with log(r))
-Mr_array_ex1 = np.array([solid_mass_integrated_r0_to_r_given_power_law_profile(r, r0, sigma0_ex1, beta_ex1) for r in r_array])
-sigma0_ex2, beta_ex2 = 50., -1.5
-Mr_array_ex2 = np.array([solid_mass_integrated_r0_to_r_given_power_law_profile(r, r0, sigma0_ex2, beta_ex2) for r in r_array])
+sigma0_ex1, beta_ex1 = 300., -2. # example with sigma0 = 300 g/cm^2 and beta = -2 (should be linear with log(r))
+Mr_array_ex1 = np.array([solid_mass_integrated_r0_to_r_given_power_law_profile(r, r0, sigma0_ex1, beta_ex1, a0=a0) for r in r_array])
+sigma0_ex2, beta_ex2 = 300., -1.5
+Mr_array_ex2 = np.array([solid_mass_integrated_r0_to_r_given_power_law_profile(r, r0, sigma0_ex2, beta_ex2, a0=a0) for r in r_array])
 
 # To plot the quantiles of total mass in solids as a function of separation:
 Mr_array_all = []
@@ -147,7 +148,7 @@ plt.xlabel(r'Separation from star, $r$ (AU)', fontsize=20)
 plt.ylabel(r'Total solid mass within $r$, $M_r$ ($M_\oplus$)', fontsize=20)
 plt.legend(loc='lower right', bbox_to_anchor=(1.,0.), ncol=1, frameon=False, fontsize=lfs)
 if savefigures:
-    plt.savefig(savefigures_directory + model_name + '_total_mass_vs_separation_RC2014_per_system.pdf')
+    plt.savefig(savefigures_directory + model_name + '_total_mass_vs_separation_%s_per_system.pdf' % prescription_str)
     plt.close()
 
 # To plot the distributions (CDFs) of total masses in solids for several separations:
@@ -158,7 +159,7 @@ for r in r_examples:
     Mr_array = np.array([solid_mass_integrated_r0_to_r_given_power_law_profile(r, r0, fit_per_sys_dict['sigma0'][i], fit_per_sys_dict['beta'][i], a0=a0) for i in range(len(fit_per_sys_dict['sigma0']))])
     r_Mr_arrays.append(Mr_array)
 
-plot_fig_cdf_simple((8,5), r_Mr_arrays, [], x_min=1e-2, x_max=200., log_x=True, c_sim=['k']*len(r_examples), ls_sim=r_linestyles, lw=1, labels_sim=[r'$r = {:0.1f}$ AU'.format(r) for r in r_examples], xticks_custom=[0.01, 0.1, 1, 10, 100], xlabel_text='Total solid mass within $r$, $M_r$ ($M_\oplus$)', ylabel_text=r'Cumulative fraction with $M_r$', one_minus=True, afs=afs, tfs=tfs, lfs=lfs, legend=True, save_name=savefigures_directory + model_name + '_total_mass_CDFs_per_separation_RC2014_per_system.pdf', save_fig=savefigures)
+plot_fig_cdf_simple((8,5), r_Mr_arrays, [], x_min=1e-2, x_max=500., log_x=True, c_sim=['k']*len(r_examples), ls_sim=r_linestyles, lw=2, labels_sim=[r'$r = {:0.1f}$ AU'.format(r) for r in r_examples], xticks_custom=[0.01, 0.1, 1, 10, 100], xlabel_text='Total solid mass within $r$, $M_r$ ($M_\oplus$)', ylabel_text=r'Cumulative fraction with $M_r$', one_minus=True, afs=afs, tfs=tfs, lfs=lfs, legend=True, save_name=savefigures_directory + model_name + '_total_mass_CDFs_per_separation_%s_per_system.pdf' % prescription_str, save_fig=savefigures)
 plt.show()
 
 # To repeat the above using the planet masses directly (i.e. step-functions in enclosed mass):
