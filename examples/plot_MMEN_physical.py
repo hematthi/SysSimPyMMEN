@@ -84,7 +84,7 @@ dists, dists_w = compute_distances_sim_Kepler(sss_per_sys, sss, ssk_per_sys, ssk
 
 # Plotting parameters:
 n_bins = 50
-lw = 1 # linewidth
+lw = 2 # linewidth
 
 afs = 20 # axes labels font size
 tfs = 20 # text labels font size
@@ -132,7 +132,7 @@ ax.tick_params(axis='both', labelsize=afs)
 plt.xlim([0.,1.1]) #[0.,0.45]
 plt.ylim([0.,6.]) #[1.5,6.]
 plt.xlabel(r'Semimajor axis $a$ (AU)', fontsize=20)
-plt.ylabel(r'Surface density, $\log_{10}(\Sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
+plt.ylabel(r'Surface density, $\log_{10}(\Sigma)$ (g/cm$^2$)', fontsize=20)
 plt.legend(loc='upper right', bbox_to_anchor=(1.,1.), ncol=1, frameon=False, fontsize=lfs)
 if savefigures:
     plt.savefig(savefigures_directory + model_name + '_mmen_%s_unlogged.pdf' % prescription_str)
@@ -162,7 +162,7 @@ ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
 plt.xlim([0.04,0.9])
 plt.ylim([0.,5.5])
 plt.xlabel(r'Semimajor axis $a$ (AU)', fontsize=20)
-plt.ylabel(r'Surface density, $\log_{10}(\Sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
+plt.ylabel(r'Surface density, $\log_{10}(\Sigma)$ (g/cm$^2$)', fontsize=20)
 plt.legend(loc='upper right', bbox_to_anchor=(1.,1.), ncol=1, frameon=False, fontsize=lfs)
 if savefigures:
     plt.savefig(savefigures_directory + model_name + '_mmen_%s.pdf' % prescription_str)
@@ -189,7 +189,7 @@ ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
 plt.xlim([0.04,0.9])
 plt.ylim([0.,5.5])
 plt.xlabel(r'Semimajor axis, $a$ (AU)', fontsize=20)
-plt.ylabel(r'Surface density, $\log_{10}(\Sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
+plt.ylabel(r'Surface density, $\log_{10}(\Sigma)$ (g/cm$^2$)', fontsize=20)
 plt.legend(loc='upper right', bbox_to_anchor=(1.,1.), ncol=1, frameon=False, fontsize=lfs)
 if savefigures:
     plt.savefig(savefigures_directory + model_name + '_mmen_%s.pdf' % prescription_str)
@@ -233,11 +233,11 @@ plt.scatter(a_all_2p[i_sample_plot], np.log10(sigma_all_RC2014[i_sample_plot]), 
 #plt.plot(a_bins_mid, np.log10(sigma_med_per_bin_S2014), drawstyle='steps-mid', lw=3, color='r') #label=r'$\Delta{a} = 2^{3/2}a(\frac{a M_p}{R_p M_\star})^{1/2}$'
 #plt.plot(a_bins_mid, np.log10(sigma_med_per_bin_nHill10), drawstyle='steps-mid', lw=3, color='b') #label=r'$\Delta{a} = 10 R_{\rm Hill}$'
 #plt.plot(a_bins_mid, np.log10(sigma_med_per_bin_RC2014), drawstyle='steps-mid', lw=3, color='m') #label=r'$\Delta{a} = \sqrt{a_{i+1} a_i} - \sqrt{a_i a_{i-1}}$ (multis only)'
-plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_CL2013, beta_CL2013, a0=a0)), lw=3, ls='--', color='k', label=r'$\Delta{a} = a$' + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_CL2013, beta_CL2013))
-plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_S2014, beta_S2014, a0=a0)), lw=3, ls='--', color='r', label=r'$\Delta{a} = 2^{3/2}a(\frac{a M_p}{R_p M_\star})^{1/2}$' + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_S2014, beta_S2014))
-plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_nHill10, beta_nHill10, a0=a0)), lw=3, ls='--', color='b', label=r'$\Delta{a} = 10 R_{\rm Hill}$' + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_nHill10, beta_nHill10))
-plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_RC2014, beta_RC2014, a0=a0)), lw=3, ls='--', color='m', label=r'$\Delta{a} = \sqrt{a_{i+1} a_i} - \sqrt{a_i a_{i-1}}$, multis only' + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_RC2014, beta_RC2014))
-plt.plot(a_array, np.log10(sigma_MMSN), lw=3, color='g', label=r'MMSN ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(MMSN(a0), -1.5)) #label=r'MMSN ($\sigma_{\rm solid} = 10.89(a/{\rm AU})^{-3/2}$ g/cm$^2$)'
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_CL2013, beta_CL2013, a0=a0)), lw=lw, ls='--', color='k', label=r'$\Delta{a} = a$' + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_CL2013, beta_CL2013))
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_S2014, beta_S2014, a0=a0)), lw=lw, ls='--', color='r', label=r'$\Delta{a} = 2^{3/2}a(\frac{a M_p}{R_p M_\star})^{1/2}$' + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_S2014, beta_S2014))
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_nHill10, beta_nHill10, a0=a0)), lw=lw, ls='--', color='b', label=r'$\Delta{a} = 10 R_{\rm Hill}$' + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_nHill10, beta_nHill10))
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_RC2014, beta_RC2014, a0=a0)), lw=lw, ls='--', color='m', label=r'$\Delta{a} = \sqrt{a_{i+1} a_i} - \sqrt{a_i a_{i-1}}$, multis only' + r' ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_RC2014, beta_RC2014))
+plt.plot(a_array, np.log10(sigma_MMSN), lw=lw, color='g', label=r'MMSN ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(MMSN(a0), -1.5)) #label=r'MMSN ($\sigma_{\rm solid} = 10.89(a/{\rm AU})^{-3/2}$ g/cm$^2$)'
 plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g', label='') #label='Solar system planets (Mercury, Venus, Earth)'
 ax.tick_params(axis='both', labelsize=afs)
 plt.gca().set_xscale("log")
@@ -246,9 +246,39 @@ ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
 plt.xlim([0.04,0.9])
 plt.ylim([0.,5.5])
 plt.xlabel(r'Semimajor axis, $a$ (AU)', fontsize=20)
-plt.ylabel(r'Surface density, $\log_{10}(\Sigma_{\rm solid})$ (g/cm$^2$)', fontsize=20)
+plt.ylabel(r'Surface density, $\log_{10}(\Sigma)$ (g/cm$^2$)', fontsize=20)
 plt.legend(loc='upper right', bbox_to_anchor=(1.,1.), ncol=1, frameon=False, fontsize=lfs)
 if savefigures:
     plt.savefig(savefigures_directory + model_name + '_mmen_deltaa_compare.pdf')
+    plt.close()
+plt.show()
+
+##### Remake for a smaller version (square panel):
+fig = plt.figure(figsize=(8,8))
+plot = GridSpec(1,1,left=0.15,bottom=0.15,right=0.95,top=0.95,wspace=0,hspace=0)
+ax = plt.subplot(plot[0,0])
+i_sample_plot = np.random.choice(np.arange(len(a_all)), 1000, replace=False)
+plt.scatter(a_all[i_sample_plot], np.log10(sigma_all_CL2013[i_sample_plot]), marker='o', s=10, alpha=0.2, color='k')
+plt.scatter(a_all[i_sample_plot], np.log10(sigma_all_S2014[i_sample_plot]), marker='o', s=10, alpha=0.2, color='r')
+plt.scatter(a_all[i_sample_plot], np.log10(sigma_all_nHill10[i_sample_plot]), marker='o', s=10, alpha=0.2, color='b')
+i_sample_plot = np.random.choice(np.arange(len(a_all_2p)), 1000, replace=False)
+plt.scatter(a_all_2p[i_sample_plot], np.log10(sigma_all_RC2014[i_sample_plot]), marker='o', s=10, alpha=0.2, color='m')
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_CL2013, beta_CL2013, a0=a0)), lw=lw, ls='--', color='k', label=r'CL13 ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0_CL2013, beta_CL2013))
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_RC2014, beta_RC2014, a0=a0)), lw=lw, ls='--', color='m', label=r'RC14 ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0_RC2014, beta_RC2014))
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_nHill10, beta_nHill10, a0=a0)), lw=lw, ls='--', color='b', label=r'10Hill ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0_nHill10, beta_nHill10))
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_S2014, beta_S2014, a0=a0)), lw=lw, ls='--', color='r', label=r'S14 ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0_S2014, beta_S2014))
+plt.plot(a_array, np.log10(sigma_MMSN), lw=lw, color='g', label=r'MMSN ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(MMSN(a0), -1.5)) #label=r'MMSN ($\sigma_{\rm solid} = 10.89(a/{\rm AU})^{-3/2}$ g/cm$^2$)'
+plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g', label='') #label='Solar system planets (Mercury, Venus, Earth)'
+ax.tick_params(axis='both', labelsize=afs)
+plt.gca().set_xscale("log")
+plt.xticks(a_ticks)
+ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
+plt.xlim([0.04,0.9])
+plt.ylim([-0.5,5.5])
+plt.xlabel(r'Semimajor axis, $a$ (AU)', fontsize=20)
+plt.ylabel(r'Surface density, $\log_{10}(\Sigma/{\rm gcm}^{-2})$', fontsize=20)
+plt.legend(loc='upper right', bbox_to_anchor=(1.,1.), ncol=1, frameon=False, fontsize=lfs)
+if savefigures:
+    plt.savefig(savefigures_directory + model_name + '_mmen_deltaa_compare_square.pdf')
     plt.close()
 plt.show()
