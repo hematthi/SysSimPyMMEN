@@ -279,6 +279,38 @@ def fit_power_law_MMEN(a_array, sigma_array, a0=1., p0=1., p1=-1.5):
     sigma0, beta = 10.**(mmen_fit[0]), mmen_fit[1]
     return sigma0, beta
 
+def fit_power_law_MMEN_all_planets_observed(sss_per_sys, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5):
+    # Compute solid surface densities and fit a power-law to all planets in an observed catalog
+    if prescription == 'CL2013':
+        sigma_obs, core_mass_obs, a_obs = solid_surface_density_CL2013_given_observed_catalog(sss_per_sys, max_core_mass=max_core_mass)
+    elif prescription == 'S2014':
+        sigma_obs, core_mass_obs, a_obs = solid_surface_density_S2014_given_observed_catalog(sss_per_sys, max_core_mass=max_core_mass)
+    elif prescription == 'nHill':
+        sigma_obs, core_mass_obs, a_obs = solid_surface_density_nHill_given_observed_catalog(sss_per_sys, max_core_mass=max_core_mass, n=n)
+    elif prescription == 'RC2014':
+        sigma_obs, core_mass_obs, a_obs, mult_obs = solid_surface_density_RC2014_given_observed_catalog(sss_per_sys, max_core_mass=max_core_mass) # outputs are for systems with 2+ planets only
+    else:
+        print('No matching prescription!')
+    sigma0, beta = fit_power_law_MMEN(a_obs, sigma_obs, a0=a0, p0=p0, p1=p1)
+    outputs_dict = {'sigma_obs': sigma_obs, 'core_mass_obs': core_mass_obs, 'a_obs': a_obs, 'sigma0': sigma0, 'beta': beta}
+    return outputs_dict
+
+def fit_power_law_MMEN_all_planets_physical(sssp_per_sys, sssp, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5):
+    # Compute solid surface densities and fit a power-law to all planets in a physical catalog
+    if prescription == 'CL2013':
+        sigma_all, a_all = solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys, max_core_mass=max_core_mass)
+    elif prescription == 'S2014':
+        sigma_all, a_all = solid_surface_density_S2014_given_physical_catalog(sssp_per_sys, sssp, max_core_mass=max_core_mass)
+    elif prescription == 'nHill':
+        sigma_all, a_all = solid_surface_density_nHill_given_physical_catalog(sssp_per_sys, sssp, max_core_mass=max_core_mass, n=n)
+    elif prescription == 'RC2014':
+        sigma_all, a_all, mult_all = solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys, max_core_mass=max_core_mass) # outputs are for systems with 2+ planets only
+    else:
+        print('No matching prescription!')
+    sigma0, beta = fit_power_law_MMEN(a_all, sigma_all, a0=a0, p0=p0, p1=p1)
+    outputs_dict = {'sigma_all': sigma_all, 'a_all': a_all, 'sigma0': sigma0, 'beta': beta}
+    return outputs_dict
+
 def fit_power_law_MMEN_per_system_observed(sss_per_sys, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False):
     # Compute solid surface densities and fit power-law parameters to each multi-planet system in an observed catalog
     # If 'scale_up' is True, will scale up the power-law to be above the surface densities of all planets in the system (i.e. multiply 'sigma0' by a factor such that sigma0*(a_i/a0)^beta >= sigma_i for all planets)

@@ -192,9 +192,30 @@ def test_fit_power_law_MMEN(seed=42):
     assert np.isclose(np.log10(sigma0), np.log10(sigma0_fit), atol=1e-5)
     assert np.isclose(beta, beta_fit, atol=1e-5)
 
-def test_fit_power_law_MMEN_per_system_observed(sss_per_sys=sss_per_sys):
-    for prescription in ['CL2013', 'S2014', 'nHill', 'RC2014']:
-        fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys, prescription=prescription)
+prescriptions = ['CL2013', 'S2014', 'nHill', 'RC2014']
+
+def test_fit_power_law_MMEN_all_planets_observed(sss_per_sys=sss_per_sys, seed=42):
+    np.random.seed(seed) # to draw the same planet masses from the M-R relation
+    max_core_mass = 10. # Earth masses
+    for pres in prescriptions:
+        fit_cat_dict = fit_power_law_MMEN_all_planets_observed(sss_per_sys, max_core_mass=max_core_mass, prescription=pres)
+        assert 0 < np.min(fit_cat_dict['sigma_obs'])
+        assert 0 < np.min(fit_cat_dict['core_mass_obs']) <= np.max(fit_cat_dict['core_mass_obs']) <= max_core_mass
+        assert 0 < np.min(fit_cat_dict['a_obs'])
+        assert 0 < fit_cat_dict['sigma0']
+
+def test_fit_power_law_MMEN_all_planets_physical(sssp_per_sys=sssp_per_sys, sssp=sssp, seed=42):
+    np.random.seed(seed) # to draw the same planet masses from the M-R relation
+    for pres in prescriptions:
+        fit_cat_dict = fit_power_law_MMEN_all_planets_physical(sssp_per_sys, sssp, prescription=pres)
+        assert 0 < np.min(fit_cat_dict['sigma_all'])
+        assert 0 < np.min(fit_cat_dict['a_all'])
+        assert 0 < fit_cat_dict['sigma0']
+
+def test_fit_power_law_MMEN_per_system_observed(sss_per_sys=sss_per_sys, seed=42):
+    np.random.seed(seed) # to draw the same planet masses from the M-R relation
+    for pres in prescriptions:
+        fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys, prescription=pres)
         assert len(fit_per_sys_dict['m_obs']) == len(fit_per_sys_dict['Mstar_obs']) == len(fit_per_sys_dict['sigma0']) == len(fit_per_sys_dict['scale_factor']) == len(fit_per_sys_dict['beta'])
         assert 2 <= np.min(fit_per_sys_dict['m_obs'])
         assert 0 < np.min(fit_per_sys_dict['Mstar_obs'])
@@ -203,17 +224,18 @@ def test_fit_power_law_MMEN_per_system_observed(sss_per_sys=sss_per_sys):
         assert np.isclose(np.min(fit_per_sys_dict['scale_factor']), 1.)
 
 def test_fit_power_law_MMEN_per_system_physical(sssp_per_sys=sssp_per_sys, sssp=sssp):
-    for prescription in ['CL2013', 'S2014', 'nHill', 'RC2014']:
-        fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription=prescription)
+    for pres in prescriptions:
+        fit_per_sys_dict = fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, prescription=pres)
         assert len(fit_per_sys_dict['n_pl']) == len(fit_per_sys_dict['sigma0']) == len(fit_per_sys_dict['scale_factor']) == len(fit_per_sys_dict['beta'])
         assert 2 <= np.min(fit_per_sys_dict['n_pl'])
         assert 0 < np.min(fit_per_sys_dict['sigma0'])
         assert np.allclose(fit_per_sys_dict['scale_factor'][fit_per_sys_dict['n_pl'] == 2], 1.)
         assert np.isclose(np.min(fit_per_sys_dict['scale_factor']), 1.)
 
-def test_fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys=sssp_per_sys, sssp=sssp):
-    for prescription in ['CL2013', 'S2014', 'nHill', 'RC2014']:
-        fit_per_sys_dict = fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, prescription=prescription)
+def test_fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys=sssp_per_sys, sssp=sssp, seed=42):
+    np.random.seed(seed) # to draw the same planet masses from the M-R relation
+    for pres in prescriptions:
+        fit_per_sys_dict = fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, prescription=pres)
         assert len(fit_per_sys_dict['n_pl_true']) == len(fit_per_sys_dict['n_pl_obs']) == len(fit_per_sys_dict['sigma0_true']) == len(fit_per_sys_dict['sigma0_obs']) == len(fit_per_sys_dict['scale_factor_true']) == len(fit_per_sys_dict['scale_factor_obs']) == len(fit_per_sys_dict['beta_true']) == len(fit_per_sys_dict['beta_obs'])
         assert 2 <= np.min(fit_per_sys_dict['n_pl_true'])
         assert 2 <= np.min(fit_per_sys_dict['n_pl_obs'])

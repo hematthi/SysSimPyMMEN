@@ -90,19 +90,7 @@ tfs = 20 # text labels font size
 lfs = 16 # legend labels font size
 
 # Parameters for defining the MMEN:
-prescription_str = 'RC2014'
 a0 = 0.3 # normalization separation for fitting power-laws
-
-
-
-
-
-##### To fit a power-law to each observed system for the Kepler catalog and plot the distribution of fitted parameters (sigma0 vs. beta):
-
-fit_per_sys_dict_Kep = fit_power_law_MMEN_per_system_observed(ssk_per_sys, prescription=prescription_str, a0=a0)
-
-plot_2d_points_and_contours_with_histograms(fit_per_sys_dict_Kep['beta'], fit_per_sys_dict_Kep['sigma0'], x_min=-8., x_max=4., y_min=1e-2, y_max=1e8, log_y=True, bins_cont=30, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Kepler observed systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + 'Kepler_mmen_%s_sigma0_vs_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
-plt.show()
 
 
 
@@ -115,7 +103,10 @@ runs = 100
 
 sss_per_sys_all = []
 sss_all = []
-fit_per_sys_dict_all = []
+
+prescriptions = ['CL2013', 'S2014', 'nHill', 'RC2014']
+fit_per_cat_dict = {pres:{'sigma0':[], 'beta':[]} for pres in prescriptions} # dictionary of dictionaries
+fit_per_sys_dict_all = {pres:[] for pres in prescriptions} # dictionary of list of dictionaries
 
 for i in range(1,runs+1):
     run_number = i
@@ -125,24 +116,41 @@ for i in range(1,runs+1):
     sss_per_sys_all.append(sss_per_sys_i)
     sss_all.append(sss_i)
 
-    fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys_i, prescription=prescription_str, a0=a0)
-    fit_per_sys_dict_all.append(fit_per_sys_dict)
+    for pres in prescriptions:
+        fit_cat_dict = fit_power_law_MMEN_all_planets_observed(sss_per_sys_i, prescription=pres, a0=a0)
+        fit_per_cat_dict[pres]['sigma0'].append(fit_cat_dict['sigma0'])
+        fit_per_cat_dict[pres]['beta'].append(fit_cat_dict['beta'])
 
-    # To plot the distribution of fitted power-law parameters (sigma0 vs. beta) for the simulated observed systems:
-    plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'], x_min=-8., x_max=4., y_min=1e-2, y_max=1e8, log_y=True, bins_cont=30, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Simulated observed systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_obs_mmen_%s_sigma0_vs_beta_per_system_%s.png' % (prescription_str, run_number), save_fig=savefigures)
-    #plt.show()
-    plt.close()
+        fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys_i, prescription=pres, a0=a0, scale_up=True)
+        fit_per_sys_dict_all[pres].append(fit_per_sys_dict)
+
+        # To plot the distribution of fitted power-law parameters (sigma0 vs. beta) for the simulated observed systems:
+        #plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'], x_min=-8., x_max=4., y_min=1e-2, y_max=1e8, log_y=True, bins_cont=30, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Simulated observed systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_obs_mmen_%s_sigma0_vs_beta_per_system_%s.png' % (pres, run_number), save_fig=savefigures)
+        #plt.show()
+        plt.close()
+
+for pres in prescriptions:
+    fit_per_cat_dict[pres]['sigma0'] = np.array(fit_per_cat_dict[pres]['sigma0'])
+    fit_per_cat_dict[pres]['beta'] = np.array(fit_per_cat_dict[pres]['beta'])
+    sigma0_qtls = np.quantile(fit_per_cat_dict[pres]['sigma0'], [0.16,0.5,0.84])
+    beta_qtls = np.quantile(fit_per_cat_dict[pres]['beta'], [0.16,0.5,0.84])
+    print('# %s:' % pres)
+    print(r'$\Sigma_0$: ${:0.1f}_{{-{:0.1f} }}^{{+{:0.1f} }}$'.format(sigma0_qtls[1], sigma0_qtls[1]-sigma0_qtls[0], sigma0_qtls[2]-sigma0_qtls[1]))
+    print(r'$\beta$: ${:0.2f}_{{-{:0.2f} }}^{{+{:0.2f} }}$'.format(beta_qtls[1], beta_qtls[1]-beta_qtls[0], beta_qtls[2]-beta_qtls[1]))
 
 plt.show()
 
 # To plot the median sigma0 vs. beta for each simulated catalog:
-sigma0_med_all = [np.median(fit_per_sys_dict['sigma0']) for fit_per_sys_dict in fit_per_sys_dict_all]
-beta_med_all = [np.median(fit_per_sys_dict['beta']) for fit_per_sys_dict in fit_per_sys_dict_all]
+for pres in prescriptions:
+    sigma0_med_all = [np.median(fit_per_sys_dict['sigma0']) for fit_per_sys_dict in fit_per_sys_dict_all[pres]]
+    beta_med_all = [np.median(fit_per_sys_dict['beta']) for fit_per_sys_dict in fit_per_sys_dict_all[pres]]
 
-ax_main = plot_2d_points_and_contours_with_histograms(beta_med_all, sigma0_med_all, x_min=-2.25, x_max=-1.5, y_min=250., y_max=750., log_y=True, bins_hist=20, points_only=True, xlabel_text=r'Median $\beta$', ylabel_text=r'Median $\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta_{\rm med}$', y_symbol=r'$\Sigma_{0,\rm med}$')
-ax_main.scatter(np.median(fit_per_sys_dict_Kep['beta']), np.log10(np.median(fit_per_sys_dict_Kep['sigma0'])), marker='x', color='r', label='Kepler')
-ax_main.legend(loc='upper left', bbox_to_anchor=(0.,1.), ncol=1, frameon=False, fontsize=lfs)
-if savefigures:
-    plt.savefig(savefigures_directory + model_name + '_obs_mmen_%s_median_sigma0_vs_beta_per_system.pdf' % prescription_str)
-    plt.close()
-plt.show()
+    fit_per_sys_dict_Kep = fit_power_law_MMEN_per_system_observed(ssk_per_sys, prescription=pres, a0=a0, scale_up=True)
+
+    ax_main = plot_2d_points_and_contours_with_histograms(beta_med_all, sigma0_med_all, x_min=-2.25, x_max=-1.5, y_min=250., y_max=750., log_y=True, bins_hist=20, points_only=True, xlabel_text=r'Median $\beta$', ylabel_text=r'Median $\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta_{\rm med}$', y_symbol=r'$\Sigma_{0,\rm med}$')
+    ax_main.scatter(np.median(fit_per_sys_dict_Kep['beta']), np.log10(np.median(fit_per_sys_dict_Kep['sigma0'])), marker='x', color='r', label='Kepler')
+    ax_main.legend(loc='upper left', bbox_to_anchor=(0.,1.), ncol=1, frameon=False, fontsize=lfs)
+    if savefigures:
+        plt.savefig(savefigures_directory + model_name + '_obs_mmen_%s_median_sigma0_vs_beta_per_system.pdf' % pres)
+        plt.close()
+    plt.show()
