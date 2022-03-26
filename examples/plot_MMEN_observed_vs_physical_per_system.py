@@ -33,7 +33,7 @@ from src.MMEN_functions import *
 
 savefigures = False
 loadfiles_directory = '/Users/hematthi/Documents/GradSchool/Research/ACI/Simulated_Data/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/GP_med/'
-savefigures_directory = '/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/Figures/Model_Optimization/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/Best_models/GP_med/MMEN/'
+savefigures_directory = '/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/Figures/Model_Optimization/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/Best_models/GP_med/MMEN/RC2014/cap_core_mass_10Mearth_and_scale_up_sigma0/' #cap_core_mass_10Mearth_and_scale_up_sigma0/
 run_number = ''
 model_name = 'Maximum_AMD_model' + run_number
 model_label, model_color = 'Maximum AMD model', 'g' #'Maximum AMD model', 'g' #'Two-Rayleigh model', 'b'
@@ -83,7 +83,7 @@ dists, dists_w = compute_distances_sim_Kepler(sss_per_sys, sss, ssk_per_sys, ssk
 
 # Plotting parameters:
 n_bins = 50
-lw = 1 # linewidth
+lw = 2 # linewidth
 
 afs = 20 # axes labels font size
 tfs = 20 # text labels font size
@@ -100,12 +100,22 @@ a0 = 0.3 # normalization separation for fitting power-laws
 ##### To fit a power-law to each observed system in a simulated observed catalog, and then for each underlying physical system (i.e. including all planets), to compare how the power-law fits change:
 ##### NOTE: we will use the 'true' planet masses for the simulated observed planets so their masses are consistent in both MMEN calculations of the physical systems and the observed systems
 
-fit_per_sys_dict = fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, prescription=prescription_str, a0=a0)
+fit_per_sys_dict = fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, prescription=prescription_str, a0=a0, scale_up=True)
 
 # To plot sigma0_obs vs sigma0_true for the simulated observed systems:
-plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['sigma0_true'], fit_per_sys_dict['sigma0_obs'], x_min=1e-2, x_max=1e7, y_min=1e-2, y_max=1e7, log_x=True, log_y=True, xlabel_text=r'$\log_{10}(\Sigma_{0,\rm true}/{\rm g cm^{-2}})$', ylabel_text=r'$\log_{10}(\Sigma_{0,\rm obs}/{\rm g cm^{-2}})$', extra_text='Simulated observed systems', plot_qtls=True, x_str_format='{:0.1f}', y_str_format='{:0.1f}', x_symbol=r'$\Sigma_{0,\rm true}$', y_symbol=r'$\Sigma_{0,\rm obs}$', save_name=savefigures_directory + model_name + '_true_vs_obs_mmen_%s_sigma0_per_system.pdf' % prescription_str, save_fig=savefigures)
+ax_min, ax_max = 1e-1, 1e6
+ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['sigma0_true'], fit_per_sys_dict['sigma0_obs'], x_min=ax_min, x_max=ax_max, y_min=ax_min, y_max=ax_max, log_x=True, log_y=True, xlabel_text=r'$\log_{10}(\Sigma_{0,\rm phys}/{\rm g cm^{-2}})$', ylabel_text=r'$\log_{10}(\Sigma_{0,\rm obs}/{\rm g cm^{-2}})$', extra_text='Simulated observed systems', plot_qtls=True, x_str_format='{:0.1f}', y_str_format='{:0.1f}', x_symbol=r'$\Sigma_{0,\rm phys}$', y_symbol=r'$\Sigma_{0,\rm obs}$')
+ax.plot([np.log10(ax_min), np.log10(ax_max)], [np.log10(ax_min), np.log10(ax_max)], ls='--', lw=lw)
+if savefigures:
+    plt.savefig(savefigures_directory + model_name + '_phys_vs_obs_mmen_%s_sigma0_per_system.pdf' % prescription_str)
+    plt.close()
 
 # To plot beta_obs vs beta_true for the simulated observed systems:
-plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta_true'], fit_per_sys_dict['beta_obs'], x_min=-8., x_max=4., y_min=-8., y_max=4., xlabel_text=r'$\beta_{\rm true}$', ylabel_text=r'$\beta_{\rm obs}$', extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$\beta_{\rm true}$', y_symbol=r'$\beta_{\rm obs}$', save_name=savefigures_directory + model_name + '_true_vs_obs_mmen_%s_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
+ax_min, ax_max = -8., 4.
+ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta_true'], fit_per_sys_dict['beta_obs'], x_min=ax_min, x_max=ax_max, y_min=ax_min, y_max=ax_max, xlabel_text=r'$\beta_{\rm phys}$', ylabel_text=r'$\beta_{\rm obs}$', extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$\beta_{\rm phys}$', y_symbol=r'$\beta_{\rm obs}$')
+ax.plot([ax_min, ax_max], [ax_min, ax_max], ls='--', lw=lw)
+if savefigures:
+    plt.savefig(savefigures_directory + model_name + '_phys_vs_obs_mmen_%s_beta_per_system.pdf' % prescription_str)
+    plt.close()
 
 plt.show()

@@ -139,7 +139,7 @@ def solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys, max_core_m
     # 'max_core_mass' is the maximum core mass (Earth masses)
     # Returns an array of solid surface densities and semi-major axes
     a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
-    core_mass_all = sssp_per_sys['mass_all'][sssp_per_sys['a_all'] > 0]
+    core_mass_all = np.copy(sssp_per_sys['mass_all'][sssp_per_sys['a_all'] > 0])
     core_mass_all[core_mass_all > max_core_mass] = max_core_mass
     sigma_all = solid_surface_density_CL2013(core_mass_all, a_all)
     return sigma_all, a_all
@@ -149,7 +149,7 @@ def solid_surface_density_S2014_given_physical_catalog(sssp_per_sys, sssp, max_c
     # 'max_core_mass' is the maximum core mass (Earth masses)
     # Returns an array of solid surface densities and semi-major axes
     a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
-    core_mass_all = sssp_per_sys['mass_all']
+    core_mass_all = np.copy(sssp_per_sys['mass_all'])
     core_mass_all[core_mass_all > max_core_mass] = max_core_mass
     sigma_all = solid_surface_density_S2014(core_mass_all, sssp_per_sys['radii_all'], sssp_per_sys['a_all'], Mstar=sssp['Mstar_all'][:,None])[sssp_per_sys['a_all'] > 0]
     return sigma_all, a_all
@@ -160,7 +160,7 @@ def solid_surface_density_nHill_given_physical_catalog(sssp_per_sys, sssp, max_c
     # 'n' is the number of Hill radii for  the feeding zone width of each planet
     # Returns an array of solid surface densities and semi-major axes
     a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
-    core_mass_all = sssp_per_sys['mass_all']
+    core_mass_all = np.copy(sssp_per_sys['mass_all'])
     core_mass_all[core_mass_all > max_core_mass] = max_core_mass
     sigma_all = solid_surface_density_nHill(core_mass_all, sssp_per_sys['a_all'], Mstar=sssp['Mstar_all'][:,None], n=n)[sssp_per_sys['a_all'] > 0]
     return sigma_all, a_all
@@ -175,7 +175,7 @@ def solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys, max_core_m
     sigma_all_2p = []
     for i in np.arange(len(mult_all))[mult_all > 1]: # only consider multi-planet systems
         a_sys = sssp_per_sys['a_all'][i]
-        core_mass_sys = sssp_per_sys['mass_all'][i][a_sys > 0]
+        core_mass_sys = np.copy(sssp_per_sys['mass_all'][i][a_sys > 0])
         core_mass_sys[core_mass_sys > max_core_mass] = max_core_mass
         a_sys = a_sys[a_sys > 0]
         a_all_2p += list(a_sys)
@@ -356,7 +356,7 @@ def fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, max_core_mass=10.
     for i,a_sys in enumerate(sssp_per_sys['a_all'][:N_sys]):
         if np.sum(a_sys > 0) > 1:
             Mstar = sssp['Mstar_all'][i]
-            core_mass_sys = sssp_per_sys['mass_all'][i][a_sys > 0]
+            core_mass_sys = np.copy(sssp_per_sys['mass_all'][i])[a_sys > 0]
             core_mass_sys[core_mass_sys > max_core_mass] = max_core_mass
             R_sys = sssp_per_sys['radii_all'][i][a_sys > 0]
             a_sys = a_sys[a_sys > 0]
@@ -388,12 +388,13 @@ def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, max_
     for i,det_sys in enumerate(sssp_per_sys['det_all']):
         if np.sum(det_sys) > 1:
             Mstar = sssp['Mstar_all'][i]
-            core_mass_sys = sssp_per_sys['mass_all'][i] # all planet masses including padded zeros
+            Mp_sys = sssp_per_sys['mass_all'][i]
+            core_mass_sys = np.copy(Mp_sys) # all planet masses including padded zeros
             core_mass_sys[core_mass_sys > max_core_mass] = max_core_mass
             R_sys = sssp_per_sys['radii_all'][i] # all planet radii including padded zeros
             a_sys = sssp_per_sys['a_all'][i] # all semimajor axes including padded zeros
 
-            core_mass_sys_obs = core_mass_sys[det_sys == 1] # masses of observed planets
+            core_mass_sys_obs = np.copy(Mp_sys)[det_sys == 1] # masses of observed planets
             core_mass_sys_obs[core_mass_sys_obs > max_core_mass] = max_core_mass
             R_sys_obs = R_sys[det_sys == 1] # radii of observed planets
             a_sys_obs = a_sys[det_sys == 1] # semimajor axes of observed planets
