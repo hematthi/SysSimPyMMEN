@@ -159,7 +159,7 @@ for r in r_examples:
     Mr_array = np.array([solid_mass_integrated_r0_to_r_given_power_law_profile(r, r0, fit_per_sys_dict['sigma0'][i], fit_per_sys_dict['beta'][i], a0=a0) for i in range(len(fit_per_sys_dict['sigma0']))])
     r_Mr_arrays.append(Mr_array)
 
-plot_fig_cdf_simple((8,5), r_Mr_arrays, [], x_min=1e-2, x_max=500., log_x=True, c_sim=['k']*len(r_examples), ls_sim=r_linestyles, lw=2, labels_sim=[r'$r = {:0.1f}$ AU'.format(r) for r in r_examples], xticks_custom=[0.01, 0.1, 1, 10, 100], xlabel_text='Total solid mass within $r$, $M_r$ ($M_\oplus$)', ylabel_text=r'Cumulative fraction with $M_r$', one_minus=True, afs=afs, tfs=tfs, lfs=lfs, legend=True, save_name=savefigures_directory + model_name + '_total_mass_CDFs_per_separation_%s_per_system.pdf' % prescription_str, save_fig=savefigures)
+plot_fig_cdf_simple((8,5), r_Mr_arrays, [], x_min=1e-2, x_max=500., log_x=True, c_sim=['k']*len(r_examples), ls_sim=r_linestyles, lw=2, labels_sim=[r'$r = {:0.1f}$ AU'.format(r) for r in r_examples], xticks_custom=[0.01, 0.1, 1, 10, 100], xlabel_text='Total mass, $M$ ($M_\oplus$)', ylabel_text=r'Fraction with $M_r \geq M$', one_minus=True, afs=afs, tfs=tfs, lfs=lfs, legend=True, save_name=savefigures_directory + model_name + '_total_mass_CDFs_per_separation_%s_per_system.pdf' % prescription_str, save_fig=savefigures)
 plt.show()
 
 # To repeat the above using the planet masses directly (i.e. step-functions in enclosed mass):

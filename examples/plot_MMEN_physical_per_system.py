@@ -137,14 +137,14 @@ if savefigures:
     plt.close()
 
 # To plot the distribution of fitted power-law parameters (sigma0 vs. beta):
-plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'], x_min=-8., x_max=4., y_min=1e-1, y_max=1e5, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Simulated physical systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_%s_sigma0_vs_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
+plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'], x_min=-8., x_max=4., y_min=1e-1, y_max=1e6, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Simulated physical systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_%s_sigma0_vs_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
 
 # To repeat the above (plot sigma0 vs. beta) per intrinsic multiplicity:
 for n in range(2,9):
     print(np.sum(fit_per_sys_dict['n_pl'] == n))
     x = fit_per_sys_dict['beta'][fit_per_sys_dict['n_pl'] == n] # beta's
     y = fit_per_sys_dict['sigma0'][fit_per_sys_dict['n_pl'] == n] # sigma0's
-    plot_2d_points_and_contours_with_histograms(x, y, x_min=-8., x_max=4., y_min=1e-1, y_max=1e5, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text=r'$n = %s$' % n, plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_%s_sigma0_vs_beta_per_system_n%s.pdf' % (prescription_str, n), save_fig=savefigures)
+    plot_2d_points_and_contours_with_histograms(x, y, x_min=-8., x_max=4., y_min=1e-1, y_max=1e6, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text=r'$n = %s$' % n, plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_%s_sigma0_vs_beta_per_system_n%s.pdf' % (prescription_str, n), save_fig=savefigures)
 
 plt.show()
 
