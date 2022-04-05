@@ -125,4 +125,4 @@ plt.show()
 
 
 ##### To plot some systems, including various feeding zones for each planet and power-law fits:
-plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, prescription=prescription_str, a0=a0, scale_up=False, N_sys=3000)
+plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, prescription=prescription_str, a0=a0, scale_up=True, N_sys=10)

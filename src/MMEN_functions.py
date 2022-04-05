@@ -466,8 +466,14 @@ def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, max_
 def plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False, N_sys=10):
     # If 'scale_up' is True, will scale up the power-law to be above the surface densities of all planets in the system (i.e. multiply 'sigma0' by a factor such that sigma0*(a_i/a0)^beta >= sigma_i for all planets)
     # 'N_sys' is the maximum number of systems to loop through (to save time)
-    for i,det_sys in enumerate(sssp_per_sys['det_all'][:N_sys]):
+    count = 0
+    for i,det_sys in enumerate(sssp_per_sys['det_all']):
+        if count >= N_sys:
+            break
         if np.sum(det_sys) > 1:
+            count += 1
+            print('##### System %s:' % count)
+
             Mstar = sssp['Mstar_all'][i]
             Mp_sys = sssp_per_sys['mass_all'][i]
             core_mass_sys = np.copy(Mp_sys) # all planet masses including padded zeros
@@ -508,18 +514,37 @@ def plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(s
             fig = plt.figure(figsize=(16,8))
             plot = GridSpec(1,1,left=0.1,bottom=0.1,right=0.95,top=0.95,wspace=0,hspace=0)
             ax = plt.subplot(plot[0,0])
-            plt.scatter(a_sys, np.log10(sigma_sys), marker='o', s=100.*R_sys**2., color='k', label='All planets')
-            for j,a in enumerate(a_sys): # loop through each planet
+            plt.scatter(a_sys, np.log10(sigma_sys), marker='o', s=100.*R_sys**2., facecolors='none', edgecolors='k', label='All planets')
+            plt.scatter(a_sys_obs, np.log10(sigma_sys_obs), marker='o', s=100.*R_sys_obs**2., color='k', label='Observed planets')
+            for j,a in enumerate(a_sys):
+                # Plot various feeding zones for each planet:
                 da_S2014 = delta_a_sys_S2014[j]
                 da_nHill = delta_a_sys_nHill[j]
                 #da_RC2014 = delta_a_sys_RC2014[j]
-                plt.plot([0.5*a, 1.5*a], [np.log10(1.15*sigma_sys[j])]*2, lw=2, color='k')
-                plt.plot([a - da_S2014/2., a + da_S2014/2.], [np.log10(1.05*sigma_sys[j])]*2, lw=2, color='r')
-                plt.plot([a - da_nHill/2., a + da_nHill/2.], [np.log10(0.95*sigma_sys[j])]*2, lw=2, color='orange')
-                plt.plot([a_bounds_sys[j], a_bounds_sys[j+1]], [np.log10(0.85*sigma_sys[j])]*2, lw=2, color='b')
-            plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0, beta, a0=a0)), lw=3, ls='--', color='r', label=r'Fit to all planets ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0, beta))
-            plt.plot(a_array, np.log10(sigma_MMSN), lw=3, color='g', label=r'MMSN ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(MMSN(a0), -1.5)) #label=r'MMSN ($\sigma_{\rm solid} = 10.89(a/{\rm AU})^{-3/2}$ g/cm$^2$)'
-            #plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g', label='') #label='Solar system planets (Mercury, Venus, Earth)'
+                plt.plot([0.5*a, 1.5*a], [np.log10(1.15*sigma_sys[j])]*2, lw=1, color='k')
+                plt.plot([a - da_S2014/2., a + da_S2014/2.], [np.log10(1.05*sigma_sys[j])]*2, lw=1, color='r')
+                plt.plot([a - da_nHill/2., a + da_nHill/2.], [np.log10(0.95*sigma_sys[j])]*2, lw=1, color='b')
+                plt.plot([a_bounds_sys[j], a_bounds_sys[j+1]], [np.log10(0.85*sigma_sys[j])]*2, lw=1, color='m')
+
+                # To compare the planet masses to the integrated disk masses:
+                Mp_core = core_mass_sys[j]
+                plt.annotate(r'${:0.1f} M_\oplus$'.format(Mp_core), (a, np.log10(1.5*sigma_sys[j])), ha='center', fontsize=16)
+                if prescription == 'CL2013':
+                    Mp_intdisk = solid_mass_integrated_r0_to_r_given_power_law_profile(1.5*a, 0.5*a, sigma0, beta, a0=a0)
+                    print('Planet (core) mass: {:0.2f} M_earth --- Integrated disk mass (CL2013): {:0.2f} M_earth'.format(Mp_core, Mp_intdisk))
+                elif prescription == 'S2014':
+                    Mp_intdisk = solid_mass_integrated_r0_to_r_given_power_law_profile(a + da_S2014/2., a - da_S2014/2., sigma0, beta, a0=a0)
+                    print('Planet (core) mass: {:0.2f} M_earth --- Integrated disk mass (S2014): {:0.2f} M_earth'.format(Mp_core, Mp_intdisk))
+                elif prescription == 'nHill':
+                    Mp_intdisk = solid_mass_integrated_r0_to_r_given_power_law_profile(a + da_nHill/2., a - da_nHill/2., sigma0, beta, a0=a0)
+                    print('Planet (core) mass: {:0.2f} M_earth --- Integrated disk mass (nHill): {:0.2f} M_earth'.format(Mp_core, Mp_intdisk))
+                elif prescription == 'RC2014':
+                    Mp_intdisk = solid_mass_integrated_r0_to_r_given_power_law_profile(a_bounds_sys[j+1], a_bounds_sys[j], sigma0, beta, a0=a0)
+                    print('Planet (core) mass: {:0.2f} M_earth --- Integrated disk mass (RC2014): {:0.2f} M_earth'.format(Mp_core, Mp_intdisk))
+
+            plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0, beta, a0=a0)), lw=3, ls='-', color='r', label=r'Fit to all planets ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0, beta))
+            plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_obs, beta_obs, a0=a0)), lw=3, ls='--', color='r', label=r'Fit to observed planets ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_obs, beta_obs))
+            plt.plot(a_array, np.log10(sigma_MMSN), lw=3, color='g', label=r'MMSN ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(MMSN(a0), -1.5))
             ax.tick_params(axis='both', labelsize=20)
             plt.gca().set_xscale("log")
             plt.xticks([0.05, 0.1, 0.2, 0.4, 0.8])
@@ -528,7 +553,7 @@ def plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(s
             plt.ylim([-0.5,5.5])
             plt.xlabel(r'Semimajor axis, $a$ (AU)', fontsize=20)
             plt.ylabel(r'Surface density, $\log_{10}(\Sigma/{\rm gcm}^{-2})$', fontsize=20)
-            plt.legend(loc='lower left', bbox_to_anchor=(0.,0.), ncol=1, frameon=False, fontsize=lfs)
+            plt.legend(loc='lower left', bbox_to_anchor=(0.,0.), ncol=1, frameon=False, fontsize=16)
 
             plt.show()
 
