@@ -6,6 +6,9 @@ from scipy.interpolate import RectBivariateSpline
 from scipy.interpolate import interp1d
 from scipy.stats import truncnorm
 from scipy.optimize import curve_fit # for fitting functions
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec # for specifying plot attributes
+from matplotlib import ticker # for setting contour plots to log scale
 
 import sys
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))),'SysSim_Plotting/src')) # TODO: update when those files get made into a package
@@ -13,6 +16,12 @@ sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.
 import functions_general as gen
 
 
+
+
+
+MeVeEa_masses = np.array([0.0553, 0.815, 1.]) # masses of Mercury, Venus, and Earth, in Earth masses
+MeVeEa_radii = np.array([0.383, 0.949, 1.]) # radii of Mercury, Venus, and Earth, in Earth radii
+MeVeEa_a = np.array([0.387, 0.723, 1.]) # semi-major axes of Mercury, Venus, and Earth, in AU
 
 
 
@@ -97,25 +106,43 @@ def solid_surface_density_CL2013(M, a):
     # Compute the solid surface density (g/cm^2) using the Chiang & Laughlin (2013) prescription (delta_a = a), given a planet mass M (M_earth) and semi-major axis a (AU)
     return solid_surface_density(M, a, a)
 
+# TODO: write unit tests
+def feeding_zone_S2014(M, R, a, Mstar=1.):
+    # Compute the feeding zone width using the Schlicting (2014) prescription (delta_a = 2^(3/2)*a((a*M)/(R*Mstar))^(1/2), given a planet mass M (M_earth), planet radius R (R_earth), semi-major axis a (AU), and stellar mass Mstar (M_sun)
+    delta_a = 2.**(3./2.)*a*np.sqrt(((a*gen.AU)/(R*gen.Rearth))*((M*gen.Mearth)/(Mstar*gen.Msun))) # AU
+    return delta_a
+
 def solid_surface_density_S2014(M, R, a, Mstar=1.):
     # Compute the solid surface density (g/cm^2) using the Schlichting (2014) prescription (delta_a = 2^(3/2)*a((a*M)/(R*Mstar))^(1/2), given a planet mass M (M_earth), planet radius R (R_earth), semi-major axis a (AU), and stellar mass Mstar (M_sun)
-    delta_a = 2.**(3./2.)*a*np.sqrt(((a*gen.AU)/(R*gen.Rearth))*((M*gen.Mearth)/(Mstar*gen.Msun))) # AU
+    delta_a = feeding_zone_S2014(M, R, a, Mstar=Mstar)
     return solid_surface_density(M, a, delta_a)
+
+# TODO: write unit tests
+def feeding_zone_nHill(M, a, Mstar=1., n=10.):
+    # Compute the feeding zone width using a number of Hill radii (delta_a = n*R_Hill), given a planet mass M (M_earth), semi-major axis a (AU), and stellar mass Mstar (M_sun)
+    delta_a = n*a*((M*gen.Mearth)/(3.*Mstar*gen.Msun))**(1./3.) # AU
+    return delta_a
 
 def solid_surface_density_nHill(M, a, Mstar=1., n=10.):
     # Compute the solid surface density (g/cm^2) using a number of Hill radii for the feeding zone width (delta_a = n*R_Hill), given a planet mass M (M_earth), semi-major axis a (AU), and stellar mass Mstar (M_sun)
-    delta_a = n*a*((M*gen.Mearth)/(3.*Mstar*gen.Msun))**(1./3.) # AU
+    delta_a = feeding_zone_nHill(M, a, Mstar=Mstar, n=n)
     return solid_surface_density(M, a, delta_a)
+
+# TODO: write unit tests
+def feeding_zone_RC2014(a_sys):
+    # Compute the feeding zone widths for planets in a multiplanet system using the Raymond & Cossou (2014) prescription (neighboring planets' feeding zones separated by the geometric means of their semi-major axes)
+    a_bounds_sys = np.zeros(len(a_sys)+1) # bounds in semi-major axis for each planet
+    a_bounds_sys[1:-1] = np.sqrt(a_sys[:-1]*a_sys[1:]) # geometric means between planets
+    a_bounds_sys[0] = a_sys[0]*np.sqrt(a_sys[0]/a_sys[1]) # same ratio for upper bound to a_sys[1] as a_sys[1] to lower bound
+    a_bounds_sys[-1] = a_sys[-1]*np.sqrt(a_sys[-1]/a_sys[-2]) # same ratio for upper bound to a_sys[-1] as a_sys[-1] to lower bound
+    delta_a_sys = np.diff(a_bounds_sys)
+    return delta_a_sys, a_bounds_sys
 
 def solid_surface_density_system_RC2014(M_sys, a_sys):
     # Compute the solid surface density (g/cm^2) of planets in a multiplanet system using the Raymond & Cossou (2014) prescription (neighboring planets' feeding zones separated by the geometric means of their semi-major axes)
     n_pl = len(M_sys)
     assert n_pl == len(a_sys) > 1
-    a_bounds_sys = np.zeros(n_pl+1) # bounds in semi-major axis for each planet
-    a_bounds_sys[1:-1] = np.sqrt(a_sys[:-1]*a_sys[1:]) # geometric means between planets
-    a_bounds_sys[0] = a_sys[0]*np.sqrt(a_sys[0]/a_sys[1]) # same ratio for upper bound to a_sys[1] as a_sys[1] to lower bound
-    a_bounds_sys[-1] = a_sys[-1]*np.sqrt(a_sys[-1]/a_sys[-2]) # same ratio for upper bound to a_sys[-1] as a_sys[-1] to lower bound
-    delta_a_sys = np.diff(a_bounds_sys)
+    delta_a_sys, _ = feeding_zone_RC2014(a_sys)
     return solid_surface_density(M_sys, a_sys, delta_a_sys)
 
 def solid_surface_density_prescription(M, R, a, Mstar=1., n=10., prescription='CL2013'):
@@ -435,6 +462,75 @@ def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, max_
     fit_per_sys_dict['beta_obs'] = np.array(fit_per_sys_dict['beta_obs'])
     return fit_per_sys_dict
 
+# TODO: write unit tests
+def plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False, N_sys=10):
+    # If 'scale_up' is True, will scale up the power-law to be above the surface densities of all planets in the system (i.e. multiply 'sigma0' by a factor such that sigma0*(a_i/a0)^beta >= sigma_i for all planets)
+    # 'N_sys' is the maximum number of systems to loop through (to save time)
+    for i,det_sys in enumerate(sssp_per_sys['det_all'][:N_sys]):
+        if np.sum(det_sys) > 1:
+            Mstar = sssp['Mstar_all'][i]
+            Mp_sys = sssp_per_sys['mass_all'][i]
+            core_mass_sys = np.copy(Mp_sys) # all planet masses including padded zeros
+            core_mass_sys[core_mass_sys > max_core_mass] = max_core_mass
+            R_sys = sssp_per_sys['radii_all'][i] # all planet radii including padded zeros
+            a_sys = sssp_per_sys['a_all'][i] # all semimajor axes including padded zeros
+
+            core_mass_sys_obs = np.copy(Mp_sys)[det_sys == 1] # masses of observed planets
+            core_mass_sys_obs[core_mass_sys_obs > max_core_mass] = max_core_mass
+            R_sys_obs = R_sys[det_sys == 1] # radii of observed planets
+            a_sys_obs = a_sys[det_sys == 1] # semimajor axes of observed planets
+            core_mass_sys = core_mass_sys[a_sys > 0] # masses of all planets
+            R_sys = R_sys[a_sys > 0] # radii of all planets
+            a_sys = a_sys[a_sys > 0] # semimajor axes of all planets
+
+            sigma_sys = solid_surface_density_prescription(core_mass_sys, R_sys, a_sys, Mstar=Mstar, n=n, prescription=prescription) # using all planets
+            sigma_sys_obs = solid_surface_density_prescription(core_mass_sys_obs, R_sys_obs, a_sys_obs, Mstar=Mstar, n=n, prescription=prescription) # using observed planets only
+            sigma0, beta = fit_power_law_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
+            sigma0_obs, beta_obs = fit_power_law_MMEN(a_sys_obs, sigma_sys_obs, a0=a0, p0=p0, p1=p1)
+
+            sigma_fit_sys = MMEN_power_law(a_sys, sigma0, beta, a0=a0)
+            sigma_fit_sys_obs = MMEN_power_law(a_sys_obs, sigma0_obs, beta_obs, a0=a0)
+            sigma_fit_ratio_sys = sigma_sys/sigma_fit_sys
+            sigma_fit_ratio_sys_obs = sigma_sys_obs/sigma_fit_sys_obs
+            scale_factor_sigma0 = np.max(sigma_fit_ratio_sys)
+            scale_factor_sigma0_obs = np.max(sigma_fit_ratio_sys_obs)
+            sigma0 = sigma0*scale_factor_sigma0 if scale_up else sigma0
+            sigma0_obs = sigma0_obs*scale_factor_sigma0_obs if scale_up else sigma0_obs
+
+            # Plot the system:
+            a_array = np.linspace(1e-3,2,1001)
+            sigma_MMSN = MMSN(a_array)
+
+            delta_a_sys_S2014 = feeding_zone_S2014(core_mass_sys, R_sys, a_sys, Mstar=Mstar)
+            delta_a_sys_nHill = feeding_zone_nHill(core_mass_sys, a_sys, Mstar=Mstar, n=n)
+            delta_a_sys_RC2014, a_bounds_sys = feeding_zone_RC2014(a_sys)
+
+            fig = plt.figure(figsize=(16,8))
+            plot = GridSpec(1,1,left=0.1,bottom=0.1,right=0.95,top=0.95,wspace=0,hspace=0)
+            ax = plt.subplot(plot[0,0])
+            plt.scatter(a_sys, np.log10(sigma_sys), marker='o', s=100.*R_sys**2., color='k', label='All planets')
+            for j,a in enumerate(a_sys): # loop through each planet
+                da_S2014 = delta_a_sys_S2014[j]
+                da_nHill = delta_a_sys_nHill[j]
+                #da_RC2014 = delta_a_sys_RC2014[j]
+                plt.plot([0.5*a, 1.5*a], [np.log10(1.15*sigma_sys[j])]*2, lw=2, color='k')
+                plt.plot([a - da_S2014/2., a + da_S2014/2.], [np.log10(1.05*sigma_sys[j])]*2, lw=2, color='r')
+                plt.plot([a - da_nHill/2., a + da_nHill/2.], [np.log10(0.95*sigma_sys[j])]*2, lw=2, color='orange')
+                plt.plot([a_bounds_sys[j], a_bounds_sys[j+1]], [np.log10(0.85*sigma_sys[j])]*2, lw=2, color='b')
+            plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0, beta, a0=a0)), lw=3, ls='--', color='r', label=r'Fit to all planets ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0, beta))
+            plt.plot(a_array, np.log10(sigma_MMSN), lw=3, color='g', label=r'MMSN ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(MMSN(a0), -1.5)) #label=r'MMSN ($\sigma_{\rm solid} = 10.89(a/{\rm AU})^{-3/2}$ g/cm$^2$)'
+            #plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g', label='') #label='Solar system planets (Mercury, Venus, Earth)'
+            ax.tick_params(axis='both', labelsize=20)
+            plt.gca().set_xscale("log")
+            plt.xticks([0.05, 0.1, 0.2, 0.4, 0.8])
+            ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
+            plt.xlim([0.04,0.9])
+            plt.ylim([-0.5,5.5])
+            plt.xlabel(r'Semimajor axis, $a$ (AU)', fontsize=20)
+            plt.ylabel(r'Surface density, $\log_{10}(\Sigma/{\rm gcm}^{-2})$', fontsize=20)
+            plt.legend(loc='lower left', bbox_to_anchor=(0.,0.), ncol=1, frameon=False, fontsize=lfs)
+
+            plt.show()
 
 
 ##### Functions to compute the total integrated mass of solids within a given separation for a fitted power-law MMEN:
