@@ -150,6 +150,13 @@ plt.show()
 
 
 
+# To plot the distribution of sigma0 vs. scale_factor:
+plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['scale_factor'][fit_per_sys_dict['n_pl'] > 2], fit_per_sys_dict['sigma0'][fit_per_sys_dict['n_pl'] > 2], x_min=1., x_max=20., y_min=1e-1, y_max=1e6, log_x=False, log_y=True, xlabel_text=r'$\alpha$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Simulated physical systems (3+ planets)', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\alpha$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_mmen_%s_sigma0_vs_scaleup_per_system.pdf' % prescription_str, save_fig=savefigures)
+
+plt.show()
+
+
+
 # To change the normalization point a0 for sigma0:
 '''
 a0_array = np.logspace(np.log10(0.04), np.log10(1.), 11)
