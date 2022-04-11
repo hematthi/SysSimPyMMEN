@@ -411,7 +411,7 @@ def fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, max_core_mass=10.
 def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False):
     # Compute solid surface densities and fit power-law parameters to each multi-planet system in an observed catalog, for the observed planets only and then for all the planets in those systems (using the physical planet properties for both)
     # If 'scale_up' is True, will scale up the power-law to be above the surface densities of all planets in the system (i.e. multiply 'sigma0' by a factor such that sigma0*(a_i/a0)^beta >= sigma_i for all planets)
-    fit_per_sys_dict = {'n_pl_true':[], 'n_pl_obs':[], 'sigma0_true':[], 'sigma0_obs':[], 'scale_factor_true':[], 'scale_factor_obs':[], 'beta_true':[], 'beta_obs':[]}
+    fit_per_sys_dict = {'n_pl_true':[], 'n_pl_obs':[], 'Mp_tot_true':[], 'Mp_tot_obs':[], 'sigma0_true':[], 'sigma0_obs':[], 'scale_factor_true':[], 'scale_factor_obs':[], 'beta_true':[], 'beta_obs':[]}
     for i,det_sys in enumerate(sssp_per_sys['det_all']):
         if np.sum(det_sys) > 1:
             Mstar = sssp['Mstar_all'][i]
@@ -445,6 +445,8 @@ def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, max_
 
             fit_per_sys_dict['n_pl_true'].append(len(a_sys))
             fit_per_sys_dict['n_pl_obs'].append(len(a_sys_obs))
+            fit_per_sys_dict['Mp_tot_true'].append(np.sum(core_mass_sys))
+            fit_per_sys_dict['Mp_tot_obs'].append(np.sum(core_mass_sys_obs))
             fit_per_sys_dict['sigma0_true'].append(sigma0)
             fit_per_sys_dict['sigma0_obs'].append(sigma0_obs)
             fit_per_sys_dict['scale_factor_true'].append(scale_factor_sigma0)
@@ -454,6 +456,8 @@ def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, max_
 
     fit_per_sys_dict['n_pl_true'] = np.array(fit_per_sys_dict['n_pl_true'])
     fit_per_sys_dict['n_pl_obs'] = np.array(fit_per_sys_dict['n_pl_obs'])
+    fit_per_sys_dict['Mp_tot_true'] = np.array(fit_per_sys_dict['Mp_tot_true'])
+    fit_per_sys_dict['Mp_tot_obs'] = np.array(fit_per_sys_dict['Mp_tot_obs'])
     fit_per_sys_dict['sigma0_true'] = np.array(fit_per_sys_dict['sigma0_true'])
     fit_per_sys_dict['sigma0_obs'] = np.array(fit_per_sys_dict['sigma0_obs'])
     fit_per_sys_dict['scale_factor_true'] = np.array(fit_per_sys_dict['scale_factor_true'])

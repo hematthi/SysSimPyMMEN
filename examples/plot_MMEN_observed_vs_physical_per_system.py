@@ -122,6 +122,39 @@ plt.show()
 
 
 
+# To plot sigma0_obs/sigma0_true vs. beta_obs/beta_true for the simulated observed systems:
+beta_ratio_min, beta_ratio_max = -4., 6.
+sigma0_ratio_min, sigma0_ratio_max = 1e-3, 1e3
+ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta_obs']/fit_per_sys_dict['beta_true'], fit_per_sys_dict['sigma0_obs']/fit_per_sys_dict['sigma0_true'], x_min=beta_ratio_min, x_max=beta_ratio_max, y_min=sigma0_ratio_min, y_max=sigma0_ratio_max, log_x=False, log_y=True, xlabel_text=r'$\beta_{\rm obs}/\beta_{\rm phys}$', ylabel_text=r'$\log_{10}(\Sigma_{0,\rm obs}/\Sigma_{0,\rm phys})$', extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$\frac{\beta_{\rm obs}}{\beta_{\rm phys}}$', y_symbol=r'$\frac{\Sigma_{0,\rm obs}}{\Sigma_{0,\rm phys}}$')
+ax.plot([beta_ratio_min, beta_ratio_max], [0., 0.], ls='--', lw=lw, color='b')
+ax.plot([1., 1.], [np.log10(sigma0_ratio_min), np.log10(sigma0_ratio_max)], ls='--', lw=lw, color='b')
+if savefigures:
+    plt.savefig(savefigures_directory + model_name + '_phys_vs_obs_mmen_%s_sigma0_ratio_vs_beta_ratio_per_system.pdf' % prescription_str)
+    plt.close()
+
+# To plot sigma0_obs/sigma0_true vs scale_factor_obs/scale_factor_true for the simulated observed systems:
+'''
+scale_ratio_min, scale_ratio_max = 0.1, 2.
+ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['scale_factor_obs']/fit_per_sys_dict['scale_factor_true'], fit_per_sys_dict['sigma0_obs']/fit_per_sys_dict['sigma0_true'], x_min=scale_ratio_min, x_max=scale_ratio_max, y_min=sigma0_ratio_min, y_max=sigma0_ratio_max, log_x=True, log_y=True, xlabel_text=r'$\alpha_{\rm obs}/\alpha_{\rm phys}$', ylabel_text=r'$\log_{10}(\Sigma_{0,\rm obs}/\Sigma_{0,\rm phys})$', extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$\frac{\alpha_{\rm obs}}{\alpha_{\rm phys}}$', y_symbol=r'$\frac{\Sigma_{0,\rm obs}}{\Sigma_{0,\rm phys}}$')
+ax.plot([np.log10(scale_ratio_min), np.log10(scale_ratio_max)], [0., 0.], ls='--', lw=lw, color='b')
+ax.plot([0., 0.], [np.log10(sigma0_ratio_min), np.log10(sigma0_ratio_max)], ls='--', lw=lw, color='b')
+if savefigures:
+    plt.savefig(savefigures_directory + model_name + '_phys_vs_obs_mmen_%s_sigma0_ratio_vs_scaleup_ratio_per_system.pdf' % prescription_str)
+    plt.close()
+'''
+
+# To plot sigma0_obs/sigma0_true vs. Mp_tot_obs/Mp_tot_true (ratio of total core masses of observed vs. all planets) for the simulated observed systems:
+'''
+Mp_ratio_min, Mp_ratio_max = 1e-1, 1.
+ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['Mp_tot_obs']/fit_per_sys_dict['Mp_tot_true'], fit_per_sys_dict['sigma0_obs']/fit_per_sys_dict['sigma0_true'], x_min=Mp_ratio_min, x_max=Mp_ratio_max, y_min=sigma0_ratio_min, y_max=sigma0_ratio_max, log_x=False, log_y=True, xlabel_text=r'$M_{p,\rm tot,obs}/M_{p,\rm tot,phys}$', ylabel_text=r'$\log_{10}(\Sigma_{0,\rm obs}/\Sigma_{0,\rm phys})$', extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$\frac{M_{p,\rm tot,obs}}{M_{p,\rm tot,phys}}$', y_symbol=r'$\frac{\Sigma_{0,\rm obs}}{\Sigma_{0,\rm phys}}$')
+ax.plot([1., 1.], [np.log10(sigma0_ratio_min), np.log10(sigma0_ratio_max)], ls='--', lw=lw, color='b')
+if savefigures:
+    plt.savefig(savefigures_directory + model_name + '_phys_vs_obs_mmen_%s_sigma0_ratio_vs_mass_ratio_per_system.pdf' % prescription_str)
+    plt.close()
+'''
+plt.show()
+
+
 
 
 ##### To plot some systems, including various feeding zones for each planet and power-law fits:
