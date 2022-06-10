@@ -93,6 +93,9 @@ lfs = 16 # legend labels font size
 prescription_str = 'RC2014'
 a0 = 0.3 # normalization separation for fitting power-laws
 
+scale_up = True
+y_sym = '\Sigma_0^*' if scale_up else '\Sigma_0'
+
 # Compute the MMSN:
 a_array = np.linspace(1e-3,2,1001)
 sigma_MMSN = MMSN(a_array)
@@ -107,8 +110,8 @@ MeVeEa_sigmas = solid_surface_density_prescription(MeVeEa_masses, MeVeEa_radii, 
 
 ##### To fit a power-law to each observed system for the simulated observed and Kepler catalog and plot the distribution of fitted parameters (sigma0 vs. beta):
 
-fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys, prescription=prescription_str, a0=a0, scale_up=True)
-fit_per_sys_dict_Kep = fit_power_law_MMEN_per_system_observed(ssk_per_sys, prescription=prescription_str, a0=a0, scale_up=True)
+fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys, prescription=prescription_str, a0=a0, scale_up=scale_up)
+fit_per_sys_dict_Kep = fit_power_law_MMEN_per_system_observed(ssk_per_sys, prescription=prescription_str, a0=a0, scale_up=scale_up)
 
 
 
@@ -155,12 +158,12 @@ plt.show()
 
 
 # To plot the distribution of fitted power-law parameters (sigma0 vs. beta) for the simulated observed systems:
-ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'], x_min=-8., x_max=4., y_min=1e-2, y_max=1e8, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Simulated observed systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_obs_mmen_%s_sigma0_vs_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
+ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'], x_min=-8., x_max=4., y_min=1e-1, y_max=1e6, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(%s/{\rm g cm^{-2}})$' % y_sym, extra_text='Simulated observed systems', plot_qtls=True, y_str_format='{:0.0f}', x_symbol=r'$\beta$', y_symbol=r'$%s$' % y_sym, save_name=savefigures_directory + model_name + '_obs_mmen_%s_sigma0_vs_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
 #max_radii_per_sys = np.max(sss_per_sys['radii_obs'][sss_per_sys['Mtot_obs'] >= 2], axis=1)
 #ax.scatter(fit_per_sys_dict['beta'][max_radii_per_sys < 1.6], np.log10(fit_per_sys_dict['sigma0'][max_radii_per_sys < 1.6]), color='b')
 
 # To plot the distribution of fitted power-law parameters (sigma0 vs. beta) for the Kepler observed systems:
-ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict_Kep['beta'], fit_per_sys_dict_Kep['sigma0'], x_min=-8., x_max=4., y_min=1e-2, y_max=1e8, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Kepler observed systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + 'Kepler_mmen_%s_sigma0_vs_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
+ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict_Kep['beta'], fit_per_sys_dict_Kep['sigma0'], x_min=-8., x_max=4., y_min=1e-1, y_max=1e6, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(%s/{\rm g cm^{-2}})$' % y_sym, extra_text='Kepler observed systems', plot_qtls=True, y_str_format='{:0.0f}', x_symbol=r'$\beta$', y_symbol=r'$%s$' % y_sym, save_name=savefigures_directory + 'Kepler_mmen_%s_sigma0_vs_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
 #max_radii_per_sys = np.max(ssk_per_sys['radii_obs'][ssk_per_sys['Mtot_obs'] >= 2], axis=1)
 #ax.scatter(fit_per_sys_dict_Kep['beta'][max_radii_per_sys < 1.6], np.log10(fit_per_sys_dict_Kep['sigma0'][max_radii_per_sys < 1.6]), color='b')
 plt.show()
@@ -174,6 +177,6 @@ for m in range(2,5):
     print(np.sum(m_sys_all == m))
     x = fit_per_sys_dict['beta'][m_sys_all == m] # beta's
     y = fit_per_sys_dict['sigma0'][m_sys_all == m] # sigma0's
-    plot_2d_points_and_contours_with_histograms(x, y, x_min=-8., x_max=4., y_min=1e-2, y_max=1e8, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text=r'$m = %s$' % m, plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_obs_mmen_%s_sigma0_vs_beta_per_system_m%s.pdf' % (prescription_str, m), save_fig=savefigures)
+    plot_2d_points_and_contours_with_histograms(x, y, x_min=-8., x_max=4., y_min=1e-1, y_max=1e6, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(%s/{\rm g cm^{-2}})$' % y_sym, extra_text=r'$m = %s$' % m, plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta$', y_symbol=r'$%s$' % y_sym, save_name=savefigures_directory + model_name + '_obs_mmen_%s_sigma0_vs_beta_per_system_m%s.pdf' % (prescription_str, m), save_fig=savefigures)
 
 plt.show()
