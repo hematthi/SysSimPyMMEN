@@ -190,3 +190,32 @@ if savefigures:
     plt.close()
 
 plt.show()
+
+
+
+
+
+##### Repeat for DDA poster:
+
+fig = plt.figure(figsize=(8,5))
+plot = GridSpec(1,1,left=0.15,bottom=0.15,right=0.95,top=0.95,wspace=0,hspace=0)
+ax = plt.subplot(plot[0,0])
+i_sample_plot = np.random.choice(np.arange(len(a_obs_2p)), len(a_obs_Kep), replace=False)
+#plt.scatter(a_obs_2p[i_sample_plot], np.log10(sigma_obs_RC2014[i_sample_plot]), marker='o', s=10, alpha=0.2, color='b', label='Simulated observed planets (RC14)')
+plt.scatter(a_obs_2p_Kep, np.log10(sigma_obs_RC2014_Kep), marker='o', s=10, alpha=0.2, color='k', label='Kepler observed planets (RC14)')
+#plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_obs_RC2014, beta_obs_RC2014, a0=a0)), lw=lw, ls='--', color='b', label=r'Simulated ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0_obs_RC2014, beta_obs_RC2014))
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_obs_RC2014_Kep, beta_obs_RC2014_Kep, a0=a0)), lw=lw, ls='--', color='k', label=r'Kepler ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0_obs_RC2014_Kep, beta_obs_RC2014_Kep))
+ax.tick_params(axis='both', labelsize=afs)
+plt.gca().set_xscale("log")
+ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
+plt.xticks(a_ticks)
+plt.xlim([0.04,0.9])
+plt.ylim([0.5,5.5])
+plt.xlabel(r'Semi-major axis, $a$ (AU)', fontsize=20)
+plt.ylabel(r'Surface density, $\log_{10}(\Sigma/{\rm gcm}^{-2})$', fontsize=20)
+#plt.legend(loc='lower left', bbox_to_anchor=(0.,0.), ncol=1, frameon=False, fontsize=lfs)
+if savefigures:
+    plt.savefig(savefigures_directory + model_name + '_obs_vs_Kepler_mmen_RC2014_simple.pdf')
+    plt.close()
+
+plt.show()

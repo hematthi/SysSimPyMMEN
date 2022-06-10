@@ -515,8 +515,8 @@ def plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(s
             delta_a_sys_nHill = feeding_zone_nHill(core_mass_sys, a_sys, Mstar=Mstar, n=n)
             delta_a_sys_RC2014, a_bounds_sys = feeding_zone_RC2014(a_sys)
 
-            fig = plt.figure(figsize=(16,8))
-            plot = GridSpec(1,1,left=0.1,bottom=0.1,right=0.95,top=0.95,wspace=0,hspace=0)
+            fig = plt.figure(figsize=(12,8))
+            plot = GridSpec(1,1,left=0.1,bottom=0.15,right=0.95,top=0.95,wspace=0,hspace=0)
             ax = plt.subplot(plot[0,0])
             plt.scatter(a_sys, np.log10(sigma_sys), marker='o', s=100.*R_sys**2., facecolors='none', edgecolors='k', label='All planets')
             plt.scatter(a_sys_obs, np.log10(sigma_sys_obs), marker='o', s=100.*R_sys_obs**2., color='k', label='Observed planets')
@@ -525,10 +525,11 @@ def plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(s
                 da_S2014 = delta_a_sys_S2014[j]
                 da_nHill = delta_a_sys_nHill[j]
                 #da_RC2014 = delta_a_sys_RC2014[j]
-                plt.plot([0.5*a, 1.5*a], [np.log10(1.15*sigma_sys[j])]*2, lw=1, color='k')
-                plt.plot([a - da_S2014/2., a + da_S2014/2.], [np.log10(1.05*sigma_sys[j])]*2, lw=1, color='r')
-                plt.plot([a - da_nHill/2., a + da_nHill/2.], [np.log10(0.95*sigma_sys[j])]*2, lw=1, color='b')
-                plt.plot([a_bounds_sys[j], a_bounds_sys[j+1]], [np.log10(0.85*sigma_sys[j])]*2, lw=1, color='m')
+                #plt.plot([0.5*a, 1.5*a], [np.log10(1.15*sigma_sys[j])]*2, lw=1, color='k')
+                #plt.plot([a - da_S2014/2., a + da_S2014/2.], [np.log10(1.05*sigma_sys[j])]*2, lw=1, color='r')
+                #plt.plot([a - da_nHill/2., a + da_nHill/2.], [np.log10(0.95*sigma_sys[j])]*2, lw=1, color='b')
+                #plt.plot([a_bounds_sys[j], a_bounds_sys[j+1]], [np.log10(0.85*sigma_sys[j])]*2, lw=1, color='m')
+                plt.plot([a_bounds_sys[j], a_bounds_sys[j+1]], [np.log10(sigma_sys[j])]*2, lw=2, color='k') # for simplicity
 
                 # To compare the planet masses to the integrated disk masses:
                 Mp_core = core_mass_sys[j]
@@ -546,8 +547,8 @@ def plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(s
                     Mp_intdisk = solid_mass_integrated_r0_to_r_given_power_law_profile(a_bounds_sys[j+1], a_bounds_sys[j], sigma0, beta, a0=a0)
                     print('Planet (core) mass: {:0.2f} M_earth --- Integrated disk mass (RC2014): {:0.2f} M_earth'.format(Mp_core, Mp_intdisk))
 
-            plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0, beta, a0=a0)), lw=3, ls='-', color='r', label=r'Fit to all planets ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0, beta))
-            plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_obs, beta_obs, a0=a0)), lw=3, ls='--', color='r', label=r'Fit to observed planets ($\Sigma_0 = {:0.2f}$, $\beta = {:0.2f}$)'.format(sigma0_obs, beta_obs))
+            plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0, beta, a0=a0)), lw=3, ls='-', color='r', label=r'Fit to all planets ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0, beta))
+            plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_obs, beta_obs, a0=a0)), lw=3, ls='--', color='r', label=r'Fit to observed planets ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0_obs, beta_obs))
             plt.plot(a_array, np.log10(sigma_MMSN), lw=3, color='g', label=r'MMSN ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(MMSN(a0), -1.5))
             ax.tick_params(axis='both', labelsize=20)
             plt.gca().set_xscale("log")
