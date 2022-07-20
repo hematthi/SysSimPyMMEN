@@ -148,7 +148,7 @@ plt.scatter(a_obs_Kep, np.log10(sigma_obs_CL2013_Kep), marker='o', s=10, alpha=0
 plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_obs_CL2013, beta_obs_CL2013, a0=a0)), lw=lw, ls='--', color='b', label=r'Simulated ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0_obs_CL2013, beta_obs_CL2013))
 plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_obs_CL2013_Kep, beta_obs_CL2013_Kep, a0=a0)), lw=lw, ls='--', color='k', label=r'Kepler ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0_obs_CL2013_Kep, beta_obs_CL2013_Kep))
 plt.plot(a_array, np.log10(sigma_MMSN), lw=lw, color='g', label=r'MMSN ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(MMSN(a0), -1.5)) #label=r'MMSN ($\sigma_{\rm solid} = 10.89(a/{\rm AU})^{-3/2}$ g/cm$^2$)'
-plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g', label='') #label='Solar system planets (Mercury, Venus, Earth)'
+#plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g', label='') #label='Solar system planets (Mercury, Venus, Earth)'
 ax.tick_params(axis='both', labelsize=afs)
 plt.gca().set_xscale("log")
 ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
@@ -170,12 +170,13 @@ plot = GridSpec(1,1,left=0.15,bottom=0.15,right=0.95,top=0.95,wspace=0,hspace=0)
 ax = plt.subplot(plot[0,0])
 #corner.hist2d(a_obs, np.log10(sigma_obs), bins=50, plot_density=False, contour_kwargs={'colors': ['0.6','0.4','0.2','0']}, data_kwargs={'color': 'k'})
 i_sample_plot = np.random.choice(np.arange(len(a_obs_2p)), len(a_obs_Kep), replace=False)
-plt.scatter(a_obs_2p[i_sample_plot], np.log10(sigma_obs_RC2014[i_sample_plot]), marker='o', s=10, alpha=0.2, color='b', label='Simulated observed planets (RC14)')
-plt.scatter(a_obs_2p_Kep, np.log10(sigma_obs_RC2014_Kep), marker='o', s=10, alpha=0.2, color='k', label='Kepler observed planets (RC14)')
+plt.scatter(a_obs_2p[i_sample_plot], np.log10(sigma_obs_RC2014[i_sample_plot]), marker='o', s=10, alpha=0.2, color='b', label='Simulated planets') # 'RC14'
+plt.scatter(a_obs_2p_Kep, np.log10(sigma_obs_RC2014_Kep), marker='o', s=10, alpha=0.2, color='k', label='Kepler planets') # 'RC14'
 plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_obs_RC2014, beta_obs_RC2014, a0=a0)), lw=lw, ls='--', color='b', label=r'Simulated ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0_obs_RC2014, beta_obs_RC2014))
 plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_obs_RC2014_Kep, beta_obs_RC2014_Kep, a0=a0)), lw=lw, ls='--', color='k', label=r'Kepler ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0_obs_RC2014_Kep, beta_obs_RC2014_Kep))
 plt.plot(a_array, np.log10(sigma_MMSN), lw=lw, color='g', label=r'MMSN ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(MMSN(a0), -1.5)) #label=r'MMSN ($\sigma_{\rm solid} = 10.89(a/{\rm AU})^{-3/2}$ g/cm$^2$)'
-plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g', label='') #label='Solar system planets (Mercury, Venus, Earth)'
+#plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g', label='') #label='Solar system planets (Mercury, Venus, Earth)'
+plt.text(x=0.98, y=0.98, s='Observed catalogs', ha='right', va='top', fontsize=lfs, transform = ax.transAxes)
 ax.tick_params(axis='both', labelsize=afs)
 plt.gca().set_xscale("log")
 ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
@@ -183,7 +184,7 @@ plt.xticks(a_ticks)
 plt.xlim([0.04,0.9])
 plt.ylim([-0.5,5.5])
 plt.xlabel(r'Semimajor axis $a$ (AU)', fontsize=20)
-plt.ylabel(r'Surface density, $\log_{10}(\Sigma/{\rm gcm}^{-2})$', fontsize=20)
+plt.ylabel(r'Surface density, $\log_{10}(\Sigma/{\rm g\,cm}^{-2})$', fontsize=20)
 plt.legend(loc='lower left', bbox_to_anchor=(0.,0.), ncol=1, frameon=False, fontsize=lfs)
 if savefigures:
     plt.savefig(savefigures_directory + model_name + '_obs_vs_Kepler_mmen_RC2014.pdf')

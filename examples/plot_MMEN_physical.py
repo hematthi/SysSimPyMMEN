@@ -269,7 +269,8 @@ plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_RC2014, beta_RC2014, a
 plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_nHill10, beta_nHill10, a0=a0)), lw=lw, ls='--', color='b', label=r'10Hill ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0_nHill10, beta_nHill10))
 plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_S2014, beta_S2014, a0=a0)), lw=lw, ls='--', color='r', label=r'S14 ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0_S2014, beta_S2014))
 plt.plot(a_array, np.log10(sigma_MMSN), lw=lw, color='g', label=r'MMSN ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(MMSN(a0), -1.5)) #label=r'MMSN ($\sigma_{\rm solid} = 10.89(a/{\rm AU})^{-3/2}$ g/cm$^2$)'
-plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g', label='') #label='Solar system planets (Mercury, Venus, Earth)'
+#plt.scatter(MeVeEa_a, np.log10(MeVeEa_sigmas), marker='o', s=100, color='g', label='') #label='Solar system planets (Mercury, Venus, Earth)'
+plt.text(x=0.98, y=0.98, s='Physical catalog', ha='right', va='top', fontsize=lfs, transform = ax.transAxes)
 ax.tick_params(axis='both', labelsize=afs)
 plt.gca().set_xscale("log")
 plt.xticks(a_ticks)
@@ -277,7 +278,7 @@ ax.get_xaxis().set_major_formatter(ticker.ScalarFormatter())
 plt.xlim([0.04,0.9])
 plt.ylim([-0.5,5.5])
 plt.xlabel(r'Semimajor axis, $a$ (AU)', fontsize=20)
-plt.ylabel(r'Surface density, $\log_{10}(\Sigma/{\rm gcm}^{-2})$', fontsize=20)
+plt.ylabel(r'Surface density, $\log_{10}(\Sigma/{\rm g\,cm}^{-2})$', fontsize=20)
 plt.legend(loc='lower left', bbox_to_anchor=(0.,0.), ncol=1, frameon=False, fontsize=lfs)
 if savefigures:
     plt.savefig(savefigures_directory + model_name + '_mmen_deltaa_compare_square.pdf')
