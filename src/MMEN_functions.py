@@ -338,13 +338,13 @@ def fit_power_law_MMEN_all_planets_physical(sssp_per_sys, sssp, max_core_mass=10
     outputs_dict = {'sigma_all': sigma_all, 'a_all': a_all, 'sigma0': sigma0, 'beta': beta}
     return outputs_dict
 
-def fit_power_law_MMEN_per_system_observed(sss_per_sys, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False):
+def fit_power_law_MMEN_per_system_observed(sss_per_sys, n_mult_min=2, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False):
     # Compute solid surface densities and fit power-law parameters to each multi-planet system in an observed catalog
     # If 'scale_up' is True, will scale up the power-law to be above the surface densities of all planets in the system (i.e. multiply 'sigma0' by a factor such that sigma0*(a_i/a0)^beta >= sigma_i for all planets)
     fit_per_sys_dict = {'m_obs':[], 'Mstar_obs':[], 'sigma0':[], 'scale_factor':[], 'beta':[]} # 'm_obs' is number of observed planets
     a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
     for i,a_sys in enumerate(a_obs_per_sys):
-        if np.sum(a_sys > 0) > 1:
+        if np.sum(a_sys > 0) >= n_mult_min:
             #print(i)
             Mstar = sss_per_sys['Mstar_obs'][i]
             R_sys = sss_per_sys['radii_obs'][i][a_sys > 0]
@@ -467,14 +467,15 @@ def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, max_
     return fit_per_sys_dict
 
 # TODO: write unit tests
-def plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False, N_sys=10):
+def plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, n_mult_min=2, n_mult_max=10, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False, N_sys=10):
     # If 'scale_up' is True, will scale up the power-law to be above the surface densities of all planets in the system (i.e. multiply 'sigma0' by a factor such that sigma0*(a_i/a0)^beta >= sigma_i for all planets)
     # 'N_sys' is the maximum number of systems to loop through (to save time)
+    assert n_mult_min <= n_mult_max
     count = 0
     for i,det_sys in enumerate(sssp_per_sys['det_all']):
         if count >= N_sys:
             break
-        if np.sum(det_sys) > 1:
+        if n_mult_min <= np.sum(det_sys) <= n_mult_max:
             count += 1
             print('##### System %s:' % count)
 
