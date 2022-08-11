@@ -170,8 +170,8 @@ for j,a in enumerate(a_sys):
         Mp_intdisk = solid_mass_integrated_r0_to_r_given_power_law_profile(a_bounds_sys[j+1], a_bounds_sys[j], sigma0, beta, a0=a0)
         print('Planet (core) mass: {:0.2f} M_earth --- Integrated disk mass (RC2014): {:0.2f} M_earth'.format(Mp_core, Mp_intdisk))
 
-plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0, beta, a0=a0)), lw=3, ls='-', color='r', label=r'Fit to all planets ($\Sigma_0^%s = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0, beta) % y_sym_star)
-plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_obs, beta_obs, a0=a0)), lw=3, ls='--', color='r', label=r'Fit to observed planets ($\Sigma_0^%s = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0_obs, beta_obs) % y_sym_star)
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0, beta, a0=a0)), lw=3, ls='-', color='b', label=r'Fit to all planets ($\Sigma_0^%s = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0, beta) % y_sym_star)
+plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_obs, beta_obs, a0=a0)), lw=3, ls='--', color='b', label=r'Fit to observed planets ($\Sigma_0^%s = {:0.0f}$, $\beta = {:0.2f}$)'.format(sigma0_obs, beta_obs) % y_sym_star)
 plt.plot(a_array, np.log10(sigma_MMSN), lw=3, color='g', label=r'MMSN') #label=r'MMSN ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(MMSN(a0), -1.5)
 ax.tick_params(axis='both', labelsize=20)
 plt.gca().set_xscale("log")
@@ -268,8 +268,8 @@ for idx_panel,i in enumerate(i_plot):
             Mp_intdisk = solid_mass_integrated_r0_to_r_given_power_law_profile(a_bounds_sys[j+1], a_bounds_sys[j], sigma0, beta, a0=a0)
             print('Planet (core) mass: {:0.2f} M_earth --- Integrated disk mass (RC2014): {:0.2f} M_earth'.format(Mp_core, Mp_intdisk))
 
-    plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0, beta, a0=a0)), lw=3, ls='-', color='r', label=r'$\Sigma_0^%s = {:0.0f}$, $\beta = {:0.2f}$'.format(sigma0, beta) % y_sym_star)
-    plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_obs, beta_obs, a0=a0)), lw=3, ls='--', color='r', label=r'$\Sigma_0^%s = {:0.0f}$, $\beta = {:0.2f}$'.format(sigma0_obs, beta_obs) % y_sym_star)
+    plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0, beta, a0=a0)), lw=3, ls='-', color='b', label=r'$\Sigma_0^%s = {:0.0f}$, $\beta = {:0.2f}$'.format(sigma0, beta) % y_sym_star)
+    plt.plot(a_array, np.log10(MMEN_power_law(a_array, sigma0_obs, beta_obs, a0=a0)), lw=3, ls='--', color='b', label=r'$\Sigma_0^%s = {:0.0f}$, $\beta = {:0.2f}$'.format(sigma0_obs, beta_obs) % y_sym_star)
     #plt.plot(a_array, np.log10(sigma_MMSN), lw=3, color='g', label=r'MMSN') #label=r'MMSN ($\Sigma_0 = {:0.0f}$, $\beta = {:0.2f}$)'.format(MMSN(a0), -1.5)
     ax.tick_params(axis='both', labelsize=20)
     plt.gca().set_xscale("log")
