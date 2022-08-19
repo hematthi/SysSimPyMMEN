@@ -33,7 +33,7 @@ from src.MMEN_functions import *
 
 savefigures = False
 loadfiles_directory = '/Users/hematthi/Documents/GradSchool/Research/ACI/Simulated_Data/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/GP_med/'
-savefigures_directory = '/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/Figures/Model_Optimization/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/Best_models/GP_med/MMEN/'
+savefigures_directory = '/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/Figures/Model_Optimization/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/Best_models/GP_best_models/MMEN/'
 run_number = ''
 model_name = 'Maximum_AMD_model' + run_number
 model_label, model_color = 'Maximum AMD model', 'g' #'Maximum AMD model', 'g' #'Two-Rayleigh model', 'b'
@@ -90,28 +90,58 @@ tfs = 20 # text labels font size
 lfs = 16 # legend labels font size
 
 # Parameters for defining the MMEN:
-prescription_str = 'RC2014'
 a0 = 0.3 # normalization separation for fitting power-laws
 
 
 
 
 
-##### To fit a power-law to each observed system for the simulated observed and Kepler catalog:
+##### To load and compute the same statistics for a large number of models:
 
-fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys, prescription=prescription_str, a0=a0)
-fit_per_sys_dict_Kep = fit_power_law_MMEN_per_system_observed(ssk_per_sys, prescription=prescription_str, a0=a0)
+loadfiles_directory = '/Users/hematthi/Documents/GradSchool/Research/ACI/Simulated_Data/AMD_system/Split_stars/Singles_ecc/Params11_KS/Distribute_AMD_per_mass/durations_norm_circ_singles_multis_GF2020_KS/GP_best_models/'
+runs = 100
 
-##### To test how the fitted observed MMEN may correlate with stellar mass:
+sss_per_sys_all = []
+sss_all = []
 
-# To plot sigma0 vs. stellar mass for the simulated and Kepler observed systems:
-plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['Mstar_obs'], fit_per_sys_dict['sigma0'], x_min=0.5, x_max=1.5, y_min=1e-2, y_max=1e8, log_y=True, bins_cont=20, points_only=True, xlabel_text=r'$M_\star$ ($M_\odot$)', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Simulated observed systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$M_\star$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + model_name + '_obs_mmen_%s_sigma0_vs_starmass_per_system.pdf' % prescription_str, save_fig=savefigures)
+prescriptions = ['CL2013', 'S2014', 'nHill', 'RC2014']
+fit_per_sys_dict_all = {pres:[] for pres in prescriptions} # dictionary of list of dictionaries
 
-plot_2d_points_and_contours_with_histograms(fit_per_sys_dict_Kep['Mstar_obs'], fit_per_sys_dict_Kep['sigma0'], x_min=0.5, x_max=1.5, y_min=1e-2, y_max=1e8, log_y=True, bins_cont=20, points_only=True, xlabel_text=r'$M_\star$ ($M_\odot$)', ylabel_text=r'$\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', extra_text='Kepler observed systems', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$M_\star$', y_symbol=r'$\Sigma_0$', save_name=savefigures_directory + 'Kepler_mmen_%s_sigma0_vs_starmass_per_system.pdf' % prescription_str, save_fig=savefigures)
+for i in range(1,runs+1):
+    run_number = i
+    sss_per_sys_i, sss_i = compute_summary_stats_from_cat_obs(file_name_path=loadfiles_directory, run_number=run_number, compute_ratios=compute_ratios)
+    dists_i, dists_w_i = compute_distances_sim_Kepler(sss_per_sys_i, sss_i, ssk_per_sys, ssk, weights_all['all'], dists_include, N_Kep, cos_factor=cos_factor, AD_mod=AD_mod, compute_ratios=compute_ratios)
 
-# To plot beta vs. stellar mass for the simulated and Kepler observed systems:
-plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['Mstar_obs'], fit_per_sys_dict['beta'], x_min=0.5, x_max=1.5, y_min=-8, y_max=4, bins_cont=20, points_only=True, xlabel_text=r'$M_\star$ ($M_\odot$)', ylabel_text=r'$\beta$', extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$M_\star$', y_symbol=r'$\beta$', save_name=savefigures_directory + model_name + '_obs_mmen_%s_beta_vs_starmass_per_system.pdf' % prescription_str, save_fig=savefigures)
+    sss_per_sys_all.append(sss_per_sys_i)
+    sss_all.append(sss_i)
 
-plot_2d_points_and_contours_with_histograms(fit_per_sys_dict_Kep['Mstar_obs'], fit_per_sys_dict_Kep['beta'], x_min=0.5, x_max=1.5, y_min=-8, y_max=4, bins_cont=20, points_only=True, xlabel_text=r'$M_\star$ ($M_\odot$)', ylabel_text=r'$\beta$', extra_text='Kepler observed systems', plot_qtls=True, x_symbol=r'$M_\star$', y_symbol=r'$\beta$', save_name=savefigures_directory + 'Kepler_mmen_%s_beta_vs_starmass_per_system.pdf' % prescription_str, save_fig=savefigures)
+    for pres in prescriptions:
+        fit_per_sys_dict = fit_power_law_MMEN_per_system_observed(sss_per_sys_i, prescription=pres, a0=a0, scale_up=True)
+        fit_per_sys_dict_all[pres].append(fit_per_sys_dict)
 
-plt.show()
+for pres in prescriptions:
+    r_mstar_sigma0 = [Pearson_correlation_coefficient(fit_per_sys_dict['Mstar_obs'], fit_per_sys_dict['sigma0']) for fit_per_sys_dict in fit_per_sys_dict_all[pres]]
+    r_mstar_beta = [Pearson_correlation_coefficient(fit_per_sys_dict['Mstar_obs'], fit_per_sys_dict['beta']) for fit_per_sys_dict in fit_per_sys_dict_all[pres]]
+    r_mstar_sigma0_qtls = np.quantile(r_mstar_sigma0, [0.16,0.5,0.84])
+    r_mstar_beta_qtls = np.quantile(r_mstar_beta, [0.16,0.5,0.84])
+    print('# %s:' % pres)
+    print(r'r_Mstar_sigma0: ${:0.2f}_{{-{:0.2f} }}^{{+{:0.2f} }}$'.format(r_mstar_sigma0_qtls[1], r_mstar_sigma0_qtls[1]-r_mstar_sigma0_qtls[0], r_mstar_sigma0_qtls[2]-r_mstar_sigma0_qtls[1]))
+    print(r'r_Mstar_beta: ${:0.2f}_{{-{:0.2f} }}^{{+{:0.2f} }}$'.format(r_mstar_beta_qtls[1], r_mstar_beta_qtls[1]-r_mstar_beta_qtls[0], r_mstar_beta_qtls[2]-r_mstar_beta_qtls[1]))
+
+# To repeat for the Kepler catalog (resampling masses many times):
+
+N_cats = 100
+for pres in prescriptions:
+    r_mstar_sigma0_Kep = []
+    r_mstar_beta_Kep = []
+    for i in range(N_cats):
+        fit_per_sys_dict_Kep = fit_power_law_MMEN_per_system_observed(ssk_per_sys, prescription=pres, a0=a0, scale_up=True)
+        r_mstar_sigma0_Kep.append(Pearson_correlation_coefficient(fit_per_sys_dict_Kep['Mstar_obs'], fit_per_sys_dict_Kep['sigma0']))
+        r_mstar_beta_Kep.append(Pearson_correlation_coefficient(fit_per_sys_dict_Kep['Mstar_obs'], fit_per_sys_dict_Kep['beta']))
+    r_mstar_sigma0_Kep = np.array(r_mstar_sigma0_Kep)
+    r_mstar_beta_Kep = np.array(r_mstar_beta_Kep)
+    r_mstar_sigma0_qtls = np.quantile(r_mstar_sigma0_Kep, [0.16,0.5,0.84])
+    r_mstar_beta_qtls = np.quantile(r_mstar_beta_Kep, [0.16,0.5,0.84])
+    print('# %s:' % pres)
+    print(r'r_Mstar_sigma0: ${:0.2f}_{{-{:0.2f} }}^{{+{:0.2f} }}$'.format(r_mstar_sigma0_qtls[1], r_mstar_sigma0_qtls[1]-r_mstar_sigma0_qtls[0], r_mstar_sigma0_qtls[2]-r_mstar_sigma0_qtls[1]))
+    print(r'r_Mstar_beta: ${:0.2f}_{{-{:0.2f} }}^{{+{:0.2f} }}$'.format(r_mstar_beta_qtls[1], r_mstar_beta_qtls[1]-r_mstar_beta_qtls[0], r_mstar_beta_qtls[2]-r_mstar_beta_qtls[1]))
