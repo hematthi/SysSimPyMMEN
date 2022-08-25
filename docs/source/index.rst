@@ -3,7 +3,7 @@ Welcome to SysSimPyMMEN's documentation!
 
 **SysSimPyMMEN** is a framework for inferring the MMEN from the SysSim models.
 
-**`SysSim <https://github.com/ExoJulia/ExoplanetsSysSim.jl>`_** -- a comprehensive forward modeling framework for studying planetary systems based on the *Kepler* mission. In particular, `SysSimExClusters <https://github.com/ExoJulia/SysSimExClusters>`_ provides clustered planetary system models that characterize the underlying occurrence and intra-system correlations of multi-planet systems.
+**SysSim** -- a comprehensive forward modeling framework for studying planetary systems based on the *Kepler* mission. In particular, `SysSimExClusters <https://github.com/ExoJulia/SysSimExClusters>`_ provides clustered planetary system models that characterize the underlying occurrence and intra-system correlations of multi-planet systems.
 
 **Py** -- this package is written almost entirely in Python 3. This is unlike the SysSim codebase which is written in `Julia <https://julialang.org>`_.
 
