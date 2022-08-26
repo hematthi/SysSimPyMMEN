@@ -4,4 +4,4 @@ Detailed API
 .. autosummary::
    :toctree: generated
 
-   MMEN_functions
+   src.MMEN_functions
