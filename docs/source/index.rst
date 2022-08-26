@@ -3,7 +3,7 @@ Welcome to SysSimPyMMEN's documentation!
 
 **SysSimPyMMEN** is a framework for inferring the MMEN from the SysSim models.
 
-.. hint:: What's behind the name?
+.. tip:: What's behind the name?
 
    **SysSim** -- a comprehensive forward modeling framework for studying planetary systems based on the *Kepler* mission. In particular, `SysSimExClusters <https://github.com/ExoJulia/SysSimExClusters>`_ provides clustered planetary system models that characterize the underlying occurrence and intra-system correlations of multi-planet systems.
 
