@@ -33,3 +33,7 @@ autodoc_mock_imports = ["numpy"]
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = [] # ['_static']
+
+# The name of an image file (relative to this directory) to place at the top
+# of the sidebar.
+html_logo = "images/syssimpymmen_logo.png"
