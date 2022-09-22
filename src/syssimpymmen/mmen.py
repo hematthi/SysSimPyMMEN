@@ -18,23 +18,17 @@ data_path = os.path.join(syssimpyplots.__path__[0], 'data') # data files are par
 
 
 
+# Solar system planet properties:
+
 MeVeEa_masses = np.array([0.0553, 0.815, 1.]) # masses of Mercury, Venus, and Earth, in Earth masses
 MeVeEa_radii = np.array([0.383, 0.949, 1.]) # radii of Mercury, Venus, and Earth, in Earth radii
 MeVeEa_a = np.array([0.387, 0.723, 1.]) # semi-major axes of Mercury, Venus, and Earth, in AU
 
 
 
-##### Mass-radius functions:
-
-def mass_given_radius_density(R, ρ):
-    # Compute mass M (Earth masses) given radius R (Earth radii) and mean density ρ (g/cm^3)
-    return ρ * (4.*np.pi/3.) * (R*gen.Rearth)**3. * (1./(gen.Mearth*1e3))
-
-def density_given_mass_radius(M, R):
-    # Compute mean density ρ (g/cm^3) given mass M (Earth masses) and radius R (Earth radii)
-    return (M*gen.Mearth*1e3) / ((4.*np.pi/3.)*(R*gen.Rearth)**3.)
 
 
+# Mass-radius model and functions:
 
 logMR_Ning2018_table = np.genfromtxt(os.path.join(data_path, 'MRpredict_table_weights3025_R1001_Q1001.txt'), delimiter=',', skip_header=2, names=True) # first column is array of log_R values
 
@@ -44,16 +38,28 @@ qtls_table = np.linspace(0,1,1001)
 logMR_table_interp = RectBivariateSpline(log_R_table, qtls_table, table_array)
 
 def generate_planet_mass_from_radius_Ning2018_table(R):
-    # Draw a planet mass from the Ning et al 2018 model interpolated on a precomputed table
-    # Requires a globally defined interpolation object ('logMR_table_interp')
-    # R is planet radius in Earth radii
+    """
+    Draw a planet mass from the Ning et al. (2018) mass-radius model interpolated on a precomputed table.
+
+    Parameters
+    ----------
+    R : float
+        The planet radius (Earth radii).
+
+    Returns
+    -------
+    The planet mass (Earth masses).
+
+
+    Note
+    ----
+    Requires a globally defined interpolation object, ``logMR_table_interp`` (defined in the same module).
+    """
     logR = np.log10(R)
     q = np.random.random() # drawn quantile
     logM = logMR_table_interp(logR, q)[0][0]
     return 10.**logM # planet mass in Earth masses
 
-
-##### Warning: need to add this file to SysSimPyPlots data first!
 MR_earthlike_rocky = np.genfromtxt(os.path.join(data_path, 'MR_earthlike_rocky.txt'), delimiter='\t', skip_header=2, names=('mass','radius'))
 
 M_earthlike_rocky_interp = interp1d(MR_earthlike_rocky['radius'], MR_earthlike_rocky['mass'])
@@ -61,24 +67,86 @@ M_earthlike_rocky_interp = interp1d(MR_earthlike_rocky['radius'], MR_earthlike_r
 radius_switch = 1.472
 σ_logM_at_radius_switch = 0.3 # log10(M/M_earth); 0.3 corresponds to about a factor of 2, and appears to be close to the std of the distribution at R=1.472 R_earth for the NWG-2018 model
 σ_logM_at_radius_min = 0.04 # log10(M/M_earth); 0.04 corresponds to about a factor of 10%
+
 def σ_logM_linear_given_radius(R, σ_logM_r1=σ_logM_at_radius_min, σ_logM_r2=σ_logM_at_radius_switch, r1=0.5, r2=radius_switch):
+    """
+    Compute the standard deviation in log planet mass at a given planet radius based on a linear relation.
+
+    Parameters
+    ----------
+    R : float
+        The planet radius (Earth radii).
+    σ_logM_r1 : float, default=σ_logM_at_radius_min
+        The standard deviation in log(mass) (Earth masses) at radius `r1`.
+    σ_logM_r2 : float, default=σ_logM_at_radius_switch
+        The standard deviation in log(mass) (Earth masses) at radius `r2`.
+    r1 : float, default=0.5
+        The planet radius (Earth radii) corresponding to `σ_logM_r1`.
+    r2 : float, default=radius_switch
+        The planet radius (Earth radii) corresponding to `σ_logM_r2`.
+
+    Returns
+    -------
+    The standard deviation in log(mass) (Earth masses) at the given radius.
+    """
     return ((σ_logM_at_radius_switch - σ_logM_at_radius_min) / (r2 - r1))*(R - r1) + σ_logM_at_radius_min
 
 def generate_planet_mass_from_radius_lognormal_mass_around_earthlike_rocky(R, ρ_min=1., ρ_max=100.):
-    # Draw a planet mass given a planet radius, from a lognormal distribution centered around the Earth-like rocky model
-    # Requires a globally defined interpolation object ('M_earthlike_rocky_interp')
-    # R is planet radius in Earth radii
+    """
+    Draw a planet mass from a lognormal distribution centered around the Earth-like rocky model from Li Zeng (https://www.cfa.harvard.edu/~lzeng/tables/massradiusEarthlikeRocky.txt).
+
+    Parameters
+    ----------
+    R : float
+        The planet radius (Earth radii).
+    ρ_min : float, default=1.
+        The minimum planet density (g/cm^3) allowed.
+    ρ_max : float, default=100.
+        The maximum planet density (g/cm^3) allowed.
+
+    Returns
+    -------
+    The planet mass (Earth masses).
+
+
+    Note
+    ----
+    Requires a globally defined interpolation object, ``M_earthlike_rocky_interp`` (defined in the same module).
+    """
     M = M_earthlike_rocky_interp(R)
     assert M > 0
     μ_logM = np.log10(M)
     σ_logM = σ_logM_linear_given_radius(R)
-    logM_min = np.log10(mass_given_radius_density(R, ρ_min))
-    logM_max = np.log10(mass_given_radius_density(R, ρ_max))
+    logM_min = np.log10(gen.M_from_R_rho(R, ρ_min))
+    logM_max = np.log10(gen.M_from_R_rho(R, ρ_max))
     a, b = (logM_min - μ_logM)/σ_logM, (logM_max - μ_logM)/σ_logM
     logM = truncnorm.rvs(a, b, loc=μ_logM, scale=σ_logM, size=1)[0] # draw from truncated normal distribution for log10(M/M_earth)
     return 10.**logM # planet mass in Earth masses
 
 def generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below(R, R_switch=radius_switch, ρ_min=1., ρ_max=100.):
+    """
+    Draw a planet mass from a combined model (the Ning et al. 2018 model for large radii, and the lognormal distribution centered around the Earth-like rocky model for small radii).
+
+    Parameters
+    ----------
+    R : float
+        The planet radius (Earth radii).
+    R_switch : float, default=radius_switch
+        The transition radius (Earth radii) defining whether to draw from the Ning et al. 2018 model (above this radius) or the lognormal-around Earth-like rocky model (below this radius).
+    ρ_min : float, default=1.
+        The minimum planet density (g/cm^3) allowed.
+    ρ_max : float, default=100.
+        The maximum planet density (g/cm^3) allowed.
+
+    Returns
+    -------
+    The planet mass (Earth masses).
+
+
+    Tip
+    ---
+    A vectorized version of this function is also available: :py:func:`syssimpymmen.mmen.generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec`.
+    """
     #assert R > 0
     if R > R_switch:
         M = generate_planet_mass_from_radius_Ning2018_table(R)
@@ -92,7 +160,9 @@ generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_r
 
 
 
-##### Functions to compute various formulations of the solid surface density/minimum mass extrasolar nebular (MMEN):
+
+
+# Functions to compute various formulations of the solid surface density/minimum mass extrasolar nebular (MMEN):
 
 def solid_surface_density(M, a, delta_a):
     # Compute the solid surface density (g/cm^2) given a planet mass M (M_earth), semi-major axis a (AU), and feeding zone width delta_a (AU)
@@ -278,7 +348,9 @@ def solid_surface_density_RC2014_given_observed_catalog(sss_per_sys, max_core_ma
 
 
 
-##### Functions to fit a power-law to the MMEN (sigma = sigma0 * (a/a0)^beta <==> log(sigma) = log(sigma0) + beta*log(a/a0)):
+
+
+# Functions to fit a power-law to the MMEN (sigma = sigma0 * (a/a0)^beta <==> log(sigma) = log(sigma0) + beta*log(a/a0)):
 
 def MMSN(a, F=1., Zrel=0.33):
     # Compute the minimum mass solar nebular (MMSN) surface density (g/cm^2) at a semi-major axis 'a' (AU), from equation 2 in Chiang & Youdin (2010) (https://arxiv.org/pdf/0909.2652.pdf)
@@ -563,7 +635,8 @@ def plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(s
             plt.show()
 
 
-##### Functions to compute the total integrated mass of solids within a given separation for a fitted power-law MMEN:
+
+# Functions to compute the total integrated mass of solids within a given separation for a fitted power-law MMEN:
 
 def solid_mass_integrated_r0_to_r_given_power_law_profile(r, r0, sigma0, beta, a0=1.):
     # Compute the total integrated mass in solids from separation 'r0' (AU) to 'r' (AU) given a power-law profile, sigma(a) = sigma0*(a/a0)^beta, where the fitted parameters are the normalization (at 'a0') 'sigma0' (g/cm^2) and slope 'beta'

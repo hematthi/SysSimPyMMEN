@@ -3,29 +3,17 @@ import numpy as np
 import os
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))),'SysSim_Plotting')) # TODO: update when those files get made into a package
+from syssimpyplots.general import *
+from syssimpyplots.compare_kepler import *
+from syssimpyplots.load_sims import *
 
-from src.functions_general import *
-from src.functions_compare_kepler import *
-from src.functions_load_sims import *
-
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))),'src'))
-
-from MMEN_functions import *
+from syssimpymmen.mmen import *
 
 
 
 
 
 # Test functions in "src/MMEN_functions.py":
-
-def test_mass_given_radius_density():
-    assert np.isclose(mass_given_radius_density(1., 5.51), 1., atol=1e-3) # Earth mass/radius
-    assert mass_given_radius_density(0., 1.) == 0
-    assert mass_given_radius_density(1., 0.) == 0
-
-def test_density_given_mass_radius():
-    assert np.isclose(density_given_mass_radius(1., 1.), 5.513259, atol=1e-5) # Earth mean density
 
 def test_generate_planet_mass_from_radius_Ning2018_table(seed=42):
     np.random.seed(seed)
