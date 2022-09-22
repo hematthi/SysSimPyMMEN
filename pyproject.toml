@@ -20,5 +20,6 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/hematthi/SysSimPyMMEN"
+"Homepage" = "https://syssimpymmen.readthedocs.io"
+"Source" = "https://github.com/hematthi/SysSimPyMMEN"
 "Bug Tracker" = "https://github.com/hematthi/SysSimPyMMEN/issues"
