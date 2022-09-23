@@ -12,8 +12,8 @@ from matplotlib import ticker # for setting contour plots to log scale
 
 import syssimpyplots
 import syssimpyplots.general as gen
-data_path = os.path.join(syssimpyplots.__path__[0], 'data') # data files are part of the SysSimPyPlots package
-
+#####data_path = os.path.join(syssimpyplots.__path__[0], 'data') # some data files are part of the SysSimPyPlots package, but this breaks the ReadtheDocs builds since autodoc_mock_imports cannot read this path for some reason (IndexError implying 'syssimpyplots.__path__' is an empty list)
+data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data') # including some data files as part of this package (some repeated/copied from SysSimPyPlots)
 
 
 
