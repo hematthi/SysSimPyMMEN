@@ -142,11 +142,6 @@ def generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthli
     Returns
     -------
     The planet mass (Earth masses).
-
-
-    Tip
-    ---
-    A vectorized version of this function is also available: :py:func:`syssimpymmen.mmen.generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_rocky_below_vec`.
     """
     #assert R > 0
     if R > R_switch:
@@ -398,7 +393,7 @@ def solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys, max_core_m
     Parameters
     ----------
     sssp_per_sys : dict
-        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_phys()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_phys>`_.
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays).
     max_core_mass : float, default=10.
         The maximum allowed (solid) core mass (Earth masses).
 
@@ -434,11 +429,6 @@ def solid_surface_density_S2014_given_physical_catalog(sssp_per_sys, sssp, max_c
         The solid surface densities (g/cm^2) of all the planets.
     a_all : array[float]
         The semi-major axes (AU) of all the planets.
-
-
-    Note
-    ----
-    ``sssp_per_sys`` and ``sssp`` are returned by the ` ``compute_summary_stats_from_cat_phys()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_phys>`_.
     """
     a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
     core_mass_all = np.copy(sssp_per_sys['mass_all'])
@@ -467,16 +457,7 @@ def solid_surface_density_nHill_given_physical_catalog(sssp_per_sys, sssp, max_c
         The solid surface densities (g/cm^2) of all the planets.
     a_all : array[float]
         The semi-major axes (AU) of all the planets.
-
-
-    Note
-    ----
-    ``sssp_per_sys`` and ``sssp`` are returned by the ` ``compute_summary_stats_from_cat_phys()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_phys>`_.
     """
-    # Compute the solid surface density (g/cm^2) using a number of Hill radii for the feeding zone width, for each planet in a given physical catalog
-    # 'max_core_mass' is the maximum core mass (Earth masses)
-    # 'n' is the number of Hill radii for  the feeding zone width of each planet
-    # Returns an array of solid surface densities and semi-major axes
     a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
     core_mass_all = np.copy(sssp_per_sys['mass_all'])
     core_mass_all[core_mass_all > max_core_mass] = max_core_mass
@@ -490,7 +471,7 @@ def solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys, max_core_m
     Parameters
     ----------
     sssp_per_sys : dict
-        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_phys()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_phys>`_.
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays).
     max_core_mass : float, default=10.
         The maximum allowed (solid) core mass (Earth masses).
 
@@ -503,9 +484,6 @@ def solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys, max_core_m
     mult_all_2p : array[float]
         The multiplicities of the multi-planet systems each planet belongs to.
     """
-    # Compute the solid surface density (g/cm^2) using the Raymond & Cossou (2014) prescription, for each planet in each multi-planet system in a given physical catalog
-    # 'max_core_mass' is the maximum core mass (Earth masses)
-    # Returns an array of solid surface densities and semi-major axes
     mult_all = sssp_per_sys['Mtot_all']
     a_all_2p = []
     mult_all_2p = []
@@ -532,7 +510,7 @@ def solid_surface_density_CL2013_given_observed_catalog(sss_per_sys, max_core_ma
     Parameters
     ----------
     sss_per_sys : dict
-        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_obs()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_obs>`_.
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays).
     max_core_mass : float, default=10.
         The maximum allowed (solid) core mass (Earth masses).
 
@@ -560,7 +538,7 @@ def solid_surface_density_S2014_given_observed_catalog(sss_per_sys, max_core_mas
     Parameters
     ----------
     sss_per_sys : dict
-        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_obs()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_obs>`_.
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays).
     max_core_mass : float, default=10.
         The maximum allowed (solid) core mass (Earth masses).
 
@@ -573,9 +551,6 @@ def solid_surface_density_S2014_given_observed_catalog(sss_per_sys, max_core_mas
     a_obs : array[float]
         The semi-major axes (AU) of all the observed planets.
     """
-    # Compute the solid surface density (g/cm^2) using the Schlichting (2014) prescription, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
-    # 'max_core_mass' is the maximum core mass (Earth masses)
-    # Returns an array of solid surface densities and semi-major axes
     Mstar_obs = np.repeat(sss_per_sys['Mstar_obs'][:,None], np.shape(sss_per_sys['P_obs'])[1], axis=1)[sss_per_sys['P_obs'] > 0] # flattened array of stellar masses repeated for each planet
     a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
     a_obs = a_obs_per_sys[sss_per_sys['P_obs'] > 0]
@@ -592,7 +567,7 @@ def solid_surface_density_nHill_given_observed_catalog(sss_per_sys, max_core_mas
     Parameters
     ----------
     sss_per_sys : dict
-        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_obs()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_obs>`_.
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays).
     max_core_mass : float, default=10.
         The maximum allowed (solid) core mass (Earth masses).
     n : float, default=10.
@@ -623,7 +598,7 @@ def solid_surface_density_RC2014_given_observed_catalog(sss_per_sys, max_core_ma
     Parameters
     ----------
     sss_per_sys : dict
-        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_obs()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_obs>`_.
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays).
     max_core_mass : float, default=10.
         The maximum allowed (solid) core mass (Earth masses).
 
@@ -754,7 +729,7 @@ def fit_power_law_MMEN_all_planets_observed(sss_per_sys, max_core_mass=10., pres
     Parameters
     ----------
     sss_per_sys : dict
-        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_obs()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_obs>`_.
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays).
     max_core_mass : float, default=10.
         The maximum allowed (solid) core mass (Earth masses).
     prescription : {'CL2013', 'S2014', 'nHill', 'RC2014'}, default='CL2013'
@@ -833,9 +808,6 @@ def fit_power_law_MMEN_all_planets_physical(sssp_per_sys, sssp, max_core_mass=10
     - `sigma0`: The best-fit value for the solid surface density normalization (g/cm^2).
     - `beta`: The best-fit value for the power-law index.
 
-    Note
-    ----
-    ``sssp_per_sys`` and ``sssp`` are returned by the ` ``compute_summary_stats_from_cat_phys()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_phys>`_.
     """
     if prescription == 'CL2013':
         sigma_all, a_all = solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys, max_core_mass=max_core_mass)
@@ -858,7 +830,7 @@ def fit_power_law_MMEN_per_system_observed(sss_per_sys, n_mult_min=2, max_core_m
     Parameters
     ----------
     sss_per_sys : dict
-        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_obs()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_obs>`_.
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays).
     n_mult_min : int, default=2
         The minimum multiplicity to include.
     max_core_mass : float, default=10.
@@ -965,9 +937,6 @@ def fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, n_mult_min=2, max
     - `scale_factor`: The scale factors required to increase the normalizations of each system such that the power-law fits are at/above the solid surface densities of every planet in the system.
     - `beta`: The best-fit values for the power-law indices of the included systems.
 
-    Note
-    ----
-    ``sssp_per_sys`` and ``sssp`` are returned by the ` ``compute_summary_stats_from_cat_phys()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_phys>`_.
     """
     assert n_mult_min >= 2
     start = time.time()
@@ -1050,9 +1019,6 @@ def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, n_mu
     - `beta_true`: The best-fit values for the power-law indices from fitting all the planets of the included systems (1-d array).
     - `beta_obs`: The best-fit values for the power-law indices from fitting only the observed planets of the included systems (1-d array).
 
-    Note
-    ----
-    ``sssp_per_sys`` and ``sssp`` are returned by the ` ``compute_summary_stats_from_cat_phys()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_phys>`_.
     """
     fit_per_sys_dict = {'n_pl_true':[], 'n_pl_obs':[], 'Mp_tot_true':[], 'Mp_tot_obs':[], 'sigma0_true':[], 'sigma0_obs':[], 'scale_factor_true':[], 'scale_factor_obs':[], 'beta_true':[], 'beta_obs':[]}
     for i,det_sys in enumerate(sssp_per_sys['det_all']):
