@@ -32,7 +32,7 @@ MeVeEa_a = np.array([0.387, 0.723, 1.]) # semi-major axes of Mercury, Venus, and
 
 logMR_Ning2018_table = np.genfromtxt(os.path.join(data_path, 'MRpredict_table_weights3025_R1001_Q1001.txt'), delimiter=',', skip_header=2, names=True) # first column is array of log_R values
 
-table_array = logMR_Ning2018_table.view(np.float64).reshape(logMR_Ning2018_table.shape + (-1,))[:,1:]
+table_array = logMR_Ning2018_table.view(np.float64).reshape(np.shape(logMR_Ning2018_table) + (-1,))[:,1:]
 log_R_table = logMR_Ning2018_table['log_R']
 qtls_table = np.linspace(0,1,1001)
 logMR_table_interp = RectBivariateSpline(log_R_table, qtls_table, table_array)
