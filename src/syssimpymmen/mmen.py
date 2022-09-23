@@ -667,7 +667,7 @@ def solid_surface_density_RC2014_given_observed_catalog(sss_per_sys, max_core_ma
 
 def MMSN(a, F=1., Zrel=0.33):
     """
-    Compute the solid surface density of the minimum mass solar nebula (MMSN) at a given separation, as defined by `Eq. 2 in Chiang & Youdin (2010) (<https://arxiv.org/pdf/0909.2652.pdf>)`_.
+    Compute the solid surface density of the minimum mass solar nebula (MMSN) at a given separation, as defined by Eq. 2 in Chiang & Youdin (2010) (https://arxiv.org/pdf/0909.2652.pdf).
 
     Note
     ----
