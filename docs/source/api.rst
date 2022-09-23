@@ -1,7 +1,7 @@
 Detailed API
 ============
 
-Coming soon!
+Here, we provide detailed documentation for all of the functions in SysSimPyMMEN.
 
-.. autosummary::
-   :toctree: generated
+.. automodule:: syssimpymmen.mmen
+   :members:

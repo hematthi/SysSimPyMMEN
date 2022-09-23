@@ -165,39 +165,160 @@ generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_r
 # Functions to compute various formulations of the solid surface density/minimum mass extrasolar nebular (MMEN):
 
 def solid_surface_density(M, a, delta_a):
-    # Compute the solid surface density (g/cm^2) given a planet mass M (M_earth), semi-major axis a (AU), and feeding zone width delta_a (AU)
+    """
+    Compute the solid surface density associated with a planet.
+
+    This divides the mass of the planet by the surface area of an annulus of a given width, centered at its semi-major axis.
+
+    Parameters
+    ----------
+    M : float or array[float]
+        The planet mass (Earth masses).
+    a : float or array[float]
+        The semi-major axis of the planet (AU).
+    delta_a : float or array[float]
+        The feeding zone width of the planet (AU).
+
+    Returns
+    -------
+    sigma_solid : float or array[float]
+        The solid surface density (g/cm^2) local to the planet.
+    """
     sigma_solid = (M*gen.Mearth*1e3)/(2.*np.pi*(a*gen.AU)*(delta_a*gen.AU))
     return sigma_solid
 
 def solid_surface_density_CL2013(M, a):
-    # Compute the solid surface density (g/cm^2) using the Chiang & Laughlin (2013) prescription (delta_a = a), given a planet mass M (M_earth) and semi-major axis a (AU)
+    """
+    Compute the solid surface density of a planet using the Chiang & Laughlin (2013) prescription for the feeding zone width (set equal to the semi-major axis; delta_a = a).
+
+    Parameters
+    ----------
+    M : float or array[float]
+        The planet mass (Earth masses).
+    a : float or array[float]
+        The semi-major axis (AU).
+
+    Returns
+    -------
+    The solid surface density (g/cm^2) local to the planet.
+    """
     return solid_surface_density(M, a, a)
 
 # TODO: write unit tests
 def feeding_zone_S2014(M, R, a, Mstar=1.):
-    # Compute the feeding zone width using the Schlicting (2014) prescription (delta_a = 2^(3/2)*a((a*M)/(R*Mstar))^(1/2), given a planet mass M (M_earth), planet radius R (R_earth), semi-major axis a (AU), and stellar mass Mstar (M_sun)
+    """
+    Compute the feeding zone width of a planet using the Schlichting (2014) prescription, delta_a = 2^(3/2)*a((a*M)/(R*Mstar))^(1/2).
+
+    Parameters
+    ----------
+    M : float or array[float]
+        The planet mass (Earth masses).
+    R : float or array[float]
+        The planet radius (Earth radii).
+    a : float or array[float]
+        The semi-major axis (AU).
+    Mstar : float or array[float], default=1.
+        The stellar mass (solar masses).
+
+    Returns
+    -------
+    delta_a : float or array[float]
+        The feeding zone width (AU) of the planet.
+    """
     delta_a = 2.**(3./2.)*a*np.sqrt(((a*gen.AU)/(R*gen.Rearth))*((M*gen.Mearth)/(Mstar*gen.Msun))) # AU
     return delta_a
 
 def solid_surface_density_S2014(M, R, a, Mstar=1.):
-    # Compute the solid surface density (g/cm^2) using the Schlichting (2014) prescription (delta_a = 2^(3/2)*a((a*M)/(R*Mstar))^(1/2), given a planet mass M (M_earth), planet radius R (R_earth), semi-major axis a (AU), and stellar mass Mstar (M_sun)
+    """
+    Compute the solid surface density of a planet using the Schlichting (2014) prescription for the feeding zone width (see :py:func:`syssimpymmen.mmen.feeding_zone_S2014`).
+
+    Parameters
+    ----------
+    M : float or array[float]
+        The planet mass (Earth masses).
+    R : float or array[float]
+        The planet radius (Earth radii).
+    a : float or array[float]
+        The semi-major axis (AU).
+    Mstar : float or array[float], default=1.
+        The stellar mass (solar masses).
+
+    Returns
+    -------
+    The solid surface density (g/cm^2) local to the planet.
+    """
     delta_a = feeding_zone_S2014(M, R, a, Mstar=Mstar)
     return solid_surface_density(M, a, delta_a)
 
 # TODO: write unit tests
 def feeding_zone_nHill(M, a, Mstar=1., n=10.):
-    # Compute the feeding zone width using a number of Hill radii (delta_a = n*R_Hill), given a planet mass M (M_earth), semi-major axis a (AU), and stellar mass Mstar (M_sun)
+    """
+    Compute the feeding zone width of a planet using a number of Hill radii, delta_a = n*R_Hill.
+
+    Parameters
+    ----------
+    M : float or array[float]
+        The planet mass (Earth masses).
+    a : float or array[float]
+        The semi-major axis (AU).
+    Mstar : float or array[float], default=1.
+        The stellar mass (solar masses).
+    n : float or array[float], default=10.
+        The number of Hill radii to use as the feeding zone.
+
+    Returns
+    -------
+    delta_a : float or array[float]
+        The feeding zone width (AU) of the planet.
+    """
     delta_a = n*a*((M*gen.Mearth)/(3.*Mstar*gen.Msun))**(1./3.) # AU
     return delta_a
 
 def solid_surface_density_nHill(M, a, Mstar=1., n=10.):
-    # Compute the solid surface density (g/cm^2) using a number of Hill radii for the feeding zone width (delta_a = n*R_Hill), given a planet mass M (M_earth), semi-major axis a (AU), and stellar mass Mstar (M_sun)
+    """
+    Compute the solid surface density of a planet using a number of Hill radii for the feeding zone width (see :py:func:`syssimpymmen.mmen.feeding_zone_nHill`).
+
+    Parameters
+    ----------
+    M : float or array[float]
+        The planet mass (Earth masses).
+    a : float or array[float]
+        The semi-major axis (AU).
+    Mstar : float or array[float], default=1.
+        The stellar mass (solar masses).
+    n : float or array[float], default=10.
+        The number of Hill radii to use as the feeding zone.
+
+    Returns
+    -------
+    The solid surface density (g/cm^2) local to the planet.
+    """
     delta_a = feeding_zone_nHill(M, a, Mstar=Mstar, n=n)
     return solid_surface_density(M, a, delta_a)
 
 # TODO: write unit tests
 def feeding_zone_RC2014(a_sys):
-    # Compute the feeding zone widths for planets in a multiplanet system using the Raymond & Cossou (2014) prescription (neighboring planets' feeding zones separated by the geometric means of their semi-major axes)
+    """
+    Compute the feeding zone widths of all the planets in a multi-planet system using the Raymond & Cossou (2014) prescription.
+
+    Uses the geometric means of the neighboring planets' semi-major axes as the boundaries of their feeding zones.
+
+    Note
+    ----
+    Assumes the same ratio for the inner edge of the innermost planet as its outer edge, and the same ratio for the outer edge of the outermost planet as its inner edge.
+
+    Parameters
+    ----------
+    a_sys : array[float]
+        The semi-major axes (AU) of all the planets.
+
+    Returns
+    -------
+    delta_a_sys : array[float]
+        The feeding zone widths (AU) of all the planets.
+    a_bounds_sys : array[float]
+        The boundaries (AU) of the feeding zones for the planets (length = n+1 where n is the number of planets). For example, `a_bounds_sys[i]` and `a_bounds_sys[i+1]` will be the inner and outer boundaries of the `i^th` planet.
+    """
     a_bounds_sys = np.zeros(len(a_sys)+1) # bounds in semi-major axis for each planet
     a_bounds_sys[1:-1] = np.sqrt(a_sys[:-1]*a_sys[1:]) # geometric means between planets
     a_bounds_sys[0] = a_sys[0]*np.sqrt(a_sys[0]/a_sys[1]) # same ratio for upper bound to a_sys[1] as a_sys[1] to lower bound
@@ -206,14 +327,55 @@ def feeding_zone_RC2014(a_sys):
     return delta_a_sys, a_bounds_sys
 
 def solid_surface_density_system_RC2014(M_sys, a_sys):
-    # Compute the solid surface density (g/cm^2) of planets in a multiplanet system using the Raymond & Cossou (2014) prescription (neighboring planets' feeding zones separated by the geometric means of their semi-major axes)
+    """
+    Compute the solid surface densities of all planets in a multi-planet system using the Raymond & Cossou (2014) prescription for their feeding zone widths (see :py:func:`syssimpymmen.mmen.feeding_zone_RC2014`).
+
+    Parameters
+    ----------
+    M_sys : array[float]
+        The planet masses (Earth masses).
+    a_sys: array[float]
+        The semi-major axes (AU) of the planets.
+
+    Returns
+    -------
+    The solid surface densities (g/cm^2) local to the planets.
+    """
     n_pl = len(M_sys)
     assert n_pl == len(a_sys) > 1
     delta_a_sys, _ = feeding_zone_RC2014(a_sys)
     return solid_surface_density(M_sys, a_sys, delta_a_sys)
 
 def solid_surface_density_prescription(M, R, a, Mstar=1., n=10., prescription='CL2013'):
-    # Wrapper function to compute the solid surface density (g/cm^2) of planets given a prescription
+    """
+    Compute the solid surface density of a planet or planetary system using a given prescription for the feeding zone width.
+
+    Wrapper function that calls the appropriate function based on the `prescription` string.
+
+    Parameters
+    ----------
+    M : float or array[float]
+        The planet masses (Earth masses).
+    R : float or array[float]
+        The planet radii (Earth radii). Only used for the 'S2014' prescription.
+    a : float or array[float]
+        The semi-major axes (AU) of the planets.
+    Mstar : float or array[float], default=1.
+        The stellar mass or masses (solar masses). Only used for the 'S2014' or 'nHill' prescriptions.
+    n : float, default=10.
+        The number of Hill radii to use as the feeding zone. Only used for the 'nHill' prescription.
+    prescription : {'CL2013', 'S2014', 'nHill', 'RC2014'}, default='CL2013'
+        The string indicating the prescription to use for computing the feeding zone widths.
+
+    Returns
+    -------
+    The solid surface densities (g/cm^2) local to the planets.
+
+
+    Note
+    ----
+    If the prescription is 'RC2014', the input arrays (i.e. `M` and `a`) must all correspond to planets in the same system!
+    """
     if prescription == 'CL2013':
         return solid_surface_density_CL2013(M, a)
     elif prescription == 'S2014':
@@ -229,9 +391,23 @@ def solid_surface_density_prescription(M, R, a, Mstar=1., n=10., prescription='C
 
 
 def solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys, max_core_mass=10.):
-    # Compute the solid surface density (g/cm^2) using the Chiang & Laughlin (2013) prescription, for each planet in a given physical catalog
-    # 'max_core_mass' is the maximum core mass (Earth masses)
-    # Returns an array of solid surface densities and semi-major axes
+    """
+    Compute the solid surface densities for all planets in a physical catalog, using the Chiang & Laughlin (2013) prescription for the feeding zone widths.
+
+    Parameters
+    ----------
+    sssp_per_sys : dict
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_phys()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_phys>`_.
+    max_core_mass : float, default=10.
+        The maximum allowed (solid) core mass (Earth masses).
+
+    Returns
+    -------
+    sigma_all : array[float]
+        The solid surface densities (g/cm^2) of all the planets.
+    a_all : array[float]
+        The semi-major axes (AU) of all the planets.
+    """
     a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
     core_mass_all = np.copy(sssp_per_sys['mass_all'][sssp_per_sys['a_all'] > 0])
     core_mass_all[core_mass_all > max_core_mass] = max_core_mass
@@ -239,9 +415,30 @@ def solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys, max_core_m
     return sigma_all, a_all
 
 def solid_surface_density_S2014_given_physical_catalog(sssp_per_sys, sssp, max_core_mass=10.):
-    # Compute the solid surface density (g/cm^2) using the Schlichting (2014) prescription, for each planet in a given physical catalog
-    # 'max_core_mass' is the maximum core mass (Earth masses)
-    # Returns an array of solid surface densities and semi-major axes
+    """
+    Compute the solid surface densities for all planets in a physical catalog, using the Schlichting (2014) prescription for the feeding zone widths.
+
+    Parameters
+    ----------
+    sssp_per_sys : dict
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays).
+    sssp : dict
+        The dictionary containing the planetary and stellar properties of all planets in a physical catalog (1-d arrays).
+    max_core_mass : float, default=10.
+        The maximum allowed (solid) core mass (Earth masses).
+
+    Returns
+    -------
+    sigma_all : array[float]
+        The solid surface densities (g/cm^2) of all the planets.
+    a_all : array[float]
+        The semi-major axes (AU) of all the planets.
+
+
+    Note
+    ----
+    ``sssp_per_sys`` and ``sssp`` are returned by the ` ``compute_summary_stats_from_cat_phys()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_phys>`_.
+    """
     a_all = sssp_per_sys['a_all'][sssp_per_sys['a_all'] > 0]
     core_mass_all = np.copy(sssp_per_sys['mass_all'])
     core_mass_all[core_mass_all > max_core_mass] = max_core_mass
@@ -249,6 +446,32 @@ def solid_surface_density_S2014_given_physical_catalog(sssp_per_sys, sssp, max_c
     return sigma_all, a_all
 
 def solid_surface_density_nHill_given_physical_catalog(sssp_per_sys, sssp, max_core_mass=10., n=10.):
+    """
+    Compute the solid surface densities for all planets in a physical catalog, using a number of Hill radii for the feeding zone widths.
+
+    Parameters
+    ----------
+    sssp_per_sys : dict
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays).
+    sssp : dict
+        The dictionary containing the planetary and stellar properties of all planets in a physical catalog (1-d arrays).
+    max_core_mass : float, default=10.
+        The maximum allowed (solid) core mass (Earth masses).
+    n : float, default=10.
+        The number of Hill radii to use as the feeding zone.
+
+    Returns
+    -------
+    sigma_all : array[float]
+        The solid surface densities (g/cm^2) of all the planets.
+    a_all : array[float]
+        The semi-major axes (AU) of all the planets.
+
+
+    Note
+    ----
+    ``sssp_per_sys`` and ``sssp`` are returned by the ` ``compute_summary_stats_from_cat_phys()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_phys>`_.
+    """
     # Compute the solid surface density (g/cm^2) using a number of Hill radii for the feeding zone width, for each planet in a given physical catalog
     # 'max_core_mass' is the maximum core mass (Earth masses)
     # 'n' is the number of Hill radii for  the feeding zone width of each planet
@@ -260,6 +483,25 @@ def solid_surface_density_nHill_given_physical_catalog(sssp_per_sys, sssp, max_c
     return sigma_all, a_all
 
 def solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys, max_core_mass=10.):
+    """
+    Compute the solid surface densities for all planets in multi-planet systems in a physical catalog, using the Raymond & Cossou (2014) prescription for the feeding zone widths.
+
+    Parameters
+    ----------
+    sssp_per_sys : dict
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_phys()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_phys>`_.
+    max_core_mass : float, default=10.
+        The maximum allowed (solid) core mass (Earth masses).
+
+    Returns
+    -------
+    sigma_all_2p : array[float]
+        The solid surface densities (g/cm^2) of the planets in multi-planet systems.
+    a_all_2p : array[float]
+        The semi-major axes (AU) of the planets in multi-planet systems.
+    mult_all_2p : array[float]
+        The multiplicities of the multi-planet systems each planet belongs to.
+    """
     # Compute the solid surface density (g/cm^2) using the Raymond & Cossou (2014) prescription, for each planet in each multi-planet system in a given physical catalog
     # 'max_core_mass' is the maximum core mass (Earth masses)
     # Returns an array of solid surface densities and semi-major axes
@@ -283,9 +525,25 @@ def solid_surface_density_RC2014_given_physical_catalog(sssp_per_sys, max_core_m
 
 
 def solid_surface_density_CL2013_given_observed_catalog(sss_per_sys, max_core_mass=10.):
-    # Compute the solid surface density (g/cm^2) using the Chiang & Laughlin (2013) prescription, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
-    # 'max_core_mass' is the maximum core mass (Earth masses)
-    # Returns an array of solid surface densities and semi-major axes
+    """
+    Compute the solid surface densities for all planets in an observed catalog, using the Chiang & Laughlin (2013) prescription for the feeding zone widths.
+
+    Parameters
+    ----------
+    sss_per_sys : dict
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_obs()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_obs>`_.
+    max_core_mass : float, default=10.
+        The maximum allowed (solid) core mass (Earth masses).
+
+    Returns
+    -------
+    sigma_obs : array[float]
+        The solid surface densities (g/cm^2) of all the observed planets.
+    core_mass_obs : array[float]
+        The core masses (Earth masses) of all the observed planets. These are the total masses of the planets computed from their observed radii using a mass-radius relation, capped at `max_core_mass`.
+    a_obs : array[float]
+        The semi-major axes (AU) of all the observed planets.
+    """
     a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
     a_obs = a_obs_per_sys[sss_per_sys['P_obs'] > 0]
     radii_obs = sss_per_sys['radii_obs'][sss_per_sys['P_obs'] > 0]
@@ -295,6 +553,25 @@ def solid_surface_density_CL2013_given_observed_catalog(sss_per_sys, max_core_ma
     return sigma_obs, core_mass_obs, a_obs
 
 def solid_surface_density_S2014_given_observed_catalog(sss_per_sys, max_core_mass=10.):
+    """
+    Compute the solid surface densities for all planets in an observed catalog, using the Schlichting (2014) prescription for the feeding zone widths.
+
+    Parameters
+    ----------
+    sss_per_sys : dict
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_obs()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_obs>`_.
+    max_core_mass : float, default=10.
+        The maximum allowed (solid) core mass (Earth masses).
+
+    Returns
+    -------
+    sigma_obs : array[float]
+        The solid surface densities (g/cm^2) of all the observed planets.
+    core_mass_obs : array[float]
+        The core masses (Earth masses) of all the observed planets. These are the total masses of the planets computed from their observed radii using a mass-radius relation, capped at `max_core_mass`.
+    a_obs : array[float]
+        The semi-major axes (AU) of all the observed planets.
+    """
     # Compute the solid surface density (g/cm^2) using the Schlichting (2014) prescription, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
     # 'max_core_mass' is the maximum core mass (Earth masses)
     # Returns an array of solid surface densities and semi-major axes
@@ -308,10 +585,27 @@ def solid_surface_density_S2014_given_observed_catalog(sss_per_sys, max_core_mas
     return sigma_obs, core_mass_obs, a_obs
 
 def solid_surface_density_nHill_given_observed_catalog(sss_per_sys, max_core_mass=10., n=10.):
-    # Compute the solid surface density (g/cm^2) using a number of Hill radii for the feeding zone width, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
-    # 'max_core_mass' is the maximum core mass (Earth masses)
-    # 'n' is the number of Hill radii for  the feeding zone width of each planet
-    # Returns an array of solid surface densities and semi-major axes
+    """
+    Compute the solid surface densities for all planets in an observed catalog, using a number of Hill radii for the feeding zone widths.
+
+    Parameters
+    ----------
+    sss_per_sys : dict
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_obs()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_obs>`_.
+    max_core_mass : float, default=10.
+        The maximum allowed (solid) core mass (Earth masses).
+    n : float, default=10.
+        The number of Hill radii to use as the feeding zone.
+
+    Returns
+    -------
+    sigma_obs : array[float]
+        The solid surface densities (g/cm^2) of all the observed planets.
+    core_mass_obs : array[float]
+        The core masses (Earth masses) of all the observed planets. These are the total masses of the planets computed from their observed radii using a mass-radius relation, capped at `max_core_mass`.
+    a_obs : array[float]
+        The semi-major axes (AU) of all the observed planets.
+    """
     Mstar_obs = np.repeat(sss_per_sys['Mstar_obs'][:,None], np.shape(sss_per_sys['P_obs'])[1], axis=1)[sss_per_sys['P_obs'] > 0] # flattened array of stellar masses repeated for each planet
     a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
     a_obs = a_obs_per_sys[sss_per_sys['P_obs'] > 0]
@@ -322,9 +616,27 @@ def solid_surface_density_nHill_given_observed_catalog(sss_per_sys, max_core_mas
     return sigma_obs, core_mass_obs, a_obs
 
 def solid_surface_density_RC2014_given_observed_catalog(sss_per_sys, max_core_mass=10.):
-    # Compute the solid surface density (g/cm^2) using the Raymond & Cossou (2014) prescription, for each planet in a given observed catalog, using a mass-radius relation on the observed radii
-    # 'max_core_mass' is the maximum core mass (Earth masses)
-    # Returns an array of solid surface densities and semi-major axes
+    """
+    Compute the solid surface densities for all planets in observed multi-planet systems in an observed catalog, using the Raymond & Cossou (2014) prescription for the feeding zone widths.
+
+    Parameters
+    ----------
+    sss_per_sys : dict
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_obs()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_obs>`_.
+    max_core_mass : float, default=10.
+        The maximum allowed (solid) core mass (Earth masses).
+
+    Returns
+    -------
+    sigma_obs_2p : array[float]
+        The solid surface densities (g/cm^2) of the observed planets in multi-planet systems.
+    core_mass_obs_2p : array[float]
+        The core masses (Earth masses) of the observed planets in multi-planet systems. These are the total masses of the planets computed from their observed radii using a mass-radius relation, capped at `max_core_mass`.
+    a_obs_2p : array[float]
+        The semi-major axes (AU) of the observed planets in multi-planet systems.
+    mult_obs_2p : array[float]
+        The multiplicities of the observed multi-planet systems each planet belongs to.
+    """
     mult_obs = sss_per_sys['Mtot_obs']
     mult_obs_2p = []
     a_obs_2p = []
@@ -353,14 +665,52 @@ def solid_surface_density_RC2014_given_observed_catalog(sss_per_sys, max_core_ma
 # Functions to fit a power-law to the MMEN (sigma = sigma0 * (a/a0)^beta <==> log(sigma) = log(sigma0) + beta*log(a/a0)):
 
 def MMSN(a, F=1., Zrel=0.33):
-    # Compute the minimum mass solar nebular (MMSN) surface density (g/cm^2) at a semi-major axis 'a' (AU), from equation 2 in Chiang & Youdin (2010) (https://arxiv.org/pdf/0909.2652.pdf)
-    # Default values of F=1 and Zrel=0.33 give 1M_earth of solids in an annulus centered on Earth's orbit
+    """
+    Compute the solid surface density of the minimum mass solar nebula (MMSN) at a given separation, as defined by `Eq. 2 in Chiang & Youdin (2010) (<https://arxiv.org/pdf/0909.2652.pdf>)`_.
+
+    Note
+    ----
+    The normalization is such that the default values of `F=1` and `Zrel=0.33` give 1 Earth mass of solids in an annulus centered on Earth's semi-major axis.
+
+    Parameters
+    ----------
+    a : float or array[float]
+        The semi-major axis (AU).
+    F : float or array[float], default=1.
+        A fudge factor.
+    Zrel : float or array[float], default=0.33
+        The relative enrichment in metallicity.
+
+    Returns
+    -------
+    sigma_p : float or array[float]
+        The solid surface density (g/cm^2) of the MMSN.
+    """
     sigma_p = 33.*F*Zrel*(a**-1.5)
     return sigma_p
 
 def MMEN_power_law(a, sigma0, beta, a0=1.):
-    # Compute a power-law profile for the MMEN (solid surface density as a function of semi-major axis), given by:
-    # sigma(a) = sigma0*(a/a0)^beta, where 'sigma(a)' (g/cm^2) is the solid surface density at semi-major axis 'a' (AU), 'sigma0' (g/cm^2) is the normalization at semi-major axis 'a0' (AU), and beta is the power-law index
+    """
+    Evaluate a power-law profile for the solid surface density of the minimum mass extrasolar nebula (MMEN) at a given separation.
+
+    Given by `sigma(a) = sigma0*(a/a0)^beta`, where `sigma(a)`` (g/cm^2) is the solid surface density at semi-major axis `a` (AU), `sigma0` (g/cm^2) is the normalization at semi-major axis `a0` (AU), and `beta` is the power-law index.
+
+    Parameters
+    ----------
+    a : float or array[float]
+        The semi-major axis (AU) at which to evaluate the solid surface density.
+    sigma0 : float
+        The solid surface density normalization (g/cm^2) at separation `a0`.
+    beta : float
+        The power-law index.
+    a0 : float, default=1.
+        The normalization point for the separation (AU).
+
+    Returns
+    -------
+    sigma_a : float or array[float]
+        The solid surface density (g/cm^2) at the given separation `a`.
+    """
     assert sigma0 > 0
     assert a0 > 0
     sigma_a = sigma0 * (a/a0)**beta
@@ -369,14 +719,69 @@ def MMEN_power_law(a, sigma0, beta, a0=1.):
 f_linear = lambda x, p0, p1: p0 + p1*x
 
 def fit_power_law_MMEN(a_array, sigma_array, a0=1., p0=1., p1=-1.5):
-    # Fit power-law parameters (normalization 'sigma0' (at separation 'a0') and slope 'beta') given an array of separations 'a_array' (AU) and solid surface densities 'sigma_array' (g/cm^2)
-    # Optional parameters: separation for the normalization 'a0' (AU; i.e. sigma0 = sigma(a0)), initial guess for log(sigma0) 'p0', and initial guess for beta 'p1'
+    """
+    Fit a power-law representing the minimum mass extrasolar nebula (MMEN) of a planetary system given the planets' semi-major axes and solid surface densities.
+
+    Parameters
+    ----------
+    a_array : array[float]
+        The semi-major axes (AU) of the planets.
+    sigma_array : array[float]
+        The solid surface densities (g/cm^2) of the planets.
+    a0 : float, default=1.
+        The normalization point for the separation (AU).
+    p0 : float, default=1.
+        The initial guess for the normalization parameter, 'log(sigma0)'.
+    p1 : float, default=-1.5
+        The initial guess for the power-law index parameter, 'beta'.
+
+    Returns
+    -------
+    sigma0 : float
+        The best-fit value for the solid surface density normalization (g/cm^2). Unlike the initial guess (`p0`), this value is unlogged.
+    beta : float
+        The best-fit value for the power-law index.
+    """
     mmen_fit = curve_fit(f_linear, np.log10(a_array/a0), np.log10(sigma_array), [p0, p1])[0]
     sigma0, beta = 10.**(mmen_fit[0]), mmen_fit[1]
     return sigma0, beta
 
 def fit_power_law_MMEN_all_planets_observed(sss_per_sys, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5):
-    # Compute solid surface densities and fit a power-law to all planets in an observed catalog
+    """
+    Compute the solid surface densities and fit a power-law to them for all planets in an observed catalog.
+
+    Parameters
+    ----------
+    sss_per_sys : dict
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_obs()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_obs>`_.
+    max_core_mass : float, default=10.
+        The maximum allowed (solid) core mass (Earth masses).
+    prescription : {'CL2013', 'S2014', 'nHill', 'RC2014'}, default='CL2013'
+        The string indicating the prescription to use for computing the feeding zone widths.
+    n : float, default=10.
+        The number of Hill radii to use for the feeding zones. Only used for the 'nHill' prescription.
+    a0 : float, default=1.
+        The normalization point for the separation (AU).
+    p0 : float, default=1.
+        The initial guess for the normalization parameter, 'log(sigma0)'.
+    p1 : float, default=-1.5
+        The initial guess for the power-law index parameter, 'beta'.
+
+    Returns
+    -------
+    outputs_dict : dict
+        A dictionary containing the solid surface densities, power-law fit parameters, and other properties computed from the observed catalog.
+
+
+    The output dictionary contains the following fields:
+
+    - `sigma_obs`: The solid surface densities (g/cm^2) of all the observed planets.
+    - `core_mass_obs`: The solid core masses (Earth masses) of all the observed planets. These are the total masses of the planets computed from their observed radii using a mass-radius relation, capped at `max_core_mass`.
+    - `a_obs`: The semi-major axes (AU) of all the observed planets.
+    - `sigma0`: The best-fit value for the solid surface density normalization (g/cm^2).
+    - `beta`: The best-fit value for the power-law index.
+
+    """
     if prescription == 'CL2013':
         sigma_obs, core_mass_obs, a_obs = solid_surface_density_CL2013_given_observed_catalog(sss_per_sys, max_core_mass=max_core_mass)
     elif prescription == 'S2014':
@@ -392,7 +797,45 @@ def fit_power_law_MMEN_all_planets_observed(sss_per_sys, max_core_mass=10., pres
     return outputs_dict
 
 def fit_power_law_MMEN_all_planets_physical(sssp_per_sys, sssp, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5):
-    # Compute solid surface densities and fit a power-law to all planets in a physical catalog
+    """
+    Compute the solid surface densities and fit a power-law to them for all planets in a physical catalog.
+
+    Parameters
+    ----------
+    sssp_per_sys : dict
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays).
+    sssp : dict
+        The dictionary containing the planetary and stellar properties of all planets in a physical catalog (1-d arrays).
+    max_core_mass : float, default=10.
+        The maximum allowed (solid) core mass (Earth masses).
+    prescription : {'CL2013', 'S2014', 'nHill', 'RC2014'}, default='CL2013'
+        The string indicating the prescription to use for computing the feeding zone widths.
+    n : float, default=10.
+        The number of Hill radii to use for the feeding zones. Only used for the 'nHill' prescription.
+    a0 : float, default=1.
+        The normalization point for the separation (AU).
+    p0 : float, default=1.
+        The initial guess for the normalization parameter, 'log(sigma0)'.
+    p1 : float, default=-1.5
+        The initial guess for the power-law index parameter, 'beta'.
+
+    Returns
+    -------
+    outputs_dict : dict
+        A dictionary containing the solid surface densities, power-law fit parameters, and other properties computed from the observed catalog.
+
+
+    The output dictionary contains the following fields:
+
+    - `sigma_all`: The solid surface densities (g/cm^2) of all the planets.
+    - `a_all`: The semi-major axes (AU) of all the planets.
+    - `sigma0`: The best-fit value for the solid surface density normalization (g/cm^2).
+    - `beta`: The best-fit value for the power-law index.
+
+    Note
+    ----
+    ``sssp_per_sys`` and ``sssp`` are returned by the ` ``compute_summary_stats_from_cat_phys()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_phys>`_.
+    """
     if prescription == 'CL2013':
         sigma_all, a_all = solid_surface_density_CL2013_given_physical_catalog(sssp_per_sys, max_core_mass=max_core_mass)
     elif prescription == 'S2014':
@@ -408,8 +851,46 @@ def fit_power_law_MMEN_all_planets_physical(sssp_per_sys, sssp, max_core_mass=10
     return outputs_dict
 
 def fit_power_law_MMEN_per_system_observed(sss_per_sys, n_mult_min=2, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False):
-    # Compute solid surface densities and fit power-law parameters to each multi-planet system in an observed catalog
-    # If 'scale_up' is True, will scale up the power-law to be above the surface densities of all planets in the system (i.e. multiply 'sigma0' by a factor such that sigma0*(a_i/a0)^beta >= sigma_i for all planets)
+    """
+    Fit power-laws to the solid surface densities of the planets *in each multi-planet system* in an observed catalog.
+
+    Parameters
+    ----------
+    sss_per_sys : dict
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays), such as one returned by the ` ``compute_summary_stats_from_cat_obs()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_obs>`_.
+    n_mult_min : int, default=2
+        The minimum multiplicity to include.
+    max_core_mass : float, default=10.
+        The maximum allowed (solid) core mass (Earth masses).
+    prescription : {'CL2013', 'S2014', 'nHill', 'RC2014'}, default='CL2013'
+        The string indicating the prescription to use for computing the feeding zone widths.
+    n : float, default=10.
+        The number of Hill radii to use for the feeding zones. Only used for the 'nHill' prescription.
+    a0 : float, default=1.
+        The normalization point for the separation (AU).
+    p0 : float, default=1.
+        The initial guess for the normalization parameter, 'log(sigma0)'.
+    p1 : float, default=-1.5
+        The initial guess for the power-law index parameter, 'beta'.
+    scale_up : bool, default=False
+        Whether to scale up the normalization such that the power-law fit for each system is at/above the solid surface densities of every planet in the system.
+
+    Returns
+    -------
+    fit_per_sys_dict : dict
+        A dictionary containing the power-law fit parameters and other properties for each included system in the observed catalog.
+
+
+    The output dictionary contains the following fields:
+
+    - `m_obs`: The observed multiplicities of the included systems (greater than or equal to `n_mult_min`).
+    - `Mstar_obs`: The stellar masses of the included system.
+    - `sigma0`: The best-fit values for the solid surface density normalizations (g/cm^2) of the included systems. If `scale_factor=True`, these normalization values have already been multiplied by the scale factor of each system.
+    - `scale_factor`: The scale factors required to increase the normalizations of each system such that the power-law fits are at/above the solid surface densities of every planet in the system.
+    - `beta`: The best-fit values for the power-law indices of the included systems.
+
+    """
+    assert n_mult_min >= 2
     fit_per_sys_dict = {'m_obs':[], 'Mstar_obs':[], 'sigma0':[], 'scale_factor':[], 'beta':[]} # 'm_obs' is number of observed planets
     a_obs_per_sys = gen.a_from_P(sss_per_sys['P_obs'], sss_per_sys['Mstar_obs'][:,None])
     for i,a_sys in enumerate(a_obs_per_sys):
@@ -441,16 +922,59 @@ def fit_power_law_MMEN_per_system_observed(sss_per_sys, n_mult_min=2, max_core_m
     fit_per_sys_dict['beta'] = np.array(fit_per_sys_dict['beta'])
     return fit_per_sys_dict
 
-def fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False, N_sys=10000):
-    # Compute solid surface densities and fit power-law parameters to each multi-planet system in a physical catalog
-    # If 'scale_up' is True, will scale up the power-law to be above the surface densities of all planets in the system (i.e. multiply 'sigma0' by a factor such that sigma0*(a_i/a0)^beta >= sigma_i for all planets)
-    # 'N_sys' is the maximum number of systems to loop through (to save time)
+def fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, n_mult_min=2, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False, N_sys=10000):
+    """
+    Fit power-laws to the solid surface densities of the planets *in each multi-planet system* in a physical catalog.
+
+    Parameters
+    ----------
+    sssp_per_sys : dict
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays).
+    sssp : dict
+        The dictionary containing the planetary and stellar properties of all planets in a physical catalog (1-d arrays).
+    n_mult_min : int, default=2
+        The minimum multiplicity to include.
+    max_core_mass : float, default=10.
+        The maximum allowed (solid) core mass (Earth masses).
+    prescription : {'CL2013', 'S2014', 'nHill', 'RC2014'}, default='CL2013'
+        The string indicating the prescription to use for computing the feeding zone widths.
+    n : float, default=10.
+        The number of Hill radii to use for the feeding zones. Only used for the 'nHill' prescription.
+    a0 : float, default=1.
+        The normalization point for the separation (AU).
+    p0 : float, default=1.
+        The initial guess for the normalization parameter, 'log(sigma0)'.
+    p1 : float, default=-1.5
+        The initial guess for the power-law index parameter, 'beta'.
+    scale_up : bool, default=False
+        Whether to scale up the normalization such that the power-law fit for each system is at/above the solid surface densities of every planet in the system.
+    N_sys : int, default=10000
+        The maximum number of systems to be included (to save time if there are too many systems in the physical catalog).
+
+    Returns
+    -------
+    fit_per_sys_dict : dict
+        A dictionary containing the power-law fit parameters and other properties for each included system in the physical catalog.
+
+
+    The output dictionary contains the following fields:
+
+    - `n_pl`: The multiplicities of the included systems (greater than or equal to `n_mult_min`).
+    - `sigma0`: The best-fit values for the solid surface density normalizations (g/cm^2) of the included systems. If `scale_factor=True`, these normalization values have already been multiplied by the scale factor of each system.
+    - `scale_factor`: The scale factors required to increase the normalizations of each system such that the power-law fits are at/above the solid surface densities of every planet in the system.
+    - `beta`: The best-fit values for the power-law indices of the included systems.
+
+    Note
+    ----
+    ``sssp_per_sys`` and ``sssp`` are returned by the ` ``compute_summary_stats_from_cat_phys()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_phys>`_.
+    """
+    assert n_mult_min >= 2
     start = time.time()
     N_sys_tot = len(sssp_per_sys['a_all'])
     print('Fitting power-laws to the first %s systems (out of %s)...' % (min(N_sys,N_sys_tot), N_sys_tot))
     fit_per_sys_dict = {'n_pl':[], 'sigma0':[], 'scale_factor':[], 'beta':[]} # 'n_pl' is number of planets in each system
     for i,a_sys in enumerate(sssp_per_sys['a_all'][:N_sys]):
-        if np.sum(a_sys > 0) > 1:
+        if np.sum(a_sys > 0) >= n_mult_min:
             Mstar = sssp['Mstar_all'][i]
             core_mass_sys = np.copy(sssp_per_sys['mass_all'][i])[a_sys > 0]
             core_mass_sys[core_mass_sys > max_core_mass] = max_core_mass
@@ -477,12 +1001,61 @@ def fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, max_core_mass=10.
     print('Time to compute: %s s' % (stop - start))
     return fit_per_sys_dict
 
-def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False):
-    # Compute solid surface densities and fit power-law parameters to each multi-planet system in an observed catalog, for the observed planets only and then for all the planets in those systems (using the physical planet properties for both)
-    # If 'scale_up' is True, will scale up the power-law to be above the surface densities of all planets in the system (i.e. multiply 'sigma0' by a factor such that sigma0*(a_i/a0)^beta >= sigma_i for all planets)
+def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, n_mult_min=2, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False):
+    """
+    Fit power-laws to the solid surface densities of the observed and physical planets *in each multi-planet system* in a physical catalog.
+
+    Will compute the solid surface densities and fit a power-law to each multi-planet system in the physical catalog, for the observed planets only and then for all the planets in those systems (using the physical planet properties for both).
+
+    Parameters
+    ----------
+    sssp_per_sys : dict
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays).
+    sssp : dict
+        The dictionary containing the planetary and stellar properties of all planets in a physical catalog (1-d arrays).
+    n_mult_min : int, default=2
+        The minimum multiplicity to include.
+    max_core_mass : float, default=10.
+        The maximum allowed (solid) core mass (Earth masses).
+    prescription : {'CL2013', 'S2014', 'nHill', 'RC2014'}, default='CL2013'
+        The string indicating the prescription to use for computing the feeding zone widths.
+    n : float, default=10.
+        The number of Hill radii to use for the feeding zones. Only used for the 'nHill' prescription.
+    a0 : float, default=1.
+        The normalization point for the separation (AU).
+    p0 : float, default=1.
+        The initial guess for the normalization parameter, 'log(sigma0)'.
+    p1 : float, default=-1.5
+        The initial guess for the power-law index parameter, 'beta'.
+    scale_up : bool, default=False
+        Whether to scale up the normalization such that the power-law fit for each system is at/above the solid surface densities of every planet in the system.
+
+    Returns
+    -------
+    fit_per_sys_dict : dict
+        A dictionary containing the power-law fit parameters and other properties for each multi-planet system in the observed catalog.
+
+
+    The output dictionary contains the following fields:
+
+    - `n_pl_true`: The true multiplicities of the included systems (greater than or equal to `n_mult_min`) (1-d array).
+    - `n_pl_obs`: The observed multiplicities of the included systems (1-d array).
+    - `Mp_tot_true`: The total solid core mass (Earth masses) of all the planets in each included system (1-d array).
+    - `Mp_tot_obs`: The total solid core mass (Earth masses) of only the observed planets in each included system (1-d array).
+    - `sigma0_true`: The best-fit values for the solid surface density normalizations (g/cm^2) from fitting all the planets of the included systems (1-d array). If `scale_factor=True`, these normalization values have already been multiplied by the scale factor of each system.
+    - `sigma0_obs`: The best-fit values for the solid surface density normalizations (g/cm^2) from fitting only the observed planets of the included systems (1-d array). If `scale_factor=True`, these normalization values have already been multiplied by the scale factor of each system.
+    - `scale_factor_true`: The scale factors required to increase the normalizations of each system such that the power-law fits are at/above the solid surface densities of every planet in the system (1-d array).
+    - `scale_factor_obs`: The scale factors required to increase the normalizations of each system such that the power-law fits are at/above the solid surface densities of every observed planet in the system (1-d array).
+    - `beta_true`: The best-fit values for the power-law indices from fitting all the planets of the included systems (1-d array).
+    - `beta_obs`: The best-fit values for the power-law indices from fitting only the observed planets of the included systems (1-d array).
+
+    Note
+    ----
+    ``sssp_per_sys`` and ``sssp`` are returned by the ` ``compute_summary_stats_from_cat_phys()`` function in SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_load_sims.html#syssimpyplots.load_sims.compute_summary_stats_from_cat_phys>`_.
+    """
     fit_per_sys_dict = {'n_pl_true':[], 'n_pl_obs':[], 'Mp_tot_true':[], 'Mp_tot_obs':[], 'sigma0_true':[], 'sigma0_obs':[], 'scale_factor_true':[], 'scale_factor_obs':[], 'beta_true':[], 'beta_obs':[]}
     for i,det_sys in enumerate(sssp_per_sys['det_all']):
-        if np.sum(det_sys) > 1:
+        if np.sum(sssp_per_sys['a_all'][i] > 0) >= n_mult_min and np.sum(det_sys) > 1:
             Mstar = sssp['Mstar_all'][i]
             Mp_sys = sssp_per_sys['mass_all'][i]
             core_mass_sys = np.copy(Mp_sys) # all planet masses including padded zeros
@@ -537,10 +1110,38 @@ def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, max_
 
 # TODO: write unit tests
 def plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, n_mult_min=2, n_mult_max=10, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5, scale_up=False, N_sys=10):
-    # If 'scale_up' is True, will scale up the power-law to be above the surface densities of all planets in the system (i.e. multiply 'sigma0' by a factor such that sigma0*(a_i/a0)^beta >= sigma_i for all planets)
-    # 'N_sys' is the maximum number of systems to loop through (to save time)
+    """
+    Make plots of solid surface density versus semi-major axis, including the feeding zones of each planet and a power-law fit to all the physical and observed planets, for each multi-planet system in a physical catalog.
+
+    Parameters
+    ----------
+    sssp_per_sys : dict
+        The dictionary containing the planetary and stellar properties for each system in a physical catalog (2-d and 1-d arrays).
+    sssp : dict
+        The dictionary containing the planetary and stellar properties of all planets in a physical catalog (1-d arrays).
+    n_mult_min : int, default=2
+        The minimum multiplicity to include.
+    n_mult_max : int, default=10
+        The maximum multiplicity to include.
+    max_core_mass : float, default=10.
+        The maximum allowed (solid) core mass (Earth masses).
+    prescription : {'CL2013', 'S2014', 'nHill', 'RC2014'}, default='CL2013'
+        The string indicating the prescription to use for computing the feeding zone widths.
+    n : float, default=10.
+        The number of Hill radii to use for the feeding zones. Only used for the 'nHill' prescription.
+    a0 : float, default=1.
+        The normalization point for the separation (AU).
+    p0 : float, default=1.
+        The initial guess for the normalization parameter, 'log(sigma0)'.
+    p1 : float, default=-1.5
+        The initial guess for the power-law index parameter, 'beta'.
+    scale_up : bool, default=False
+        Whether to scale up the normalization such that the power-law fit for each system is at/above the solid surface densities of every planet in the system.
+    N_sys : int, default=10
+        The maximum number of systems to plot. A separate figure will be plotted for each system.
+    """
     y_sym_star = '*' if scale_up else ''
-    assert n_mult_min <= n_mult_max
+    assert 2 <= n_mult_min <= n_mult_max
     count = 0
     for i,det_sys in enumerate(sssp_per_sys['det_all']):
         if count >= N_sys:
@@ -639,8 +1240,34 @@ def plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(s
 # Functions to compute the total integrated mass of solids within a given separation for a fitted power-law MMEN:
 
 def solid_mass_integrated_r0_to_r_given_power_law_profile(r, r0, sigma0, beta, a0=1.):
-    # Compute the total integrated mass in solids from separation 'r0' (AU) to 'r' (AU) given a power-law profile, sigma(a) = sigma0*(a/a0)^beta, where the fitted parameters are the normalization (at 'a0') 'sigma0' (g/cm^2) and slope 'beta'
-    # Will convert the total integrated mass in solids to units of Earth masses
+    """
+    Compute the total solid mass from a power-law profile for the solid surface density, within a given separation.
+
+    Integrates the power-law over an annular area from radius `r0` to `r`.
+
+    Parameters
+    ----------
+    r : float
+        The separation (AU) of the outer boundary.
+    r0 : float
+        The separation (AU) of the inner boundary.
+    sigma0 : float
+        The normalization for the solid surface density (g/cm^2) at separation `a0`.
+    beta : float
+        The power-law index.
+    a0 : float, default=1.
+        The normalization point for the separation (AU).
+
+    Returns
+    -------
+    M_r : float
+        The total integrated solid mass (Earth masses).
+
+
+    Warning
+    -------
+    The inner boundary `r0` must be non-zero to avoid infinite mass for `beta <= -2`.
+    """
     assert 0 <= r0 < r # r0 must be nonzero to avoid infinite mass for beta <= -2
     assert 0 < sigma0
     assert 0 < a0
