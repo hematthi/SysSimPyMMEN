@@ -42,6 +42,7 @@ autodoc_mock_imports = [
    "matplotlib",
    "scipy",
    "corner",
+   "syssimpyplots",
 ]
 
 
