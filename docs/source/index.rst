@@ -30,3 +30,5 @@ Contents
 
    installation
    usage
+   api
+   
