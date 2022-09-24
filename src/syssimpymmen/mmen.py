@@ -163,11 +163,9 @@ generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_r
 # TODO: write unit tests
 def feeding_zone_S2014(M, R, a, Mstar=1.):
     """
-    Compute the feeding zone width of a planet using the Schlichting (2014) prescription:
+    Compute the feeding zone width of a planet using the Schlichting (2014) prescription::
 
-    .. math::
-
-        \delta_a = 2^{3/2}*a(\frac{a*M}{R*M_\star})^{1/2}.
+        delta_a = 2^(3/2)*a((a*M)/(R*Mstar))^(1/2).
 
 
     Parameters
@@ -192,11 +190,9 @@ def feeding_zone_S2014(M, R, a, Mstar=1.):
 # TODO: write unit tests
 def feeding_zone_nHill(M, a, Mstar=1., n=10.):
     """
-    Compute the feeding zone width of a planet using a number of Hill radii:
+    Compute the feeding zone width of a planet using a number of Hill radii::
 
-    .. math::
-
-        \delta_a = n*R_Hill = n*a*(\frac{M}{3*M_\star})^{1/3}.
+        delta_a = n*R_Hill = n*a*(M/(3*Mstar))^(1/3).
 
 
     Parameters
