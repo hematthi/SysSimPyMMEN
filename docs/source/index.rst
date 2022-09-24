@@ -30,4 +30,3 @@ Contents
 
    installation
    usage
-   api
