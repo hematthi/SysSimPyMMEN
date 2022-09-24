@@ -19,7 +19,7 @@ Welcome to SysSimPyMMEN's documentation!
 Publication
 -----------
 
-Our paper for this project is currently under review! You can view a preprint on the `arXiv <https://arxiv.org/abs/2208.09031>`_.
+Our paper for this project has been accepted to the Astronomical Journal! You can view an initial preprint on the `arXiv <https://arxiv.org/abs/2208.09031>`_.
 
 
 Contents
@@ -28,4 +28,6 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   installation
+   usage
    api
