@@ -160,6 +160,90 @@ generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_r
 
 # Functions to compute various formulations of the solid surface density/minimum mass extrasolar nebular (MMEN):
 
+# TODO: write unit tests
+def feeding_zone_S2014(M, R, a, Mstar=1.):
+    """
+    Compute the feeding zone width of a planet using the Schlichting (2014) prescription:
+
+    .. math:: \delta_a = 2^{3/2}*a(\frac{a*M}{R*M_\star})^{1/2}.
+
+    Parameters
+    ----------
+    M : float or array[float]
+        The planet mass (Earth masses).
+    R : float or array[float]
+        The planet radius (Earth radii).
+    a : float or array[float]
+        The semi-major axis (AU).
+    Mstar : float or array[float], default=1.
+        The stellar mass (solar masses).
+
+    Returns
+    -------
+    delta_a : float or array[float]
+        The feeding zone width (AU) of the planet.
+    """
+    delta_a = 2.**(3./2.)*a*np.sqrt(((a*gen.AU)/(R*gen.Rearth))*((M*gen.Mearth)/(Mstar*gen.Msun))) # AU
+    return delta_a
+
+# TODO: write unit tests
+def feeding_zone_nHill(M, a, Mstar=1., n=10.):
+    """
+    Compute the feeding zone width of a planet using a number of Hill radii:
+
+    .. math:: \delta_a = n*R_Hill = n*a*(\frac{M}{3*M_\star})^{1/3}.
+
+    Parameters
+    ----------
+    M : float or array[float]
+        The planet mass (Earth masses).
+    a : float or array[float]
+        The semi-major axis (AU).
+    Mstar : float or array[float], default=1.
+        The stellar mass (solar masses).
+    n : float or array[float], default=10.
+        The number of Hill radii to use as the feeding zone.
+
+    Returns
+    -------
+    delta_a : float or array[float]
+        The feeding zone width (AU) of the planet.
+    """
+    delta_a = n*a*((M*gen.Mearth)/(3.*Mstar*gen.Msun))**(1./3.) # AU
+    return delta_a
+
+# TODO: write unit tests
+def feeding_zone_RC2014(a_sys):
+    """
+    Compute the feeding zone widths of all the planets in a multi-planet system using the Raymond & Cossou (2014) prescription.
+
+    Uses the geometric means of the neighboring planets' semi-major axes as the boundaries of their feeding zones.
+
+    Note
+    ----
+    Assumes the same ratio for the inner edge of the innermost planet as its outer edge, and the same ratio for the outer edge of the outermost planet as its inner edge.
+
+    Parameters
+    ----------
+    a_sys : array[float]
+        The semi-major axes (AU) of all the planets.
+
+    Returns
+    -------
+    delta_a_sys : array[float]
+        The feeding zone widths (AU) of all the planets.
+    a_bounds_sys : array[float]
+        The boundaries (AU) of the feeding zones for the planets (length = n+1 where n is the number of planets). For example, `a_bounds_sys[i]` and `a_bounds_sys[i+1]` will be the inner and outer boundaries of the `i^th` planet.
+    """
+    a_bounds_sys = np.zeros(len(a_sys)+1) # bounds in semi-major axis for each planet
+    a_bounds_sys[1:-1] = np.sqrt(a_sys[:-1]*a_sys[1:]) # geometric means between planets
+    a_bounds_sys[0] = a_sys[0]*np.sqrt(a_sys[0]/a_sys[1]) # same ratio for upper bound to a_sys[1] as a_sys[1] to lower bound
+    a_bounds_sys[-1] = a_sys[-1]*np.sqrt(a_sys[-1]/a_sys[-2]) # same ratio for upper bound to a_sys[-1] as a_sys[-1] to lower bound
+    delta_a_sys = np.diff(a_bounds_sys)
+    return delta_a_sys, a_bounds_sys
+
+
+
 def solid_surface_density(M, a, delta_a):
     """
     Compute the solid surface density associated with a planet.
@@ -200,30 +284,6 @@ def solid_surface_density_CL2013(M, a):
     """
     return solid_surface_density(M, a, a)
 
-# TODO: write unit tests
-def feeding_zone_S2014(M, R, a, Mstar=1.):
-    """
-    Compute the feeding zone width of a planet using the Schlichting (2014) prescription, delta_a = 2^(3/2)*a((a*M)/(R*Mstar))^(1/2).
-
-    Parameters
-    ----------
-    M : float or array[float]
-        The planet mass (Earth masses).
-    R : float or array[float]
-        The planet radius (Earth radii).
-    a : float or array[float]
-        The semi-major axis (AU).
-    Mstar : float or array[float], default=1.
-        The stellar mass (solar masses).
-
-    Returns
-    -------
-    delta_a : float or array[float]
-        The feeding zone width (AU) of the planet.
-    """
-    delta_a = 2.**(3./2.)*a*np.sqrt(((a*gen.AU)/(R*gen.Rearth))*((M*gen.Mearth)/(Mstar*gen.Msun))) # AU
-    return delta_a
-
 def solid_surface_density_S2014(M, R, a, Mstar=1.):
     """
     Compute the solid surface density of a planet using the Schlichting (2014) prescription for the feeding zone width (see :py:func:`syssimpymmen.mmen.feeding_zone_S2014`).
@@ -246,30 +306,6 @@ def solid_surface_density_S2014(M, R, a, Mstar=1.):
     delta_a = feeding_zone_S2014(M, R, a, Mstar=Mstar)
     return solid_surface_density(M, a, delta_a)
 
-# TODO: write unit tests
-def feeding_zone_nHill(M, a, Mstar=1., n=10.):
-    """
-    Compute the feeding zone width of a planet using a number of Hill radii, delta_a = n*R_Hill.
-
-    Parameters
-    ----------
-    M : float or array[float]
-        The planet mass (Earth masses).
-    a : float or array[float]
-        The semi-major axis (AU).
-    Mstar : float or array[float], default=1.
-        The stellar mass (solar masses).
-    n : float or array[float], default=10.
-        The number of Hill radii to use as the feeding zone.
-
-    Returns
-    -------
-    delta_a : float or array[float]
-        The feeding zone width (AU) of the planet.
-    """
-    delta_a = n*a*((M*gen.Mearth)/(3.*Mstar*gen.Msun))**(1./3.) # AU
-    return delta_a
-
 def solid_surface_density_nHill(M, a, Mstar=1., n=10.):
     """
     Compute the solid surface density of a planet using a number of Hill radii for the feeding zone width (see :py:func:`syssimpymmen.mmen.feeding_zone_nHill`).
@@ -291,36 +327,6 @@ def solid_surface_density_nHill(M, a, Mstar=1., n=10.):
     """
     delta_a = feeding_zone_nHill(M, a, Mstar=Mstar, n=n)
     return solid_surface_density(M, a, delta_a)
-
-# TODO: write unit tests
-def feeding_zone_RC2014(a_sys):
-    """
-    Compute the feeding zone widths of all the planets in a multi-planet system using the Raymond & Cossou (2014) prescription.
-
-    Uses the geometric means of the neighboring planets' semi-major axes as the boundaries of their feeding zones.
-
-    Note
-    ----
-    Assumes the same ratio for the inner edge of the innermost planet as its outer edge, and the same ratio for the outer edge of the outermost planet as its inner edge.
-
-    Parameters
-    ----------
-    a_sys : array[float]
-        The semi-major axes (AU) of all the planets.
-
-    Returns
-    -------
-    delta_a_sys : array[float]
-        The feeding zone widths (AU) of all the planets.
-    a_bounds_sys : array[float]
-        The boundaries (AU) of the feeding zones for the planets (length = n+1 where n is the number of planets). For example, `a_bounds_sys[i]` and `a_bounds_sys[i+1]` will be the inner and outer boundaries of the `i^th` planet.
-    """
-    a_bounds_sys = np.zeros(len(a_sys)+1) # bounds in semi-major axis for each planet
-    a_bounds_sys[1:-1] = np.sqrt(a_sys[:-1]*a_sys[1:]) # geometric means between planets
-    a_bounds_sys[0] = a_sys[0]*np.sqrt(a_sys[0]/a_sys[1]) # same ratio for upper bound to a_sys[1] as a_sys[1] to lower bound
-    a_bounds_sys[-1] = a_sys[-1]*np.sqrt(a_sys[-1]/a_sys[-2]) # same ratio for upper bound to a_sys[-1] as a_sys[-1] to lower bound
-    delta_a_sys = np.diff(a_bounds_sys)
-    return delta_a_sys, a_bounds_sys
 
 def solid_surface_density_system_RC2014(M_sys, a_sys):
     """
