@@ -165,7 +165,7 @@ def feeding_zone_S2014(M, R, a, Mstar=1.):
     """
     Compute the feeding zone width of a planet using the Schlichting (2014) prescription::
 
-        delta_a = 2^(3/2)*a((a*M)/(R*Mstar))^(1/2).
+        delta_a = 2^(3/2)*a*((a*M)/(R*Mstar))^(1/2).
 
 
     Parameters
@@ -257,9 +257,9 @@ def solid_surface_density(M, a, delta_a):
     M : float or array[float]
         The planet mass (Earth masses).
     a : float or array[float]
-        The semi-major axis of the planet (AU).
+        The semi-major axis (AU).
     delta_a : float or array[float]
-        The feeding zone width of the planet (AU).
+        The feeding zone width (AU).
 
     Returns
     -------
@@ -668,7 +668,7 @@ def MMSN(a, F=1., Zrel=0.33):
     Returns
     -------
     sigma_p : float or array[float]
-        The solid surface density (g/cm^2) of the MMSN.
+        The solid surface density (g/cm^2) of the MMSN at the given separation `a`.
     """
     sigma_p = 33.*F*Zrel*(a**-1.5)
     return sigma_p
@@ -677,7 +677,7 @@ def MMEN_power_law(a, sigma0, beta, a0=1.):
     """
     Evaluate a power-law profile for the solid surface density of the minimum mass extrasolar nebula (MMEN) at a given separation.
 
-    Given by `sigma(a) = sigma0*(a/a0)^beta`, where `sigma(a)`` (g/cm^2) is the solid surface density at semi-major axis `a` (AU), `sigma0` (g/cm^2) is the normalization at semi-major axis `a0` (AU), and `beta` is the power-law index.
+    Given by `sigma(a) = sigma0*(a/a0)^beta`, where `sigma0` (g/cm^2) is the normalization at semi-major axis `a0` (AU), and `beta` is the power-law index.
 
     Parameters
     ----------
@@ -759,9 +759,9 @@ def fit_power_law_MMEN_all_planets_observed(sss_per_sys, max_core_mass=10., pres
 
     The output dictionary contains the following fields:
 
-    - `sigma_obs`: The solid surface densities (g/cm^2) of all the observed planets.
-    - `core_mass_obs`: The solid core masses (Earth masses) of all the observed planets. These are the total masses of the planets computed from their observed radii using a mass-radius relation, capped at `max_core_mass`.
-    - `a_obs`: The semi-major axes (AU) of all the observed planets.
+    - `sigma_obs`: The solid surface densities (g/cm^2) of all the observed planets (1-d array).
+    - `core_mass_obs`: The solid core masses (Earth masses) of all the observed planets (1-d array). These are the total masses of the planets computed from their observed radii using a mass-radius relation, capped at `max_core_mass`.
+    - `a_obs`: The semi-major axes (AU) of all the observed planets (1-d array).
     - `sigma0`: The best-fit value for the solid surface density normalization (g/cm^2).
     - `beta`: The best-fit value for the power-law index.
 
@@ -811,8 +811,8 @@ def fit_power_law_MMEN_all_planets_physical(sssp_per_sys, sssp, max_core_mass=10
 
     The output dictionary contains the following fields:
 
-    - `sigma_all`: The solid surface densities (g/cm^2) of all the planets.
-    - `a_all`: The semi-major axes (AU) of all the planets.
+    - `sigma_all`: The solid surface densities (g/cm^2) of all the planets (1-d array).
+    - `a_all`: The semi-major axes (AU) of all the planets (1-d array).
     - `sigma0`: The best-fit value for the solid surface density normalization (g/cm^2).
     - `beta`: The best-fit value for the power-law index.
 
@@ -864,11 +864,11 @@ def fit_power_law_MMEN_per_system_observed(sss_per_sys, n_mult_min=2, max_core_m
 
     The output dictionary contains the following fields:
 
-    - `m_obs`: The observed multiplicities of the included systems (greater than or equal to `n_mult_min`).
-    - `Mstar_obs`: The stellar masses of the included system.
-    - `sigma0`: The best-fit values for the solid surface density normalizations (g/cm^2) of the included systems. If `scale_factor=True`, these normalization values have already been multiplied by the scale factor of each system.
-    - `scale_factor`: The scale factors required to increase the normalizations of each system such that the power-law fits are at/above the solid surface densities of every planet in the system.
-    - `beta`: The best-fit values for the power-law indices of the included systems.
+    - `m_obs`: The observed multiplicities of the included systems (greater than or equal to `n_mult_min`; 1-d array).
+    - `Mstar_obs`: The stellar masses of the included system (1-d array).
+    - `sigma0`: The best-fit values for the solid surface density normalizations (g/cm^2) of the included systems (1-d array). If `scale_factor=True`, these normalization values have already been multiplied by the scale factor of each system.
+    - `scale_factor`: The scale factors required to increase the normalizations of each system such that the power-law fits are at/above the solid surface densities of every planet in the system (1-d array).
+    - `beta`: The best-fit values for the power-law indices of the included systems (1-d array).
 
     """
     assert n_mult_min >= 2
@@ -940,10 +940,10 @@ def fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, n_mult_min=2, max
 
     The output dictionary contains the following fields:
 
-    - `n_pl`: The multiplicities of the included systems (greater than or equal to `n_mult_min`).
-    - `sigma0`: The best-fit values for the solid surface density normalizations (g/cm^2) of the included systems. If `scale_factor=True`, these normalization values have already been multiplied by the scale factor of each system.
-    - `scale_factor`: The scale factors required to increase the normalizations of each system such that the power-law fits are at/above the solid surface densities of every planet in the system.
-    - `beta`: The best-fit values for the power-law indices of the included systems.
+    - `n_pl`: The multiplicities of the included systems (greater than or equal to `n_mult_min`; 1-d array).
+    - `sigma0`: The best-fit values for the solid surface density normalizations (g/cm^2) of the included systems (1-d array). If `scale_factor=True`, these normalization values have already been multiplied by the scale factor of each system.
+    - `scale_factor`: The scale factors required to increase the normalizations of each system such that the power-law fits are at/above the solid surface densities of every planet in the system (1-d array).
+    - `beta`: The best-fit values for the power-law indices of the included systems (1-d array).
 
     """
     assert n_mult_min >= 2
@@ -983,7 +983,7 @@ def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, n_mu
     """
     Fit power-laws to the solid surface densities of the observed and physical planets *in each multi-planet system* in a physical catalog.
 
-    Will compute the solid surface densities and fit a power-law to each multi-planet system in the physical catalog, for the observed planets only and then for all the planets in those systems (using the physical planet properties for both).
+    Computes the solid surface densities and fit a power-law to each multi-planet system in the physical catalog, for the observed planets only and then for all the planets in those systems (using the physical planet properties for both).
 
     Parameters
     ----------
