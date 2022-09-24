@@ -24,7 +24,6 @@ Here, we've used the Chiang & Laughlin (2013) prescription for the feeding zone 
 .. tip::
 
    Several other prescriptions are available: see :py:func:`solid_surface_density_S2014 <syssimpymmen.mmen.solid_surface_density_S2014>`, :py:func:`solid_surface_density_nHill <syssimpymmen.mmen.solid_surface_density_nHill>`, and :py:func:`solid_surface_density_RC2014 <syssimpymmen.mmen.solid_surface_density_RC2014>`.
-
    Some of these may require additional parameters, such as the planet radii (for "S2014") and the stellar mass (for "S2014" and "nHill").
 
 You can also define and use your own custom prescription for the feeding zone width (``delta_a``) by using the core function that all of the above functions call, :py:func:`solid_surface_density <syssimpymmen.mmen.solid_surface_density>`.
