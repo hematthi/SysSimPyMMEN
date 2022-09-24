@@ -165,7 +165,9 @@ def feeding_zone_S2014(M, R, a, Mstar=1.):
     """
     Compute the feeding zone width of a planet using the Schlichting (2014) prescription:
 
-    .. math:: \delta_a = 2^{3/2}*a(\frac{a*M}{R*M_\star})^{1/2}.
+    .. math::
+
+        \delta_a = 2^{3/2}*a(\frac{a*M}{R*M_\star})^{1/2}.
 
 
     Parameters
@@ -192,7 +194,9 @@ def feeding_zone_nHill(M, a, Mstar=1., n=10.):
     """
     Compute the feeding zone width of a planet using a number of Hill radii:
 
-    .. math:: \delta_a = n*R_Hill = n*a*(\frac{M}{3*M_\star})^{1/3}.
+    .. math::
+
+        \delta_a = n*R_Hill = n*a*(\frac{M}{3*M_\star})^{1/3}.
 
 
     Parameters
