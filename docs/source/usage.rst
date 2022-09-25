@@ -23,7 +23,7 @@ Here, we've used the Chiang & Laughlin (2013) prescription for the feeding zone 
 
 .. tip::
 
-   Several other prescriptions are available: see :py:func:`solid_surface_density_S2014 <syssimpymmen.mmen.solid_surface_density_S2014>`, :py:func:`solid_surface_density_nHill <syssimpymmen.mmen.solid_surface_density_nHill>`, and :py:func:`solid_surface_density_RC2014 <syssimpymmen.mmen.solid_surface_density_RC2014>`.
+   Several other prescriptions are available; see :py:func:`solid_surface_density_S2014 <syssimpymmen.mmen.solid_surface_density_S2014>`, :py:func:`solid_surface_density_nHill <syssimpymmen.mmen.solid_surface_density_nHill>`, and :py:func:`solid_surface_density_RC2014 <syssimpymmen.mmen.solid_surface_density_RC2014>`.
    Some of these may require additional parameters, such as the planet radii (for "S2014") and the stellar mass (for "S2014" and "nHill").
 
 You can also define and use your own custom prescription for the feeding zone width (``delta_a``) by using the core function that all of the above functions call, :py:func:`solid_surface_density <syssimpymmen.mmen.solid_surface_density>`.
@@ -31,6 +31,15 @@ You can also define and use your own custom prescription for the feeding zone wi
 
 Fitting a power-law
 -------------------
+
+It is easy to fit a power-law to the solid surface densities as a function of semi-major axis:
+
+.. code-block:: python
+
+   a0 = 0.3 # AU; separation for the normalization constant
+   sigma0, beta = fit_power_law_MMEN(planet_semi_a, sigmas, a0=a0)
+
+Here, ``sigma0`` is the normalization constant for the solid surface density (g/cm^2) at the chosen separation ``a0``, and ``beta`` is the slope or power-law index.
 
 
 An example using a SysSim catalog
@@ -46,6 +55,7 @@ An example using a SysSim catalog
    sigma_obs_CL2013, mass_obs, a_obs = solid_surface_density_CL2013_given_observed_catalog(sss_per_sys, max_core_mass=np.inf)
 
    # Fit a power-law profile for the MMEN:
+   a0 = 0.3 # AU; choice for the normalization point
    sigma0_obs_CL2013, beta_obs_CL2013 = fit_power_law_MMEN(a_obs, sigma_obs_CL2013, a0=a0)
 
    # Plot solid surface density vs semi-major axis:
