@@ -2,7 +2,7 @@ Fitting individual systems
 ==========================
 
 
-The usage for fitting individual planetary systems can be exactly the same as for fitting a catalog! On the :ref:`previous page <usage_basic>`, the inputs ``planet_masses`` and ``planet_semi_a`` could have been either arrays for many planets in an entire catalog, or arrays of just a few planets in a single planetary system. The following shows an example of fitting three hypothetical planets in the same system:
+The usage for fitting individual planetary systems can be exactly the same as for fitting a catalog! On the :ref:`previous page <basic_usage>`, the inputs ``planet_masses`` and ``planet_semi_a`` could have been either arrays for many planets in an entire catalog, or arrays of just a few planets in a single planetary system. The following shows an example of fitting three hypothetical planets in the same system:
 
 .. code-block:: python
 
