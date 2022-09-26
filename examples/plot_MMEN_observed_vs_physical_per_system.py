@@ -15,17 +15,13 @@ import scipy.interpolate # for interpolation functions
 import scipy.optimize # for fitting functions
 import corner # corner.py package for corner plots
 
-sys.path.append('/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/SysSimExClusters_plotting') # TODO: update when those files get made into a package
+from syssimpyplots.general import *
+from syssimpyplots.compare_kepler import *
+from syssimpyplots.load_sims import *
+from syssimpyplots.plot_catalogs import *
+from syssimpyplots.plot_params import *
 
-from functions_general import *
-from functions_compare_kepler import *
-from functions_load_sims import *
-from functions_plot_catalogs import *
-from functions_plot_params import *
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-
-from src.MMEN_functions import *
+from syssimpymmen.mmen import *
 
 
 
@@ -75,7 +71,7 @@ sss_per_sys, sss = compute_summary_stats_from_cat_obs(file_name_path=loadfiles_d
 # To load and process the observed Kepler catalog and compare with our simulated catalog:
 ssk_per_sys, ssk = compute_summary_stats_from_Kepler_catalog(P_min, P_max, radii_min, radii_max, compute_ratios=compute_ratios)
 
-dists, dists_w = compute_distances_sim_Kepler(sss_per_sys, sss, ssk_per_sys, ssk, weights_all['all'], dists_include, N_sim, cos_factor=cos_factor, AD_mod=AD_mod, compute_ratios=compute_ratios)
+dists, dists_w = compute_distances_sim_Kepler(sss_per_sys, sss, ssk_per_sys, ssk, weights_all['all'], dists_include, N_sim, cos_factor=cos_factor, AD_mod=AD_mod)
 
 
 

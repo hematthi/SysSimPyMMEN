@@ -15,17 +15,13 @@ import scipy.interpolate # for interpolation functions
 import scipy.optimize # for fitting functions
 import corner # corner.py package for corner plots
 
-sys.path.append('/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/SysSimExClusters_plotting') # TODO: update when those files get made into a package
+from syssimpyplots.general import *
+from syssimpyplots.compare_kepler import *
+from syssimpyplots.load_sims import *
+from syssimpyplots.plot_catalogs import *
+from syssimpyplots.plot_params import *
 
-from functions_general import *
-from functions_compare_kepler import *
-from functions_load_sims import *
-from functions_plot_catalogs import *
-from functions_plot_params import *
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-
-from src.MMEN_functions import *
+from syssimpymmen.mmen import *
 
 
 
@@ -66,16 +62,13 @@ N_sim, cos_factor, P_min, P_max, radii_min, radii_max = read_targets_period_radi
 # To read the simulation parameters from the file:
 param_vals_all = read_sim_params(loadfiles_directory + 'periods%s.out' % run_number)
 
-# To load and process the simulated physical catalog of stars and planets:
-sssp_per_sys, sssp = compute_summary_stats_from_cat_phys(file_name_path=loadfiles_directory, run_number=run_number, load_full_tables=True)
-
 # To load and process the simulated observed catalog of stars and planets:
 sss_per_sys, sss = compute_summary_stats_from_cat_obs(file_name_path=loadfiles_directory, run_number=run_number, compute_ratios=compute_ratios)
 
 # To load and process the observed Kepler catalog and compare with our simulated catalog:
 ssk_per_sys, ssk = compute_summary_stats_from_Kepler_catalog(P_min, P_max, radii_min, radii_max, compute_ratios=compute_ratios)
 
-dists, dists_w = compute_distances_sim_Kepler(sss_per_sys, sss, ssk_per_sys, ssk, weights_all['all'], dists_include, N_sim, cos_factor=cos_factor, AD_mod=AD_mod, compute_ratios=compute_ratios)
+dists, dists_w = compute_distances_sim_Kepler(sss_per_sys, sss, ssk_per_sys, ssk, weights_all['all'], dists_include, N_sim, cos_factor=cos_factor, AD_mod=AD_mod)
 
 
 
@@ -102,9 +95,9 @@ a0 = 0.3 # normalization separation for fitting power-laws
 # Compute the MMSN for comparison:
 a_array = np.linspace(1e-3,2,1001)
 sigma_MMSN = MMSN(a_array)
-MeVeEa_masses = np.array([0.0553, 0.815, 1.]) # masses of Mercury, Venus, and Earth, in Earth masses
-MeVeEa_radii = np.array([0.383, 0.949, 1.]) # radii of Mercury, Venus, and Earth, in Earth radii
-MeVeEa_a = np.array([0.387, 0.723, 1.]) # semi-major axes of Mercury, Venus, and Earth, in AU
+#MeVeEa_masses = np.array([0.0553, 0.815, 1.]) # masses of Mercury, Venus, and Earth, in Earth masses
+#MeVeEa_radii = np.array([0.383, 0.949, 1.]) # radii of Mercury, Venus, and Earth, in Earth radii
+#MeVeEa_a = np.array([0.387, 0.723, 1.]) # semi-major axes of Mercury, Venus, and Earth, in AU
 MeVeEa_sigmas = solid_surface_density_prescription(MeVeEa_masses, MeVeEa_radii, MeVeEa_a, prescription=prescription_str)
 
 # Simulated observed planets:

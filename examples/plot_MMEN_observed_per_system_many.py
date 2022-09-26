@@ -15,17 +15,13 @@ import scipy.interpolate # for interpolation functions
 import scipy.optimize # for fitting functions
 import corner # corner.py package for corner plots
 
-sys.path.append('/Users/hematthi/Documents/GradSchool/Research/ExoplanetsSysSim_Clusters/SysSimExClusters_plotting') # TODO: update when those files get made into a package
+from syssimpyplots.general import *
+from syssimpyplots.compare_kepler import *
+from syssimpyplots.load_sims import *
+from syssimpyplots.plot_catalogs import *
+from syssimpyplots.plot_params import *
 
-from functions_general import *
-from functions_compare_kepler import *
-from functions_load_sims import *
-from functions_plot_catalogs import *
-from functions_plot_params import *
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-
-from src.MMEN_functions import *
+from syssimpymmen.mmen import *
 
 
 
@@ -66,16 +62,13 @@ N_sim, cos_factor, P_min, P_max, radii_min, radii_max = read_targets_period_radi
 # To read the simulation parameters from the file:
 param_vals_all = read_sim_params(loadfiles_directory + 'periods%s.out' % run_number)
 
-# To load and process the simulated physical catalog of stars and planets:
-sssp_per_sys, sssp = compute_summary_stats_from_cat_phys(file_name_path=loadfiles_directory, run_number=run_number, load_full_tables=True)
-
 # To load and process the simulated observed catalog of stars and planets:
 sss_per_sys, sss = compute_summary_stats_from_cat_obs(file_name_path=loadfiles_directory, run_number=run_number, compute_ratios=compute_ratios)
 
 # To load and process the observed Kepler catalog and compare with our simulated catalog:
 ssk_per_sys, ssk = compute_summary_stats_from_Kepler_catalog(P_min, P_max, radii_min, radii_max, compute_ratios=compute_ratios)
 
-dists, dists_w = compute_distances_sim_Kepler(sss_per_sys, sss, ssk_per_sys, ssk, weights_all['all'], dists_include, N_sim, cos_factor=cos_factor, AD_mod=AD_mod, compute_ratios=compute_ratios)
+dists, dists_w = compute_distances_sim_Kepler(sss_per_sys, sss, ssk_per_sys, ssk, weights_all['all'], dists_include, N_sim, cos_factor=cos_factor, AD_mod=AD_mod)
 
 
 
@@ -111,7 +104,7 @@ fit_per_sys_dict_all = {pres:[] for pres in prescriptions} # dictionary of list 
 for i in range(1,runs+1):
     run_number = i
     sss_per_sys_i, sss_i = compute_summary_stats_from_cat_obs(file_name_path=loadfiles_directory, run_number=run_number, compute_ratios=compute_ratios)
-    dists_i, dists_w_i = compute_distances_sim_Kepler(sss_per_sys_i, sss_i, ssk_per_sys, ssk, weights_all['all'], dists_include, N_Kep, cos_factor=cos_factor, AD_mod=AD_mod, compute_ratios=compute_ratios)
+    dists_i, dists_w_i = compute_distances_sim_Kepler(sss_per_sys_i, sss_i, ssk_per_sys, ssk, weights_all['all'], dists_include, N_Kep, cos_factor=cos_factor, AD_mod=AD_mod)
 
     sss_per_sys_all.append(sss_per_sys_i)
     sss_all.append(sss_i)
