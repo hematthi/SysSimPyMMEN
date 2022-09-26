@@ -82,7 +82,7 @@ A full working example using a simulated catalog is shown below (make sure to re
    plt.show()
 
 .. figure:: images/example_mmen_observed_catalog.png
-   :scale: 50 %
+   :scale: 80 %
    :alt: MMEN of a simulated observed catalog
    :align: center
 
