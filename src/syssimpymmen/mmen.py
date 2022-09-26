@@ -726,9 +726,52 @@ def fit_power_law_MMEN(a_array, sigma_array, a0=1., p0=1., p1=-1.5):
     beta : float
         The best-fit value for the power-law index.
     """
+    assert len(a_array) == len(sigma_array) >= 2
     mmen_fit = curve_fit(f_linear, np.log10(a_array/a0), np.log10(sigma_array), [p0, p1])[0]
     sigma0, beta = 10.**(mmen_fit[0]), mmen_fit[1]
     return sigma0, beta
+
+def fit_power_law_and_scale_up_MMEN(a_sys, sigma_sys, a0=1., p0=1., p1=-1.5):
+    """
+    Call :py:func:`syssimpymmen.mmen.fit_power_law_MMEN`, and then scale up the resulting power-law fit to be at/above all of the input solid surface densities given by `sigma_sys`.
+
+    Note
+    ----
+    Should only be used for fitting MMEN to individual planetary systems; should NOT be used for fitting MMEN to an entire catalog or a collection of planets from different planetary systems.
+
+    Parameters
+    ----------
+    a_sys : array[float]
+        The semi-major axes (AU) of the planets in the system.
+    sigma_sys : array[float]
+        The solid surface densities (g/cm^2) of the planets in the system.
+    a0 : float, default=1.
+        The normalization point for the separation (AU).
+    p0 : float, default=1.
+        The initial guess for the normalization parameter, 'log(sigma0)'.
+    p1 : float, default=-1.5
+        The initial guess for the power-law index parameter, 'beta'.
+
+    Returns
+    -------
+    sigma0 : float
+        The best-fit value for the solid surface density normalization (g/cm^2), multiplied by a scale factor `scale_factor`. Unlike the initial guess (`p0`), this value is unlogged.
+    beta : float
+        The best-fit value for the power-law index.
+    scale_factor : float
+        The scale factor required to shift the power-law to be at/above all of the values in `sigma_sys`. This is always unity for systems with two planets, and greater than or equal to one in general.
+    """
+    sigma0, beta = fit_power_law_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
+
+    if len(a_sys) > 2:
+        sigma_fit_sys = MMEN_power_law(a_sys, sigma0, beta, a0=a0)
+        sigma_fit_ratio_sys = sigma_sys/sigma_fit_sys
+        scale_factor = np.max(sigma_fit_ratio_sys)
+        sigma0 = sigma0 * scale_factor
+    else: # for systems with 2 planets, the scale factor is not necessary
+        scale_factor = 1.
+
+    return sigma0, beta, scale_factor
 
 def fit_power_law_MMEN_all_planets_observed(sss_per_sys, max_core_mass=10., prescription='CL2013', n=10., a0=1., p0=1., p1=-1.5):
     """
@@ -883,12 +926,12 @@ def fit_power_law_MMEN_per_system_observed(sss_per_sys, n_mult_min=2, max_core_m
             core_mass_sys[core_mass_sys > max_core_mass] = max_core_mass
             a_sys = a_sys[a_sys > 0]
             sigma_obs_sys = solid_surface_density_prescription(core_mass_sys, R_sys, a_sys, Mstar=Mstar, n=n, prescription=prescription)
-            sigma0, beta = fit_power_law_MMEN(a_sys, sigma_obs_sys, a0=a0, p0=p0, p1=p1)
 
-            sigma_fit_sys = MMEN_power_law(a_sys, sigma0, beta, a0=a0) # the solid surface density at the semi-major axes of each planet in the system, as computed from the power-law fit
-            sigma_fit_ratio_sys = sigma_obs_sys/sigma_fit_sys
-            scale_factor_sigma0 = np.max(sigma_fit_ratio_sys)
-            sigma0 = sigma0*scale_factor_sigma0 if scale_up else sigma0 # scale up sigma0 such that the power-law fit is above the solid surface density of all the planets
+            if scale_up:
+                sigma0, beta, scale_factor_sigma0 = fit_power_law_and_scale_up_MMEN(a_sys, sigma_obs_sys, a0=a0, p0=p0, p1=p1)
+            else:
+                sigma0, beta = fit_power_law_MMEN(a_sys, sigma_obs_sys, a0=a0, p0=p0, p1=p1)
+                scale_factor_sigma0 = 1.
 
             fit_per_sys_dict['m_obs'].append(len(a_sys))
             fit_per_sys_dict['Mstar_obs'].append(sss_per_sys['Mstar_obs'][i])
@@ -959,12 +1002,12 @@ def fit_power_law_MMEN_per_system_physical(sssp_per_sys, sssp, n_mult_min=2, max
             R_sys = sssp_per_sys['radii_all'][i][a_sys > 0]
             a_sys = a_sys[a_sys > 0]
             sigma_sys = solid_surface_density_prescription(core_mass_sys, R_sys, a_sys, Mstar=Mstar, n=n, prescription=prescription)
-            sigma0, beta = fit_power_law_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
 
-            sigma_fit_sys = MMEN_power_law(a_sys, sigma0, beta, a0=a0) # the solid surface density at the semi-major axes of each planet in the system, as computed from the power-law fit
-            sigma_fit_ratio_sys = sigma_sys/sigma_fit_sys
-            scale_factor_sigma0 = np.max(sigma_fit_ratio_sys)
-            sigma0 = sigma0*scale_factor_sigma0 if scale_up else sigma0 # scale up sigma0 such that the power-law fit is above the solid surface density of all the planets
+            if scale_up:
+                sigma0, beta, scale_factor_sigma0 = fit_power_law_and_scale_up_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
+            else:
+                sigma0, beta = fit_power_law_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
+                scale_factor_sigma0 = 1.
 
             fit_per_sys_dict['n_pl'].append(len(a_sys))
             fit_per_sys_dict['sigma0'].append(sigma0)
@@ -1048,17 +1091,15 @@ def fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, n_mu
 
             sigma_sys = solid_surface_density_prescription(core_mass_sys, R_sys, a_sys, Mstar=Mstar, n=n, prescription=prescription) # using all planets
             sigma_sys_obs = solid_surface_density_prescription(core_mass_sys_obs, R_sys_obs, a_sys_obs, Mstar=Mstar, n=n, prescription=prescription) # using observed planets only
-            sigma0, beta = fit_power_law_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
-            sigma0_obs, beta_obs = fit_power_law_MMEN(a_sys_obs, sigma_sys_obs, a0=a0, p0=p0, p1=p1)
 
-            sigma_fit_sys = MMEN_power_law(a_sys, sigma0, beta, a0=a0)
-            sigma_fit_sys_obs = MMEN_power_law(a_sys_obs, sigma0_obs, beta_obs, a0=a0)
-            sigma_fit_ratio_sys = sigma_sys/sigma_fit_sys
-            sigma_fit_ratio_sys_obs = sigma_sys_obs/sigma_fit_sys_obs
-            scale_factor_sigma0 = np.max(sigma_fit_ratio_sys)
-            scale_factor_sigma0_obs = np.max(sigma_fit_ratio_sys_obs)
-            sigma0 = sigma0*scale_factor_sigma0 if scale_up else sigma0
-            sigma0_obs = sigma0_obs*scale_factor_sigma0_obs if scale_up else sigma0_obs
+            if scale_up:
+                sigma0, beta, scale_factor_sigma0 = fit_power_law_and_scale_up_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
+                sigma0_obs, beta_obs, scale_factor_sigma0_obs = fit_power_law_and_scale_up_MMEN(a_sys_obs, sigma_sys_obs, a0=a0, p0=p0, p1=p1)
+            else:
+                sigma0, beta = fit_power_law_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
+                scale_factor_sigma0 = 1.
+                sigma0_obs, beta_obs = fit_power_law_MMEN(a_sys_obs, sigma_sys_obs, a0=a0, p0=p0, p1=p1)
+                scale_factor_sigma0_obs = 1.
 
             fit_per_sys_dict['n_pl_true'].append(len(a_sys))
             fit_per_sys_dict['n_pl_obs'].append(len(a_sys_obs))
@@ -1142,17 +1183,15 @@ def plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(s
 
             sigma_sys = solid_surface_density_prescription(core_mass_sys, R_sys, a_sys, Mstar=Mstar, n=n, prescription=prescription) # using all planets
             sigma_sys_obs = solid_surface_density_prescription(core_mass_sys_obs, R_sys_obs, a_sys_obs, Mstar=Mstar, n=n, prescription=prescription) # using observed planets only
-            sigma0, beta = fit_power_law_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
-            sigma0_obs, beta_obs = fit_power_law_MMEN(a_sys_obs, sigma_sys_obs, a0=a0, p0=p0, p1=p1)
 
-            sigma_fit_sys = MMEN_power_law(a_sys, sigma0, beta, a0=a0)
-            sigma_fit_sys_obs = MMEN_power_law(a_sys_obs, sigma0_obs, beta_obs, a0=a0)
-            sigma_fit_ratio_sys = sigma_sys/sigma_fit_sys
-            sigma_fit_ratio_sys_obs = sigma_sys_obs/sigma_fit_sys_obs
-            scale_factor_sigma0 = np.max(sigma_fit_ratio_sys)
-            scale_factor_sigma0_obs = np.max(sigma_fit_ratio_sys_obs)
-            sigma0 = sigma0*scale_factor_sigma0 if scale_up else sigma0
-            sigma0_obs = sigma0_obs*scale_factor_sigma0_obs if scale_up else sigma0_obs
+            if scale_up:
+                sigma0, beta, scale_factor_sigma0 = fit_power_law_and_scale_up_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
+                sigma0_obs, beta_obs, scale_factor_sigma0_obs = fit_power_law_and_scale_up_MMEN(a_sys_obs, sigma_sys_obs, a0=a0, p0=p0, p1=p1)
+            else:
+                sigma0, beta = fit_power_law_MMEN(a_sys, sigma_sys, a0=a0, p0=p0, p1=p1)
+                scale_factor_sigma0 = 1.
+                sigma0_obs, beta_obs = fit_power_law_MMEN(a_sys_obs, sigma_sys_obs, a0=a0, p0=p0, p1=p1)
+                scale_factor_sigma0_obs = 1.
 
             # Plot the system:
             a_array = np.linspace(1e-3,2,1001)

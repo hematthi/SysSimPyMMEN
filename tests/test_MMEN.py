@@ -180,6 +180,21 @@ def test_fit_power_law_MMEN(seed=42):
     assert np.isclose(np.log10(sigma0), np.log10(sigma0_fit), atol=1e-5)
     assert np.isclose(beta, beta_fit, atol=1e-5)
 
+def test_fit_power_law_and_scale_up_MMEN(seed=42):
+    np.random.seed(seed)
+    sigma0 = 10.**(3.*np.random.rand()) # log-uniform draw between 1 and 1e3
+    beta = -3. + 5.*np.random.rand() # uniform draw between -3 and 2
+    a0 = 10.**(-1. + 2.*np.random.rand()) # log-uniform draw between 0.1 and 10
+    a_array = np.logspace(-1., 1, 1000)
+    sigma_array = sigma0*(a_array/a0)**beta
+    sigma0_fit, beta_fit = fit_power_law_MMEN(a_array, sigma_array, a0=a0)
+    sigma0_fit_scale_up, beta_fit_scale_up, scale_factor = fit_power_law_and_scale_up_MMEN(a_array, sigma_array, a0=a0)
+    assert np.isclose(np.log10(sigma0), np.log10(sigma0_fit), atol=1e-5)
+    assert np.isclose(np.log10(sigma0_fit*scale_factor), np.log10(sigma0_fit_scale_up), atol=1e-5)
+    assert scale_factor >= 1.
+    assert np.isclose(beta, beta_fit, atol=1e-5)
+    assert np.isclose(beta_fit, beta_fit_scale_up, atol=1e-5)
+
 prescriptions = ['CL2013', 'S2014', 'nHill', 'RC2014']
 
 def test_fit_power_law_MMEN_all_planets_observed(sss_per_sys=sss_per_sys, seed=42):
