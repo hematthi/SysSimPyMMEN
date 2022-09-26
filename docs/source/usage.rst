@@ -1,3 +1,5 @@
+.. _basic_usage:
+
 Basic usage
 ===========
 
@@ -90,4 +92,6 @@ A full working example using a simulated catalog is shown below (make sure to re
 
 .. note::
 
-   In this example, we've removed the maximum core mass limit (by setting ``max_core_mass=np.inf``) to show you the broad range of surface densities arising from the broad range of planet masses. By default, it is set to 10 Earth masses.
+   In this example, the function :py:func:`solid_surface_density_CL2013_given_observed_catalog <syssimpymmen.mmen.solid_surface_density_CL2013_given_observed_catalog>` takes the observed catalog, uses a mass-radius relation to draw a set of planet masses from the planet radii, and enforces a limit on the maximum mass via ``max_core_mass`` before calling the function :py:func:`solid_surface_density_CL2013 <syssimpymmen.mmen.solid_surface_density_CL2013>` we started with at the top of this page.
+
+   We've removed the maximum core mass limit (by setting ``max_core_mass=np.inf``) to show you the broad range of surface densities arising from the broad range of planet masses. By default, it is set to 10 Earth masses.
