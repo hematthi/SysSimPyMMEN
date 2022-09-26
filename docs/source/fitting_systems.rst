@@ -82,7 +82,7 @@ We provide a function for fitting and plotting individual systems from a simulat
    plot_feeding_zones_and_power_law_fit_MMEN_per_system_observed_and_physical(sssp_per_sys, sssp, n_mult_min=3, prescription=prescription, a0=a0, scale_up=True, N_sys=10)
 
 .. figure:: images/example_mmen_obs_vs_phys.png
-   :scale: 80 %
+   :scale: 50 %
    :alt: An example system
    :align: center
 
