@@ -92,7 +92,7 @@ We provide a function for fitting and plotting individual systems from a simulat
 Plotting a diversity of MMEN
 ----------------------------
 
-You can fit MMEN to a large number of systems, and then plot the distribution of power-law parameters (i.e. ``sigma0`` and ``beta``) using the ` ``plot_2d_points_and_contours_with_histograms`` function from SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_plot_params.html#syssimpyplots.plot_params.plot_2d_points_and_contours_with_histograms>`_:
+You can fit MMEN to a large number of systems, and then plot the distribution of power-law parameters (i.e. ``sigma0`` and ``beta``) using the `plot_2d_points_and_contours_with_histograms`` `function from SysSimPyPlots <https://syssimpyplots.readthedocs.io/en/latest/api_plot_params.html#syssimpyplots.plot_params.plot_2d_points_and_contours_with_histograms>`_:
 
 .. code-block:: python
 
