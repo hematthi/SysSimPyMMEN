@@ -30,5 +30,5 @@ Contents
 
    installation
    usage
+   fitting_systems
    api
-   
