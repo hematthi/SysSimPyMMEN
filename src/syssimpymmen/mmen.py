@@ -160,7 +160,6 @@ generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_earthlike_r
 
 # Functions to compute various formulations of the solid surface density/minimum mass extrasolar nebular (MMEN):
 
-# TODO: write unit tests
 def feeding_zone_S2014(M, R, a, Mstar=1.):
     """
     Compute the feeding zone width of a planet using the Schlichting (2014) prescription::
@@ -187,7 +186,6 @@ def feeding_zone_S2014(M, R, a, Mstar=1.):
     delta_a = 2.**(3./2.)*a*np.sqrt(((a*gen.AU)/(R*gen.Rearth))*((M*gen.Mearth)/(Mstar*gen.Msun))) # AU
     return delta_a
 
-# TODO: write unit tests
 def feeding_zone_nHill(M, a, Mstar=1., n=10.):
     """
     Compute the feeding zone width of a planet using a number of Hill radii::
@@ -214,7 +212,6 @@ def feeding_zone_nHill(M, a, Mstar=1., n=10.):
     delta_a = n*a*((M*gen.Mearth)/(3.*Mstar*gen.Msun))**(1./3.) # AU
     return delta_a
 
-# TODO: write unit tests
 def feeding_zone_RC2014(a_sys):
     """
     Compute the feeding zone widths of all the planets in a multi-planet system using the Raymond & Cossou (2014) prescription.

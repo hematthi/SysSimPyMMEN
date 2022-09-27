@@ -46,6 +46,36 @@ def test_generate_planet_mass_from_radius_Ning2018_table_above_lognormal_mass_ea
     assert np.all(0. <= M_array2)
     assert gen.Pearson_correlation_coefficient(R_logunif, M_array2) > 0.
 
+def test_feeding_zone_S2014(seed=42):
+    np.random.seed(seed)
+    M, R, a = np.array([5., 2., 0.8])*np.random.rand(3)
+    assert np.isclose(feeding_zone_S2014(1., 1., 1.), 0.751017, atol=1e-5)
+    assert feeding_zone_S2014(M, R, a) > 0.
+    assert np.isclose(feeding_zone_S2014(M, R, a), feeding_zone_S2014(M, R, a, Mstar=2.)*np.sqrt(2.), atol=1e-5)
+    assert np.isclose(feeding_zone_S2014(M, R, a), feeding_zone_S2014(M, 3.*R, a)*np.sqrt(3.), atol=1e-5)
+    assert np.isclose(feeding_zone_S2014(M, R, a), feeding_zone_S2014(M, R, a/2.)*(2.**(3/2)), atol=1e-5)
+    assert np.isclose(feeding_zone_S2014(M, R, a), feeding_zone_S2014(2.*M, 2.*R, a), atol=1e-5)
+
+def test_feeding_zone_nHill(seed=42):
+    np.random.seed(seed)
+    M, a, Mstar = np.array([5., 0.8, 1.])*np.random.rand(3)
+    assert feeding_zone_nHill(M, a, Mstar=Mstar) > 0.
+    assert np.isclose(feeding_zone_nHill(M, a, Mstar=Mstar, n=12), 2.*feeding_zone_nHill(M, a, Mstar=Mstar, n=6), atol=1e-5)
+    assert np.isclose(feeding_zone_nHill(M, a, Mstar=Mstar), feeding_zone_nHill(M, 2.*a, Mstar=Mstar)/2., atol=1e-5)
+    assert np.isclose(feeding_zone_nHill(M, a, Mstar=Mstar), feeding_zone_nHill(3.*M, a, Mstar=3.*Mstar), atol=1e-5)
+
+def test_feeding_zone_RC2014(seed=42):
+    np.random.seed(seed)
+    n = np.random.randint(3,9) # random integer between 3 and 8
+    a_sys = np.sort(np.random.rand(n))
+    delta_a_sys, a_bounds_sys = feeding_zone_RC2014(a_sys)
+    assert n == len(delta_a_sys) == len(a_bounds_sys)-1
+    assert np.all(delta_a_sys > 0)
+    assert np.all(a_bounds_sys > 0)
+    assert np.all(np.isclose(np.diff(a_bounds_sys), delta_a_sys, atol=1e-5))
+    assert np.isclose(a_bounds_sys[1]/a_sys[0], a_sys[0]/a_bounds_sys[0], atol=1e-5)
+    assert np.isclose(a_bounds_sys[-1]/a_sys[-1], a_sys[-1]/a_bounds_sys[-2], atol=1e-5)
+
 def test_solid_surface_density(seed=42):
     np.random.seed(seed)
     M, a, delta_a = np.array([100., 2., 2.])*np.random.rand(3)
