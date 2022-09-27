@@ -5,9 +5,11 @@ Installation
 Using pip
 ---------
 
-.. attention::
+You can install the most recent stable version of SysSimPyMMEN using `pip <https://pip.pypa.io/en/stable/>`_:
 
-   SysSimPyMMEN will be pip installable soon!
+.. code-block:: bash
+
+   python -m pip install syssimpymmen
 
 
 From source
