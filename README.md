@@ -2,6 +2,6 @@
 
 # SysSimPyMMEN
 
-Inferring the Minimum Mass Extrasolar Nebula (MMEN) from SysSim Clustered Planetary System Models
+Inferring the minimum-mass extrasolar nebula (MMEN) from the SysSim models.
 
-Currently under construction! Documentation and installation instructions coming soon...
+For installation instructions, tutorials, and detailed documentation, [read the documentation](https://syssimpymmen.readthedocs.io/).
