@@ -11,10 +11,6 @@ Welcome to SysSimPyMMEN's documentation!
 
    **MMEN** -- short for "minimum-mass extrasolar nebula". This is the idea of a power-law profile for the minimum mass in disk solids required to form the existing exoplanets, if they formed in their present locations (*in situ* formation).
 
-.. note::
-
-   The documentation for this project (this site!) is currently under development.
-
 
 Publication
 -----------
