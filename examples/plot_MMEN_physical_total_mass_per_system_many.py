@@ -96,7 +96,7 @@ r_linestyles = [':', '-.', '--', '-']
 Mr_array_eval = np.logspace(-3., 3., 1000) # array of masses to evaluate CDFs
 
 #'''
-plot_fig_cdf_simple((8,5), [], [], x_min=1e-2, x_max=500., log_x=True, xticks_custom=[0.01, 0.1, 1, 10, 100], xlabel_text='Total mass, $M$ ($M_\oplus$)', ylabel_text=r'Fraction with $M_r \geq M$', one_minus=True, afs=afs, tfs=tfs, lfs=lfs)
+plot_fig_cdf_simple([], [], x_min=1e-2, x_max=500., log_x=True, xticks_custom=[0.01, 0.1, 1, 10, 100], xlabel_text='Total mass, $M$ ($M_\oplus$)', ylabel_text=r'Fraction with $M_r \geq M$', one_minus=True, afs=afs, tfs=tfs, lfs=lfs, fig_size=(8,5))
 start = time.time()
 for j,r in enumerate(r_examples):
     cdf_Mr_eval_all = []

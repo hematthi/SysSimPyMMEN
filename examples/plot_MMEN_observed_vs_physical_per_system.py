@@ -134,7 +134,7 @@ if savefigures:
 # Histograms only:
 x = fit_per_sys_dict['beta_obs']/fit_per_sys_dict['beta_true']
 x_qtls = np.quantile(x, q=[0.16,0.5,0.84])
-ax = plot_fig_pdf_simple((8,4), [x], [], x_min=-2., x_max=4., n_bins=50, normalize=False, lw=lw, xlabel_text=r'$\beta_{\rm obs}/\beta_{\rm phys}$', ylabel_text='Systems')
+ax = plot_fig_pdf_simple([x], [], x_min=-2., x_max=4., n_bins=50, normalize=False, lw=lw, xlabel_text=r'$\beta_{\rm obs}/\beta_{\rm phys}$', ylabel_text='Systems')
 ax.text(x=0.98, y=0.95, s=r'$\frac{\beta_{\rm obs}}{\beta_{\rm phys}}$' + r'$ = {:0.2f}_{{-{:0.2f} }}^{{+{:0.2f} }}$'.format(x_qtls[1], x_qtls[1]-x_qtls[0], x_qtls[2]-x_qtls[1]), ha='right', va='top', fontsize=20, transform = ax.transAxes)
 ax.axvline(x=1., lw=lw, linestyle='--')
 if savefigures:
@@ -143,7 +143,7 @@ if savefigures:
 
 x = fit_per_sys_dict['sigma0_obs']/fit_per_sys_dict['sigma0_true']
 x_qtls = np.quantile(x, q=[0.16,0.5,0.84])
-ax = plot_fig_pdf_simple((8,4), [x], [], x_min=1e-3, x_max=1e3, n_bins=50, log_x=True, normalize=False, lw=lw, xlabel_text=r'$\Sigma_{0,\rm obs}^%s/\Sigma_{0,\rm phys}^%s$' % (y_sym_star, y_sym_star), ylabel_text='Systems')
+ax = plot_fig_pdf_simple([x], [], x_min=1e-3, x_max=1e3, n_bins=50, log_x=True, normalize=False, lw=lw, xlabel_text=r'$\Sigma_{0,\rm obs}^%s/\Sigma_{0,\rm phys}^%s$' % (y_sym_star, y_sym_star), ylabel_text='Systems')
 ax.text(x=0.98, y=0.95, s=r'$\frac{\Sigma_{0,\rm obs}^%s}{\Sigma_{0,\rm phys}^%s}$' % (y_sym_star, y_sym_star) + r'$ = {:0.2f}_{{-{:0.2f} }}^{{+{:0.2f} }}$'.format(x_qtls[1], x_qtls[1]-x_qtls[0], x_qtls[2]-x_qtls[1]), ha='right', va='top', fontsize=20, transform = ax.transAxes)
 ax.axvline(x=1., lw=lw, linestyle='--')
 if savefigures:
