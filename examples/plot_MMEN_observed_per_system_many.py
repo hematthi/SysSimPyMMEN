@@ -140,7 +140,7 @@ for pres in prescriptions:
 
     fit_per_sys_dict_Kep = fit_power_law_MMEN_per_system_observed(ssk_per_sys, prescription=pres, a0=a0, scale_up=True)
 
-    ax_main = plot_2d_points_and_contours_with_histograms(beta_med_all, sigma0_med_all, x_min=-2.25, x_max=-1.5, y_min=250., y_max=750., log_y=True, bins_hist=20, points_only=True, xlabel_text=r'Median $\beta$', ylabel_text=r'Median $\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta_{\rm med}$', y_symbol=r'$\Sigma_{0,\rm med}$')
+    ax_main, ax_top, ax_side = plot_2d_points_and_contours_with_histograms(beta_med_all, sigma0_med_all, x_min=-2.25, x_max=-1.5, y_min=250., y_max=750., log_y=True, bins_hist=20, points_only=True, xlabel_text=r'Median $\beta$', ylabel_text=r'Median $\log_{10}(\Sigma_0/{\rm g cm^{-2}})$', plot_qtls=True, y_str_format='{:0.1f}', x_symbol=r'$\beta_{\rm med}$', y_symbol=r'$\Sigma_{0,\rm med}$')
     ax_main.scatter(np.median(fit_per_sys_dict_Kep['beta']), np.log10(np.median(fit_per_sys_dict_Kep['sigma0'])), marker='x', color='r', label='Kepler')
     ax_main.legend(loc='upper left', bbox_to_anchor=(0.,1.), ncol=1, frameon=False, fontsize=lfs)
     if savefigures:

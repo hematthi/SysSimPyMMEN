@@ -151,12 +151,12 @@ plt.show()
 
 
 # To plot the distribution of fitted power-law parameters (sigma0 vs. beta) for the simulated observed systems:
-ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'], x_min=-8., x_max=4., y_min=1e-1, y_max=1e6, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(%s/{\rm g cm^{-2}})$' % y_sym, extra_text='Simulated observed systems', plot_qtls=True, y_str_format='{:0.0f}', x_symbol=r'$\beta$', y_symbol=r'$%s$' % y_sym, save_name=savefigures_directory + model_name + '_obs_mmen_%s_sigma0_vs_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
+ax, ax_top, ax_side = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta'], fit_per_sys_dict['sigma0'], x_min=-8., x_max=4., y_min=1e-1, y_max=1e6, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(%s/{\rm g cm^{-2}})$' % y_sym, extra_text='Simulated observed systems', plot_qtls=True, y_str_format='{:0.0f}', x_symbol=r'$\beta$', y_symbol=r'$%s$' % y_sym, save_name=savefigures_directory + model_name + '_obs_mmen_%s_sigma0_vs_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
 #max_radii_per_sys = np.max(sss_per_sys['radii_obs'][sss_per_sys['Mtot_obs'] >= 2], axis=1)
 #ax.scatter(fit_per_sys_dict['beta'][max_radii_per_sys < 1.6], np.log10(fit_per_sys_dict['sigma0'][max_radii_per_sys < 1.6]), color='b')
 
 # To plot the distribution of fitted power-law parameters (sigma0 vs. beta) for the Kepler observed systems:
-ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict_Kep['beta'], fit_per_sys_dict_Kep['sigma0'], x_min=-8., x_max=4., y_min=1e-1, y_max=1e6, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(%s/{\rm g cm^{-2}})$' % y_sym, extra_text='Kepler observed systems', plot_qtls=True, y_str_format='{:0.0f}', x_symbol=r'$\beta$', y_symbol=r'$%s$' % y_sym, save_name=savefigures_directory + 'Kepler_mmen_%s_sigma0_vs_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
+ax, ax_top, ax_side = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict_Kep['beta'], fit_per_sys_dict_Kep['sigma0'], x_min=-8., x_max=4., y_min=1e-1, y_max=1e6, log_y=True, xlabel_text=r'$\beta$', ylabel_text=r'$\log_{10}(%s/{\rm g cm^{-2}})$' % y_sym, extra_text='Kepler observed systems', plot_qtls=True, y_str_format='{:0.0f}', x_symbol=r'$\beta$', y_symbol=r'$%s$' % y_sym, save_name=savefigures_directory + 'Kepler_mmen_%s_sigma0_vs_beta_per_system.pdf' % prescription_str, save_fig=savefigures)
 #max_radii_per_sys = np.max(ssk_per_sys['radii_obs'][ssk_per_sys['Mtot_obs'] >= 2], axis=1)
 #ax.scatter(fit_per_sys_dict_Kep['beta'][max_radii_per_sys < 1.6], np.log10(fit_per_sys_dict_Kep['sigma0'][max_radii_per_sys < 1.6]), color='b')
 plt.show()

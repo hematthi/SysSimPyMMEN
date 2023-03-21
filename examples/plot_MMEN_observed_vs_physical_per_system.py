@@ -103,7 +103,7 @@ fit_per_sys_dict = fit_power_law_MMEN_per_system_observed_and_physical(sssp_per_
 
 # To plot sigma0_obs vs sigma0_true for the simulated observed systems:
 ax_min, ax_max = 1e-1, 1e6
-ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['sigma0_true'], fit_per_sys_dict['sigma0_obs'], x_min=ax_min, x_max=ax_max, y_min=ax_min, y_max=ax_max, log_x=True, log_y=True, xlabel_text=r'$\log_{10}(\Sigma_{0,\rm phys}^%s/{\rm g\, cm^{-2}})$' % y_sym_star, ylabel_text=r'$\log_{10}(\Sigma_{0,\rm obs}^%s/{\rm g\, cm^{-2}})$' % y_sym_star, extra_text='Simulated observed systems', plot_qtls=True, x_str_format='{:0.0f}', y_str_format='{:0.0f}', x_symbol=r'$\Sigma_{0,\rm phys}^%s$' % y_sym_star, y_symbol=r'$\Sigma_{0,\rm obs}^%s$' % y_sym_star)
+ax, ax_top, ax_side = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['sigma0_true'], fit_per_sys_dict['sigma0_obs'], x_min=ax_min, x_max=ax_max, y_min=ax_min, y_max=ax_max, log_x=True, log_y=True, xlabel_text=r'$\log_{10}(\Sigma_{0,\rm phys}^%s/{\rm g\, cm^{-2}})$' % y_sym_star, ylabel_text=r'$\log_{10}(\Sigma_{0,\rm obs}^%s/{\rm g\, cm^{-2}})$' % y_sym_star, extra_text='Simulated observed systems', plot_qtls=True, x_str_format='{:0.0f}', y_str_format='{:0.0f}', x_symbol=r'$\Sigma_{0,\rm phys}^%s$' % y_sym_star, y_symbol=r'$\Sigma_{0,\rm obs}^%s$' % y_sym_star)
 ax.plot([np.log10(ax_min), np.log10(ax_max)], [np.log10(ax_min), np.log10(ax_max)], ls='--', lw=lw)
 if savefigures:
     plt.savefig(savefigures_directory + model_name + '_phys_vs_obs_mmen_%s_sigma0_per_system.pdf' % prescription_str)
@@ -111,7 +111,7 @@ if savefigures:
 
 # To plot beta_obs vs beta_true for the simulated observed systems:
 ax_min, ax_max = -8., 4.
-ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta_true'], fit_per_sys_dict['beta_obs'], x_min=ax_min, x_max=ax_max, y_min=ax_min, y_max=ax_max, xlabel_text=r'$\beta_{\rm phys}$', ylabel_text=r'$\beta_{\rm obs}$', extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$\beta_{\rm phys}$', y_symbol=r'$\beta_{\rm obs}$')
+ax, ax_top, ax_side = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta_true'], fit_per_sys_dict['beta_obs'], x_min=ax_min, x_max=ax_max, y_min=ax_min, y_max=ax_max, xlabel_text=r'$\beta_{\rm phys}$', ylabel_text=r'$\beta_{\rm obs}$', extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$\beta_{\rm phys}$', y_symbol=r'$\beta_{\rm obs}$')
 ax.plot([ax_min, ax_max], [ax_min, ax_max], ls='--', lw=lw)
 if savefigures:
     plt.savefig(savefigures_directory + model_name + '_phys_vs_obs_mmen_%s_beta_per_system.pdf' % prescription_str)
@@ -124,7 +124,7 @@ plt.show()
 # To plot sigma0_obs/sigma0_true vs. beta_obs/beta_true for the simulated observed systems:
 beta_ratio_min, beta_ratio_max = -4., 6.
 sigma0_ratio_min, sigma0_ratio_max = 1e-3, 1e3
-ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta_obs']/fit_per_sys_dict['beta_true'], fit_per_sys_dict['sigma0_obs']/fit_per_sys_dict['sigma0_true'], x_min=beta_ratio_min, x_max=beta_ratio_max, y_min=sigma0_ratio_min, y_max=sigma0_ratio_max, log_x=False, log_y=True, xlabel_text=r'$\beta_{\rm obs}/\beta_{\rm phys}$', ylabel_text=r'$\log_{10}(\Sigma_{0,\rm obs}^%s/\Sigma_{0,\rm phys}^%s)$' % (y_sym_star, y_sym_star), extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$\frac{\beta_{\rm obs}}{\beta_{\rm phys}}$', y_symbol=r'$\frac{\Sigma_{0,\rm obs}^%s}{\Sigma_{0,\rm phys}^%s}$' % (y_sym_star, y_sym_star))
+ax, ax_top, ax_side = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['beta_obs']/fit_per_sys_dict['beta_true'], fit_per_sys_dict['sigma0_obs']/fit_per_sys_dict['sigma0_true'], x_min=beta_ratio_min, x_max=beta_ratio_max, y_min=sigma0_ratio_min, y_max=sigma0_ratio_max, log_x=False, log_y=True, xlabel_text=r'$\beta_{\rm obs}/\beta_{\rm phys}$', ylabel_text=r'$\log_{10}(\Sigma_{0,\rm obs}^%s/\Sigma_{0,\rm phys}^%s)$' % (y_sym_star, y_sym_star), extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$\frac{\beta_{\rm obs}}{\beta_{\rm phys}}$', y_symbol=r'$\frac{\Sigma_{0,\rm obs}^%s}{\Sigma_{0,\rm phys}^%s}$' % (y_sym_star, y_sym_star))
 ax.plot([beta_ratio_min, beta_ratio_max], [0., 0.], ls='--', lw=lw, color='b')
 ax.plot([1., 1.], [np.log10(sigma0_ratio_min), np.log10(sigma0_ratio_max)], ls='--', lw=lw, color='b')
 if savefigures:
@@ -155,7 +155,7 @@ if savefigures:
 # To plot sigma0_obs/sigma0_true vs scale_factor_obs/scale_factor_true for the simulated observed systems:
 '''
 scale_ratio_min, scale_ratio_max = 0.1, 2.
-ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['scale_factor_obs']/fit_per_sys_dict['scale_factor_true'], fit_per_sys_dict['sigma0_obs']/fit_per_sys_dict['sigma0_true'], x_min=scale_ratio_min, x_max=scale_ratio_max, y_min=sigma0_ratio_min, y_max=sigma0_ratio_max, log_x=True, log_y=True, xlabel_text=r'$\alpha_{\rm obs}/\alpha_{\rm phys}$', ylabel_text=r'$\log_{10}(\Sigma_{0,\rm obs}^%s/\Sigma_{0,\rm phys}^%s)$' % (y_sym_star, y_sym_star), extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$\frac{\alpha_{\rm obs}}{\alpha_{\rm phys}}$', y_symbol=r'$\frac{\Sigma_{0,\rm obs}^%s}{\Sigma_{0,\rm phys}^%s}$' % (y_sym_star, y_sym_star))
+ax, ax_top, ax_side = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['scale_factor_obs']/fit_per_sys_dict['scale_factor_true'], fit_per_sys_dict['sigma0_obs']/fit_per_sys_dict['sigma0_true'], x_min=scale_ratio_min, x_max=scale_ratio_max, y_min=sigma0_ratio_min, y_max=sigma0_ratio_max, log_x=True, log_y=True, xlabel_text=r'$\alpha_{\rm obs}/\alpha_{\rm phys}$', ylabel_text=r'$\log_{10}(\Sigma_{0,\rm obs}^%s/\Sigma_{0,\rm phys}^%s)$' % (y_sym_star, y_sym_star), extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$\frac{\alpha_{\rm obs}}{\alpha_{\rm phys}}$', y_symbol=r'$\frac{\Sigma_{0,\rm obs}^%s}{\Sigma_{0,\rm phys}^%s}$' % (y_sym_star, y_sym_star))
 ax.plot([np.log10(scale_ratio_min), np.log10(scale_ratio_max)], [0., 0.], ls='--', lw=lw, color='b')
 ax.plot([0., 0.], [np.log10(sigma0_ratio_min), np.log10(sigma0_ratio_max)], ls='--', lw=lw, color='b')
 if savefigures:
@@ -166,7 +166,7 @@ if savefigures:
 # To plot sigma0_obs/sigma0_true vs. Mp_tot_obs/Mp_tot_true (ratio of total core masses of observed vs. all planets) for the simulated observed systems:
 '''
 Mp_ratio_min, Mp_ratio_max = 1e-1, 1.
-ax = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['Mp_tot_obs']/fit_per_sys_dict['Mp_tot_true'], fit_per_sys_dict['sigma0_obs']/fit_per_sys_dict['sigma0_true'], x_min=Mp_ratio_min, x_max=Mp_ratio_max, y_min=sigma0_ratio_min, y_max=sigma0_ratio_max, log_x=False, log_y=True, xlabel_text=r'$M_{p,\rm tot,obs}/M_{p,\rm tot,phys}$', ylabel_text=r'$\log_{10}(\Sigma_{0,\rm obs}^%s/\Sigma_{0,\rm phys}^%s)$' % (y_sym_star, y_sym_star), extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$\frac{M_{p,\rm tot,obs}}{M_{p,\rm tot,phys}}$', y_symbol=r'$\frac{\Sigma_{0,\rm obs}^%s}{\Sigma_{0,\rm phys}^%s}$' % (y_sym_star, y_sym_star))
+ax, ax_top, ax_side = plot_2d_points_and_contours_with_histograms(fit_per_sys_dict['Mp_tot_obs']/fit_per_sys_dict['Mp_tot_true'], fit_per_sys_dict['sigma0_obs']/fit_per_sys_dict['sigma0_true'], x_min=Mp_ratio_min, x_max=Mp_ratio_max, y_min=sigma0_ratio_min, y_max=sigma0_ratio_max, log_x=False, log_y=True, xlabel_text=r'$M_{p,\rm tot,obs}/M_{p,\rm tot,phys}$', ylabel_text=r'$\log_{10}(\Sigma_{0,\rm obs}^%s/\Sigma_{0,\rm phys}^%s)$' % (y_sym_star, y_sym_star), extra_text='Simulated observed systems', plot_qtls=True, x_symbol=r'$\frac{M_{p,\rm tot,obs}}{M_{p,\rm tot,phys}}$', y_symbol=r'$\frac{\Sigma_{0,\rm obs}^%s}{\Sigma_{0,\rm phys}^%s}$' % (y_sym_star, y_sym_star))
 ax.plot([1., 1.], [np.log10(sigma0_ratio_min), np.log10(sigma0_ratio_max)], ls='--', lw=lw, color='b')
 if savefigures:
     plt.savefig(savefigures_directory + model_name + '_phys_vs_obs_mmen_%s_sigma0_ratio_vs_mass_ratio_per_system.pdf' % prescription_str)
